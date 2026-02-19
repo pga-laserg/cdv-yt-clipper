@@ -1,0 +1,5 @@
+faster-whisper
+python-dotenv
+openai-whisper
+mediapipe
+opencv-python-headless

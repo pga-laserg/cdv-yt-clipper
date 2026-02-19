@@ -1,0 +1,30 @@
+{
+    "name": "worker-service",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "dev": "ts-node-dev --respawn src/index.ts",
+        "test:ingest": "ts-node-dev src/test-ingest.ts",
+        "test:transcribe": "ts-node-dev src/test-transcribe.ts",
+        "test:analyze": "ts-node-dev src/test-analyze.ts",
+        "test:autocrop": "ts-node-dev src/test-autocrop.ts",
+        "test:render": "ts-node-dev src/test-render.ts",
+        "init-storage": "ts-node-dev src/init-storage.ts",
+        "seed": "ts-node-dev src/seed.ts"
+    },
+    "dependencies": {
+        "dotenv": "^16.3.1",
+        "@supabase/supabase-js": "^2.39.0",
+        "fluent-ffmpeg": "^2.1.2",
+        "ytdl-core": "^4.11.5",
+        "openai": "^4.20.1"
+    },
+    "devDependencies": {
+        "typescript": "^5.2.2",
+        "@types/node": "^20.9.0",
+        "ts-node-dev": "^2.0.0",
+        "@types/fluent-ffmpeg": "^2.1.22"
+    }
+}
