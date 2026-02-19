@@ -26,39 +26,10 @@ export async function findHighlights(
 ): Promise<HighlightClip[]> {
     console.log(`Finding highlights using strategy: ${strategy}`);
 
-    if (strategy === 'openai') {
-        return findHighlightsOpenAI(transcript);
+    if (strategy !== 'openai') {
+        throw new Error(`Highlight strategy "${strategy}" is disabled. Use "openai".`);
     }
-
-    // Fallback logic if API fails or is missing
-    const clips: HighlightClip[] = [];
-
-    // Heuristic: Look for markers of meaningful segments
-    // (e.g. segments that have high density of religious keywords)
-    const religiousKeywords = ['dios', 'jesús', 'cristo', 'señor', 'fe', 'amor', 'biblia', 'palabra', 'amén', 'victoria'];
-
-    for (let i = 0; i < transcript.length - 15; i += 50) { // Sample every 50 segments
-        const chunk = transcript.slice(i, i + 15);
-        if (chunk.length < 5) continue;
-
-        const text = chunk.map(c => c.text.toLowerCase()).join(' ');
-        const score = religiousKeywords.filter(k => text.includes(k)).length;
-
-        if (score >= 2) {
-            clips.push({
-                start: chunk[0].start,
-                end: chunk[chunk.length - 1].end,
-                title: `Reflection: ${chunk[0].text.substring(0, 30)}...`,
-                excerpt: chunk.map(c => c.text).join(' ').substring(0, 150) + '...',
-                hook: "Listen to this powerful reflection.",
-                confidence: 0.5 + (score * 0.1)
-            });
-        }
-
-        if (clips.length >= 6) break;
-    }
-
-    return clips;
+    return findHighlightsOpenAI(transcript);
 }
 
 async function findHighlightsOpenAI(transcript: { start: number; end: number; text: string }[]): Promise<HighlightClip[]> {

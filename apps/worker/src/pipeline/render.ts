@@ -90,44 +90,21 @@ function cutVideo(input: string, start: number, end: number, output: string): Pr
 function cutVideoVertical(input: string, start: number, end: number, output: string, centerX: number): Promise<void> {
     return new Promise((resolve, reject) => {
         console.log(`Cutting vertical clip: ${start}s to ${end}s with center ${centerX}`);
+        // Use ffmpeg expression-based crop to avoid runtime ffprobe dependency.
+        // Crop width = ih*9/16, then clamp X around detected centerX.
+        const xExpr = `max(min(${centerX}*iw-(ih*9/16)/2\\,iw-(ih*9/16))\\,0)`;
 
-        ffmpeg.ffprobe(input, (err, metadata) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-
-            const stream = metadata.streams.find(s => s.codec_type === 'video');
-            if (!stream || !stream.width || !stream.height) {
-                reject(new Error('No video stream found or resolution missing'));
-                return;
-            }
-
-            const inputWidth = stream.width;
-            const inputHeight = stream.height;
-
-            // Calculate vertical crop width based on aspect ratio
-            const targetHeight = inputHeight;
-            let targetWidth = Math.floor(inputHeight * (9 / 16));
-            if (targetWidth % 2 !== 0) targetWidth -= 1;
-
-            let x = Math.floor((centerX * inputWidth) - (targetWidth / 2));
-            if (x % 2 !== 0) x -= 1;
-            if (x < 0) x = 0;
-            if (x + targetWidth > inputWidth) x = inputWidth - targetWidth;
-
-            ffmpeg(input)
-                .setStartTime(start)
-                .setDuration(end - start)
-                .videoFilters([
-                    `crop=${targetWidth}:${targetHeight}:${x}:0`,
-                    `scale=1080:1920`
-                ])
-                .output(output)
-                .on('stderr', (line) => console.log(`ffmpeg: ${line}`))
-                .on('end', () => resolve())
-                .on('error', (err) => reject(err))
-                .run();
-        });
+        ffmpeg(input)
+            .setStartTime(start)
+            .setDuration(end - start)
+            .videoFilters([
+                `crop=ih*9/16:ih:${xExpr}:0`,
+                `scale=1080:1920`
+            ])
+            .output(output)
+            .on('stderr', (line) => console.log(`ffmpeg: ${line}`))
+            .on('end', () => resolve())
+            .on('error', (err) => reject(err))
+            .run();
     });
 }

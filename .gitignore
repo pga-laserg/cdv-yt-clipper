@@ -1,34 +1,8 @@
-# Node dependencies
-node_modules/
-
-# Environment files
 .env
-.env.*
-!.env.example
-
-# Build/cache artifacts
-.turbo/
-.run-logs/
-dist/
-build/
-coverage/
-
-# OS/editor files
 .DS_Store
-.vscode/
-.idea/
-
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# Worker temp/output artifacts
+node_modules/
+.run-logs/
+.turbo/
+apps/worker/venv311/
 apps/worker/work_dir/
 apps/worker/work_tmp/
-
-# Local test media artifacts
-apps/test_data/ingest_test/*.wav
-apps/test_data/ingest_test/*.mp4
-apps/test_data/ingest_test/*.part

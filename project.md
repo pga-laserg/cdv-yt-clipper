@@ -105,9 +105,16 @@ Goal: identify sermon start/end and ignore:
 	•	music/cantos
 	•	offering / church housekeeping
 
-This can be:
-	•	heuristic first (keywords)
-	•	optionally refined by an LLM
+Current focus:
+	•	OpenAI-based boundary detection in the standalone analysis test flow.
+	•	Heuristic boundary logic in the legacy pipeline is being phased out.
+
+Future improvement planned:
+	•	Add speaker diarization to better isolate the main sermon speaker section (pyannote `speaker-diarization-3.1` candidate).
+	•	Prerequisites for pyannote diarization:
+	•	A Hugging Face token with accepted access terms for both:
+	•	`pyannote/speaker-diarization-3.1`
+	•	`pyannote/segmentation-3.0`
 
 Output:
 	•	sermon_start_sec, sermon_end_sec
@@ -120,10 +127,9 @@ Goal: pick 4–8 moments that are:
 	•	not cut mid-thought
 	•	spread across the sermon (not all from one part)
 
-There are multiple “strategies” to test:
-	•	DeepSeek LLM analysis
-	•	OpenAI LLM analysis
-	•	Cohere embeddings + clustering (no generative model for selection)
+Current focus:
+	•	OpenAI-only highlight selection while quality is being tuned.
+	•	DeepSeek/heuristic alternatives are intentionally disabled for now.
 
 Output:
 	•	list of {start_sec, end_sec, title, excerpt, hook, confidence}
@@ -159,6 +165,11 @@ Dashboard reads from Supabase to show review queue.
 	•	Hetzner VPS
 	•	Proxmox server (Chile)
 	•	MacBook Air M1
+
+### Known technical constraint (current implementation)
+	•	For files larger than the storage free-tier object limit (50 MB), the dashboard uses a lightweight uploaded preview while full-resolution download is served from local worker disk.
+	•	This requires the web app host to have filesystem access to the worker `work_dir` (same host or shared volume).
+	•	Future work: remove this coupling by moving full-resolution assets to shared/object storage (paid tier or external) or by adding a worker-side authenticated download proxy.
 
 ⸻
 

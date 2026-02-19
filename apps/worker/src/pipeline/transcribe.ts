@@ -9,7 +9,18 @@ export interface TransientSegment {
     text: string;
 }
 
-export async function transcribe(audioPath: string): Promise<TransientSegment[]> {
+interface TranscribeOptions {
+    onProgress?: (currentSeconds: number) => void;
+    onFallback?: (reason: string) => void;
+}
+
+export async function transcribe(audioPath: string, options?: TranscribeOptions): Promise<TransientSegment[]> {
+    const cached = loadCachedTranscriptFromWorkDir(audioPath);
+    if (cached.length > 0) {
+        console.log(`Reusing cached transcription with ${cached.length} segments (no retranscribe).`);
+        return cached;
+    }
+
     const attempts: Array<{ model: string; beamSize: number }> = [
         { model: 'small', beamSize: 5 },
         { model: 'base', beamSize: 1 }
@@ -19,7 +30,7 @@ export async function transcribe(audioPath: string): Promise<TransientSegment[]>
 
     for (const [index, attempt] of attempts.entries()) {
         try {
-            const segments = await runTranscriptionAttempt(audioPath, attempt.model, attempt.beamSize);
+            const segments = await runTranscriptionAttempt(audioPath, attempt.model, attempt.beamSize, options);
 
             // Export SRT
             try {
@@ -27,6 +38,7 @@ export async function transcribe(audioPath: string): Promise<TransientSegment[]>
                 const srtPath = path.join(path.dirname(audioPath), 'source.srt');
                 fs.writeFileSync(srtPath, srtContent);
                 console.log('SRT file exported to:', srtPath);
+                writeTranscriptJson(audioPath, segments);
             } catch (srtError) {
                 console.error('Failed to export SRT:', srtError);
             }
@@ -39,24 +51,32 @@ export async function transcribe(audioPath: string): Promise<TransientSegment[]>
         }
     }
 
-    const cached = loadCachedTranscriptFallback();
-    if (cached.length > 0) {
-        console.warn(`Using cached transcript fallback with ${cached.length} segments.`);
+    const fallbackCached = loadCachedTranscriptFallback();
+    if (fallbackCached.length > 0) {
+        const fallbackReason = `Using cached transcript fallback with ${fallbackCached.length} segments after transcription failures.`;
+        console.warn(fallbackReason);
+        options?.onFallback?.(fallbackReason);
         try {
-            const srtContent = jsonToSrt(cached);
+            const srtContent = jsonToSrt(fallbackCached);
             const srtPath = path.join(path.dirname(audioPath), 'source.srt');
             fs.writeFileSync(srtPath, srtContent);
             console.log('SRT file exported from cached fallback to:', srtPath);
+            writeTranscriptJson(audioPath, fallbackCached);
         } catch (srtError) {
             console.error('Failed to export SRT from cached fallback:', srtError);
         }
-        return cached;
+        return fallbackCached;
     }
 
     throw new Error(`All transcription attempts failed. Last error: ${String(lastError)}`);
 }
 
-function runTranscriptionAttempt(audioPath: string, model: string, beamSize: number): Promise<TransientSegment[]> {
+function runTranscriptionAttempt(
+    audioPath: string,
+    model: string,
+    beamSize: number,
+    options?: TranscribeOptions
+): Promise<TransientSegment[]> {
     return new Promise((resolve, reject) => {
         const pythonScript = path.resolve(__dirname, 'python/transcribe.py');
         const venvPython = path.resolve(__dirname, '../../venv/bin/python3');
@@ -69,17 +89,23 @@ function runTranscriptionAttempt(audioPath: string, model: string, beamSize: num
         let stdout = '';
         let stderr = '';
         let settled = false;
-        const timeoutMs = Number(process.env.TRANSCRIBE_ATTEMPT_TIMEOUT_MS || 120000);
-        const timeout = setTimeout(() => {
-            if (settled) return;
-            settled = true;
-            try {
-                pythonProcess.kill('SIGKILL');
-            } catch {
-                // Ignore kill errors.
-            }
-            reject(new Error(`Transcribe attempt timed out after ${timeoutMs}ms (model=${model}, beam=${beamSize})`));
-        }, timeoutMs);
+        const timeoutMs = Number(process.env.TRANSCRIBE_NO_PROGRESS_TIMEOUT_MS || 180000);
+        let timeout: NodeJS.Timeout | null = null;
+        const resetNoProgressTimeout = () => {
+            if (timeout) clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                if (settled) return;
+                settled = true;
+                try {
+                    pythonProcess.kill('SIGKILL');
+                } catch {
+                    // Ignore kill errors.
+                }
+                reject(new Error(`Transcribe attempt stalled (no progress for ${timeoutMs}ms, model=${model}, beam=${beamSize})`));
+            }, timeoutMs);
+        };
+
+        resetNoProgressTimeout();
 
         pythonProcess.stdout.on('data', (data) => {
             stdout += data.toString();
@@ -89,19 +115,31 @@ function runTranscriptionAttempt(audioPath: string, model: string, beamSize: num
             const text = data.toString();
             stderr += text;
             console.error(`Python stderr: ${text}`);
+
+            // Any stderr output means the process is alive, so extend stall timeout.
+            resetNoProgressTimeout();
+
+            // Parse stderr progress lines like: [1200.00s -> 1207.42s] text...
+            const matches = text.matchAll(/\[(\d+(?:\.\d+)?)s\s*->\s*(\d+(?:\.\d+)?)s\]/g);
+            for (const match of matches) {
+                const end = Number(match[2]);
+                if (Number.isFinite(end)) {
+                    options?.onProgress?.(end);
+                }
+            }
         });
 
         pythonProcess.on('error', (error) => {
             if (settled) return;
             settled = true;
-            clearTimeout(timeout);
+            if (timeout) clearTimeout(timeout);
             reject(new Error(`Failed to start transcription process: ${String(error)}`));
         });
 
         pythonProcess.on('close', (code, signal) => {
             if (settled) return;
             settled = true;
-            clearTimeout(timeout);
+            if (timeout) clearTimeout(timeout);
 
             try {
                 const parsed = JSON.parse(stdout) as TransientSegment[];
@@ -142,5 +180,82 @@ function loadCachedTranscriptFallback(): TransientSegment[] {
     } catch (error) {
         console.error('Failed to load cached transcript fallback:', error);
         return [];
+    }
+}
+
+function loadCachedTranscriptFromWorkDir(audioPath: string): TransientSegment[] {
+    const workDir = path.dirname(audioPath);
+    const transcriptJsonPath = path.join(workDir, 'transcript.json');
+    const srtPath = path.join(workDir, 'source.srt');
+
+    if (fs.existsSync(transcriptJsonPath)) {
+        try {
+            const raw = fs.readFileSync(transcriptJsonPath, 'utf8');
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+                const segments = parsed
+                    .filter((s) => typeof s?.start === 'number' && typeof s?.end === 'number' && typeof s?.text === 'string')
+                    .map((s) => ({ start: s.start, end: s.end, text: s.text })) as TransientSegment[];
+                if (segments.length > 0) return segments;
+            }
+        } catch (error) {
+            console.error('Failed to read cached transcript.json:', error);
+        }
+    }
+
+    if (fs.existsSync(srtPath)) {
+        try {
+            const srtText = fs.readFileSync(srtPath, 'utf8');
+            const segments = parseSrtToSegments(srtText);
+            if (segments.length > 0) return segments;
+        } catch (error) {
+            console.error('Failed to read cached source.srt:', error);
+        }
+    }
+
+    return [];
+}
+
+function parseSrtToSegments(srt: string): TransientSegment[] {
+    const blocks = srt.trim().split(/\r?\n\r?\n+/);
+    const segments: TransientSegment[] = [];
+
+    for (const block of blocks) {
+        const lines = block.split(/\r?\n/).filter(Boolean);
+        if (lines.length < 3) continue;
+
+        const timeLine = lines[1];
+        const match = timeLine.match(
+            /(\d{2}):(\d{2}):(\d{2}),(\d{3})\s+-->\s+(\d{2}):(\d{2}):(\d{2}),(\d{3})/
+        );
+        if (!match) continue;
+
+        const start =
+            Number(match[1]) * 3600 +
+            Number(match[2]) * 60 +
+            Number(match[3]) +
+            Number(match[4]) / 1000;
+        const end =
+            Number(match[5]) * 3600 +
+            Number(match[6]) * 60 +
+            Number(match[7]) +
+            Number(match[8]) / 1000;
+
+        const text = lines.slice(2).join(' ').trim();
+        if (!text) continue;
+
+        segments.push({ start, end, text });
+    }
+
+    return segments;
+}
+
+function writeTranscriptJson(audioPath: string, segments: TransientSegment[]): void {
+    try {
+        const workDir = path.dirname(audioPath);
+        const transcriptJsonPath = path.join(workDir, 'transcript.json');
+        fs.writeFileSync(transcriptJsonPath, JSON.stringify(segments, null, 2));
+    } catch (error) {
+        console.error('Failed to write transcript.json cache:', error);
     }
 }
