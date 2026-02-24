@@ -15,10 +15,15 @@ interface TranscribeOptions {
 }
 
 export async function transcribe(audioPath: string, options?: TranscribeOptions): Promise<TransientSegment[]> {
-    const cached = loadCachedTranscriptFromWorkDir(audioPath);
-    if (cached.length > 0) {
-        console.log(`Reusing cached transcription with ${cached.length} segments (no retranscribe).`);
-        return cached;
+    const forceRedo = String(process.env.TRANSCRIBE_FORCE_REDO ?? 'false').toLowerCase() === 'true';
+    if (!forceRedo) {
+        const cached = loadCachedTranscriptFromWorkDir(audioPath);
+        if (cached.length > 0) {
+            console.log(`Reusing cached transcription with ${cached.length} segments (no retranscribe).`);
+            return cached;
+        }
+    } else {
+        console.log('TRANSCRIBE_FORCE_REDO=true, skipping cached transcript reuse.');
     }
 
     const attempts: Array<{ model: string; beamSize: number }> = [
@@ -31,6 +36,12 @@ export async function transcribe(audioPath: string, options?: TranscribeOptions)
     for (const [index, attempt] of attempts.entries()) {
         try {
             const segments = await runTranscriptionAttempt(audioPath, attempt.model, attempt.beamSize, options);
+            if (isLikelyBrokenTranscript(segments)) {
+                throw new Error(
+                    `Transcription quality check failed for attempt model=${attempt.model} beam=${attempt.beamSize} ` +
+                    `(dot/empty dominated output).`
+                );
+            }
 
             // Export SRT
             try {
@@ -80,9 +91,16 @@ function runTranscriptionAttempt(
     return new Promise((resolve, reject) => {
         const pythonScript = path.resolve(__dirname, 'python/transcribe.py');
         const venvPython = path.resolve(__dirname, '../../venv/bin/python3');
+        const noWordTs = String(process.env.TRANSCRIBE_NO_WORD_TIMESTAMPS ?? 'false').toLowerCase() === 'true';
+        const args = [pythonScript, audioPath, '--model', model, '--beam-size', String(beamSize)];
+        const wordGapSplitSec = Number(process.env.TRANSCRIBE_WORD_GAP_SPLIT_SEC ?? 0.55);
+        if (Number.isFinite(wordGapSplitSec) && wordGapSplitSec > 0) {
+            args.push('--word-gap-split-sec', String(wordGapSplitSec));
+        }
+        if (noWordTs) args.push('--no-word-timestamps');
         const pythonProcess = spawn(
             venvPython,
-            [pythonScript, audioPath, '--model', model, '--beam-size', String(beamSize)],
+            args,
             { stdio: ['ignore', 'pipe', 'pipe'] }
         );
 
@@ -174,9 +192,11 @@ function loadCachedTranscriptFallback(): TransientSegment[] {
         const parsed = JSON.parse(raw);
         if (!Array.isArray(parsed)) return [];
 
-        return parsed
+        const segments = parsed
             .filter((s) => typeof s?.start === 'number' && typeof s?.end === 'number' && typeof s?.text === 'string')
             .map((s) => ({ start: s.start, end: s.end, text: s.text }));
+        if (isLikelyBrokenTranscript(segments)) return [];
+        return segments;
     } catch (error) {
         console.error('Failed to load cached transcript fallback:', error);
         return [];
@@ -196,7 +216,7 @@ function loadCachedTranscriptFromWorkDir(audioPath: string): TransientSegment[] 
                 const segments = parsed
                     .filter((s) => typeof s?.start === 'number' && typeof s?.end === 'number' && typeof s?.text === 'string')
                     .map((s) => ({ start: s.start, end: s.end, text: s.text })) as TransientSegment[];
-                if (segments.length > 0) return segments;
+                if (segments.length > 0 && !isLikelyBrokenTranscript(segments)) return segments;
             }
         } catch (error) {
             console.error('Failed to read cached transcript.json:', error);
@@ -207,7 +227,7 @@ function loadCachedTranscriptFromWorkDir(audioPath: string): TransientSegment[] 
         try {
             const srtText = fs.readFileSync(srtPath, 'utf8');
             const segments = parseSrtToSegments(srtText);
-            if (segments.length > 0) return segments;
+            if (segments.length > 0 && !isLikelyBrokenTranscript(segments)) return segments;
         } catch (error) {
             console.error('Failed to read cached source.srt:', error);
         }
@@ -258,4 +278,22 @@ function writeTranscriptJson(audioPath: string, segments: TransientSegment[]): v
     } catch (error) {
         console.error('Failed to write transcript.json cache:', error);
     }
+}
+
+function isLikelyBrokenTranscript(segments: TransientSegment[]): boolean {
+    if (!segments || segments.length === 0) return true;
+    const n = segments.length;
+    const empty = segments.filter((s) => !String(s.text ?? '').trim()).length;
+    const dots = segments.filter((s) => /^\s*\.+\s*$/.test(String(s.text ?? ''))).length;
+    const tiny = segments.filter((s) => String(s.text ?? '').trim().length <= 2).length;
+
+    const emptyRatio = empty / n;
+    const dotsRatio = dots / n;
+    const tinyRatio = tiny / n;
+
+    // Strong signal of failed decode: almost everything is punctuation-only placeholders.
+    if (dotsRatio >= 0.8) return true;
+    if (emptyRatio >= 0.5) return true;
+    if (tinyRatio >= 0.9 && dotsRatio >= 0.5) return true;
+    return false;
 }

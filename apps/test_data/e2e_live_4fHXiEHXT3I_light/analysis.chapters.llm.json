@@ -1,0 +1,60 @@
+{
+  "chapters": [
+    {
+      "start": 0,
+      "end": 720,
+      "title": "Welcome & Opening Remarks",
+      "type": "welcome",
+      "confidence": 0.9,
+      "reason": "Initial greetings, welcome and brief intro to service"
+    },
+    {
+      "start": 720,
+      "end": 1350,
+      "title": "Child Presentation / Dedication",
+      "type": "child_presentation",
+      "confidence": 0.92,
+      "reason": "Family brings child forward and pastor prays/blesses"
+    },
+    {
+      "start": 1350,
+      "end": 1980,
+      "title": "Announcements & Scripture",
+      "type": "announcement",
+      "confidence": 0.88,
+      "reason": "Announcements, scripture references and pastoral instructions"
+    },
+    {
+      "start": 1980,
+      "end": 3811.47,
+      "title": "Congregational Music & Prayer",
+      "type": "congregational_music",
+      "confidence": 0.82,
+      "reason": "Worship songs, communal prayers and pastoral intercession leading into sermon"
+    },
+    {
+      "start": 3811.47,
+      "end": 5465.97,
+      "title": "Sermon",
+      "type": "sermon",
+      "confidence": 0.95,
+      "reason": "Aligned to provided sermon start/end bounds; extended teaching message"
+    },
+    {
+      "start": 5465.97,
+      "end": 5670,
+      "title": "Offering / Response Time",
+      "type": "offering",
+      "confidence": 0.6,
+      "reason": "Likely time for offering/response immediately after sermon"
+    },
+    {
+      "start": 5670,
+      "end": 5891.14,
+      "title": "Closing & Benediction",
+      "type": "closing",
+      "confidence": 0.86,
+      "reason": "Final prayers, benediction and farewells to end the livestream"
+    }
+  ]
+}

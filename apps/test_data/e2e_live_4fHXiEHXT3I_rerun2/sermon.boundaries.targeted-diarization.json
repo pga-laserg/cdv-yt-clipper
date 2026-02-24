@@ -1,0 +1,328 @@
+{
+  "guess": {
+    "start_sec": 3574,
+    "end_sec": 5564.5,
+    "start_candidates_sec": [
+      3574
+    ],
+    "end_candidates_sec": [
+      5564.5
+    ]
+  },
+  "selected_target_speaker": {
+    "start": "pre:SPEAKER_00",
+    "end": "post:SPEAKER_00"
+  },
+  "boundary_confirmation": {
+    "start_confirmed_change_of_speaker": false,
+    "end_confirmed_change_of_speaker": true,
+    "start_chosen_by": "primary",
+    "end_chosen_by": "candidate:5564.5",
+    "start_previous_turn": null,
+    "end_next_turn": {
+      "start": 5567.75784375,
+      "end": 5574.60909375,
+      "speaker": "post:SPEAKER_01"
+    }
+  },
+  "targeted_windows": {
+    "pre": {
+      "start_sec": 3454,
+      "end_sec": 3604,
+      "anchor_speaker": "pre:SPEAKER_00",
+      "turns": [
+        {
+          "start": 3454.57096875,
+          "end": 3457.03471875,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "vidrio no es complicado y en realidad vaso roto es peligroso y ere personas heridas y Eren y eso tiene que ver con el pecado que ha sido cometido en"
+        },
+        {
+          "start": 3458.24971875,
+          "end": 3471.24346875,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "heridas y Eren y eso tiene que ver con el pecado que ha sido cometido en contra nuestra de las heridas que cargamos que ni siquiera t\u00fa y yo somos responsables, pero pasaron, ocurrieron, est\u00e1n en nuestra historia."
+        },
+        {
+          "start": 3472.62721875,
+          "end": 3474.46659375,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "Y la tercera dimensi\u00f3n del pecado es el pecado que se comete alrededor."
+        },
+        {
+          "start": 3474.87159375,
+          "end": 3477.63909375,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "dimensi\u00f3n del pecado es el pecado que se comete alrededor."
+        },
+        {
+          "start": 3478.48284375,
+          "end": 3479.29284375,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "Nuestro entorno nos"
+        },
+        {
+          "start": 3479.79909375,
+          "end": 3481.06471875,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "Nuestro entorno nos ha contagiado,"
+        },
+        {
+          "start": 3481.72284375,
+          "end": 3487.17346875,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "los psic\u00f3logos le pueden llamar traumas secundarios, Jes\u00fas le llamaba el mundo."
+        },
+        {
+          "start": 3487.84846875,
+          "end": 3492.23596875,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "Vivimos en un mundo donde lamentablemente es dif\u00edcil hacer lo bueno."
+        },
+        {
+          "start": 3492.62409375,
+          "end": 3493.02909375,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": ""
+        },
+        {
+          "start": 3493.56909375,
+          "end": 3504.65596875,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "Y pareciera ser que eso est\u00e1 hondo en nosotros. Es m\u00e1s f\u00e1cil desordenar la casa que ordenarla, literalmente y tambi\u00e9n aleg\u00f3ricamente."
+        },
+        {
+          "start": 3504.89221875,
+          "end": 3512.28346875,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "Yo que soy padre y con mi hijita, bueno, todas las noches estoy ah\u00ed, vamos a ordenar los juguetes, todo queda linda la casa para que el otro d\u00eda,"
+        },
+        {
+          "start": 3512.68846875,
+          "end": 3514.40971875,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "en un segundo todo vuelva a estar desordenado."
+        },
+        {
+          "start": 3514.51096875,
+          "end": 3516.23221875,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "en un segundo todo vuelva a estar desordenado."
+        },
+        {
+          "start": 3517.07596875,
+          "end": 3524.50096875,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "Pareciera ser que como seres humanos nos es m\u00e1s dif\u00edcil poner las cosas en orden que desordenarlas, \u00bfno?"
+        },
+        {
+          "start": 3524.85534375,
+          "end": 3529.36096875,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "Hay una frase de Calistos Ware en su libro de Orthodox White que dice,"
+        },
+        {
+          "start": 3529.90096875,
+          "end": 3534.28846875,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "nacimos en un ambiente en donde es f\u00e1cil hacerlo malo y dif\u00edcil hacerlo bueno."
+        },
+        {
+          "start": 3534.42346875,
+          "end": 3556.37784375,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "Es f\u00e1cil lastimar a otros y dif\u00edcil curar sus heridas. Es f\u00e1cil levantar sospechas contra el hombre y dif\u00edcil ganarse su confianza. Significa que cada uno de nosotros est\u00e1 condicionado por la solidaridad de la raza humana en su acumulaci\u00f3n de malas acciones y malos pensamientos, y por lo tanto, de mal ser."
+        },
+        {
+          "start": 3556.93471875,
+          "end": 3567.00909375,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "Y a esta acumulaci\u00f3n de maldad hemos agregado nuestros propios actos deliberados de pecado, y as\u00ed el abismo se hace cada vez m\u00e1s amplio."
+        },
+        {
+          "start": 3568.37596875,
+          "end": 3586.78659375,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "Hoy me quiero centrar porque esta es una realidad compleja y yo creo que se requiere semanas y semanas para hablar de nuestra condici\u00f3n en este sentido, pero hoy me centrar\u00e9 exclusivamente en la dimensi\u00f3n n\u00famero dos, que es el pecado cometido en contra de nosotros. Y aqu\u00ed es donde te hago la pregunta nuevamente."
+        },
+        {
+          "start": 3587.42784375,
+          "end": 3589.38534375,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "\u00bfTe has preguntado de d\u00f3nde viene eso?"
+        },
+        {
+          "start": 3590.38096875,
+          "end": 3601.09659375,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "\u00bfDe d\u00f3nde viene ese aspecto en tu car\u00e1cter que te cuesta tanto dejar atr\u00e1s, esa lucha, eso que tanto tiempo has querido cambiar, pero no puedes."
+        },
+        {
+          "start": 3602.14284375,
+          "end": 3603.96534375,
+          "speaker": "pre:SPEAKER_00",
+          "transcript_text": "Aqu\u00ed hay dos tipos de reacciones y puedo estar hablando de dos tipos de personas."
+        }
+      ]
+    },
+    "post": {
+      "start_sec": 5534.5,
+      "end_sec": 5684.5,
+      "anchor_speaker": "post:SPEAKER_00",
+      "turns": [
+        {
+          "start": 5534.53096875,
+          "end": 5536.97784375,
+          "speaker": "post:SPEAKER_00",
+          "transcript_text": "Vamos a cantar, vamos a ponernos de pie si hoy quieres responder a nuestro Dios con esta invitaci\u00f3n vamos a cantar de esta maravillosa gracia, est\u00e1 al avanza, la hizo una amiga en Chile"
+        },
+        {
+          "start": 5537.36596875,
+          "end": 5543.23846875,
+          "speaker": "post:SPEAKER_00",
+          "transcript_text": "vamos a cantar de esta maravillosa gracia, est\u00e1 al avanza, la hizo una amiga en Chile y siempre me emociona y es una alabanza que hoy quiero que sea tu oraci\u00f3n as\u00ed que quiero que nos"
+        },
+        {
+          "start": 5543.87971875,
+          "end": 5547.01846875,
+          "speaker": "post:SPEAKER_00",
+          "transcript_text": "y siempre me emociona y es una alabanza que hoy quiero que sea tu oraci\u00f3n as\u00ed que quiero que nos"
+        },
+        {
+          "start": 5548.06471875,
+          "end": 5553.05971875,
+          "speaker": "post:SPEAKER_00",
+          "transcript_text": "y siempre me emociona y es una alabanza que hoy quiero que sea tu oraci\u00f3n as\u00ed que quiero que nos acompa\u00f1es y vamos a cantar juntos, maravillosa gracia."
+        },
+        {
+          "start": 5567.75784375,
+          "end": 5574.60909375,
+          "speaker": "post:SPEAKER_01",
+          "transcript_text": ""
+        },
+        {
+          "start": 5576.19534375,
+          "end": 5582.33784375,
+          "speaker": "post:SPEAKER_01",
+          "transcript_text": ""
+        },
+        {
+          "start": 5584.70034375,
+          "end": 5590.77534375,
+          "speaker": "post:SPEAKER_01",
+          "transcript_text": ""
+        },
+        {
+          "start": 5592.68221875,
+          "end": 5598.68971875,
+          "speaker": "post:SPEAKER_01",
+          "transcript_text": ""
+        },
+        {
+          "start": 5602.18284375,
+          "end": 5608.79784375,
+          "speaker": "post:SPEAKER_01",
+          "transcript_text": ""
+        },
+        {
+          "start": 5610.46846875,
+          "end": 5615.54784375,
+          "speaker": "post:SPEAKER_01",
+          "transcript_text": ""
+        },
+        {
+          "start": 5615.54784375,
+          "end": 5622.77034375,
+          "speaker": "post:SPEAKER_02",
+          "transcript_text": ""
+        },
+        {
+          "start": 5623.56346875,
+          "end": 5630.87034375,
+          "speaker": "post:SPEAKER_02",
+          "transcript_text": ""
+        },
+        {
+          "start": 5631.17409375,
+          "end": 5647.20534375,
+          "speaker": "post:SPEAKER_02",
+          "transcript_text": ""
+        },
+        {
+          "start": 5648.35284375,
+          "end": 5655.42346875,
+          "speaker": "post:SPEAKER_02",
+          "transcript_text": ""
+        },
+        {
+          "start": 5655.81159375,
+          "end": 5663.25346875,
+          "speaker": "post:SPEAKER_02",
+          "transcript_text": ""
+        },
+        {
+          "start": 5663.27034375,
+          "end": 5665.76784375,
+          "speaker": "post:SPEAKER_02",
+          "transcript_text": ""
+        },
+        {
+          "start": 5665.36284375,
+          "end": 5665.54846875,
+          "speaker": "post:SPEAKER_01",
+          "transcript_text": ""
+        },
+        {
+          "start": 5665.76784375,
+          "end": 5670.47596875,
+          "speaker": "post:SPEAKER_01",
+          "transcript_text": ""
+        },
+        {
+          "start": 5670.47596875,
+          "end": 5671.26909375,
+          "speaker": "post:SPEAKER_02",
+          "transcript_text": ""
+        },
+        {
+          "start": 5671.72471875,
+          "end": 5675.04909375,
+          "speaker": "post:SPEAKER_02",
+          "transcript_text": ""
+        },
+        {
+          "start": 5675.55534375,
+          "end": 5683.62159375,
+          "speaker": "post:SPEAKER_02",
+          "transcript_text": ""
+        },
+        {
+          "start": 5684.04346875,
+          "end": 5684.46534375,
+          "speaker": "post:SPEAKER_02",
+          "transcript_text": ""
+        }
+      ]
+    }
+  },
+  "refined_speaker_bounds": {
+    "start_sec": 3454.57096875,
+    "end_sec": 5553.05971875
+  },
+  "final_clip_bounds": {
+    "clip_start_sec": 2869.37,
+    "clip_end_sec": 5878.41,
+    "applied_pre_pad_sec": 10.0,
+    "applied_post_pad_sec": 0.7100000000000364,
+    "next_speech_start_sec": 5567.75784375,
+    "prev_other_speaker_end_sec": null,
+    "next_other_speaker_start_sec": 5567.75784375
+  },
+  "llm_single_adjudicator": {
+    "start": 2879.37,
+    "end": 5891.14,
+    "confidence": 0.9,
+    "decision": "adjust",
+    "reason": "Aligned to chapter-labeled sermon span (sermon intro + sermon); excludes subsequent altar-call/post-sermon and closing/benediction."
+  }
+}

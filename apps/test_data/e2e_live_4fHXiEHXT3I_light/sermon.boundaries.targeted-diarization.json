@@ -1,0 +1,292 @@
+{
+  "guess": {
+    "start_sec": 4007,
+    "end_sec": 5405,
+    "start_candidates_sec": [
+      4007,
+      3616,
+      4024
+    ],
+    "end_candidates_sec": [
+      5405,
+      5384
+    ]
+  },
+  "selected_target_speaker": {
+    "start": "pre:SPEAKER_1",
+    "end": "post:SPEAKER_0"
+  },
+  "boundary_confirmation": {
+    "start_confirmed_change_of_speaker": true,
+    "end_confirmed_change_of_speaker": true,
+    "start_chosen_by": "scored-candidate:4007",
+    "end_chosen_by": "scored-candidate:5405",
+    "start_previous_turn": {
+      "start": 3787.4,
+      "end": 3811.36,
+      "speaker": "pre:SPEAKER_1"
+    },
+    "end_next_turn": null,
+    "start_audio_signal": {
+      "beforeMusicRatio": 0,
+      "afterMusicRatio": 0,
+      "beforeNoenergyRatio": 0,
+      "afterNoenergyRatio": 0,
+      "beforeSpeechRatio": 0.8333333333333334,
+      "afterSpeechRatio": 1,
+      "beforeGender": "female",
+      "afterGender": "male",
+      "genderChange": true,
+      "musicToSpeech": false,
+      "speechToMusic": false,
+      "pauseToSpeech": false,
+      "speechToPause": false
+    },
+    "end_audio_signal": {
+      "beforeMusicRatio": 0,
+      "afterMusicRatio": 0,
+      "beforeNoenergyRatio": 0,
+      "afterNoenergyRatio": 0,
+      "beforeSpeechRatio": 1,
+      "afterSpeechRatio": 1,
+      "beforeGender": "male",
+      "afterGender": "female",
+      "genderChange": true,
+      "musicToSpeech": false,
+      "speechToMusic": false,
+      "pauseToSpeech": false,
+      "speechToPause": false
+    }
+  },
+  "targeted_windows": {
+    "pre": {
+      "start_sec": 3556,
+      "end_sec": 4044,
+      "anchor_speaker": "pre:SPEAKER_1",
+      "turns": [
+        {
+          "start": 3556,
+          "end": 3567.04,
+          "speaker": "pre:SPEAKER_1"
+        },
+        {
+          "start": 3568.4,
+          "end": 3684.56,
+          "speaker": "pre:SPEAKER_1"
+        },
+        {
+          "start": 3687.24,
+          "end": 3733.44,
+          "speaker": "pre:SPEAKER_1"
+        },
+        {
+          "start": 3734.72,
+          "end": 3785.92,
+          "speaker": "pre:SPEAKER_1"
+        },
+        {
+          "start": 3787.4,
+          "end": 3811.36,
+          "speaker": "pre:SPEAKER_1"
+        },
+        {
+          "start": 3812.6,
+          "end": 3914,
+          "speaker": "pre:SPEAKER_1"
+        },
+        {
+          "start": 3915.4,
+          "end": 3960.8,
+          "speaker": "pre:SPEAKER_1"
+        },
+        {
+          "start": 3962.2799999999997,
+          "end": 4043.92,
+          "speaker": "pre:SPEAKER_1"
+        }
+      ]
+    },
+    "post": {
+      "start_sec": 5364,
+      "end_sec": 5465,
+      "anchor_speaker": "post:SPEAKER_0",
+      "turns": [
+        {
+          "start": 5364,
+          "end": 5425.2,
+          "speaker": "post:SPEAKER_0"
+        },
+        {
+          "start": 5426.44,
+          "end": 5459.84,
+          "speaker": "post:SPEAKER_0"
+        },
+        {
+          "start": 5461.12,
+          "end": 5464.96,
+          "speaker": "post:SPEAKER_0"
+        }
+      ]
+    }
+  },
+  "audio_events": {
+    "source": "local-dsp-heuristic-v1",
+    "duration_sec": 5912.055875,
+    "total_segments": 1268
+  },
+  "candidate_scoring": {
+    "start": [
+      {
+        "seed": 4007,
+        "candidateStart": 3812.6,
+        "prev": {
+          "start": 3787.4,
+          "end": 3811.36,
+          "speaker": "pre:SPEAKER_1"
+        },
+        "diarChange": false,
+        "audio": {
+          "beforeMusicRatio": 0,
+          "afterMusicRatio": 0,
+          "beforeNoenergyRatio": 0,
+          "afterNoenergyRatio": 0,
+          "beforeSpeechRatio": 0.8333333333333334,
+          "afterSpeechRatio": 1,
+          "beforeGender": "female",
+          "afterGender": "male",
+          "genderChange": true,
+          "musicToSpeech": false,
+          "speechToMusic": false,
+          "pauseToSpeech": false,
+          "speechToPause": false
+        },
+        "score": -0.16000000000000103
+      },
+      {
+        "seed": 4024,
+        "candidateStart": 3812.6,
+        "prev": {
+          "start": 3787.4,
+          "end": 3811.36,
+          "speaker": "pre:SPEAKER_1"
+        },
+        "diarChange": false,
+        "audio": {
+          "beforeMusicRatio": 0,
+          "afterMusicRatio": 0,
+          "beforeNoenergyRatio": 0,
+          "afterNoenergyRatio": 0,
+          "beforeSpeechRatio": 0.8333333333333334,
+          "afterSpeechRatio": 1,
+          "beforeGender": "female",
+          "afterGender": "male",
+          "genderChange": true,
+          "musicToSpeech": false,
+          "speechToMusic": false,
+          "pauseToSpeech": false,
+          "speechToPause": false
+        },
+        "score": -0.16000000000000103
+      },
+      {
+        "seed": 3616,
+        "candidateStart": 3556,
+        "prev": null,
+        "diarChange": false,
+        "audio": {
+          "beforeMusicRatio": 0,
+          "afterMusicRatio": 0,
+          "beforeNoenergyRatio": 0,
+          "afterNoenergyRatio": 0,
+          "beforeSpeechRatio": 1,
+          "afterSpeechRatio": 1,
+          "beforeGender": "female",
+          "afterGender": "male",
+          "genderChange": true,
+          "musicToSpeech": false,
+          "speechToMusic": false,
+          "pauseToSpeech": false,
+          "speechToPause": false
+        },
+        "score": -3.011111111111111
+      }
+    ],
+    "end": [
+      {
+        "seed": 5405,
+        "candidateEnd": 5464.96,
+        "next": null,
+        "diarChange": false,
+        "audio": {
+          "beforeMusicRatio": 0,
+          "afterMusicRatio": 0,
+          "beforeNoenergyRatio": 0,
+          "afterNoenergyRatio": 0,
+          "beforeSpeechRatio": 1,
+          "afterSpeechRatio": 1,
+          "beforeGender": "male",
+          "afterGender": "female",
+          "genderChange": true,
+          "musicToSpeech": false,
+          "speechToMusic": false,
+          "pauseToSpeech": false,
+          "speechToPause": false
+        },
+        "handoffCue": true,
+        "score": 3.133777777777777
+      },
+      {
+        "seed": 5384,
+        "candidateEnd": 5464.96,
+        "next": null,
+        "diarChange": false,
+        "audio": {
+          "beforeMusicRatio": 0,
+          "afterMusicRatio": 0,
+          "beforeNoenergyRatio": 0,
+          "afterNoenergyRatio": 0,
+          "beforeSpeechRatio": 1,
+          "afterSpeechRatio": 1,
+          "beforeGender": "male",
+          "afterGender": "female",
+          "genderChange": true,
+          "musicToSpeech": false,
+          "speechToMusic": false,
+          "pauseToSpeech": false,
+          "speechToPause": false
+        },
+        "handoffCue": true,
+        "score": 3.133777777777777
+      }
+    ]
+  },
+  "refined_speaker_bounds": {
+    "start_sec": 3812.6,
+    "end_sec": 5464.96
+  },
+  "final_clip_bounds": {
+    "clip_start_sec": 2869.37,
+    "clip_end_sec": 5901.14,
+    "applied_pre_pad_sec": 10,
+    "applied_post_pad_sec": 10,
+    "next_speech_start_sec": 5465.97,
+    "prev_other_speaker_end_sec": null,
+    "next_other_speaker_start_sec": null,
+    "padding_source": "manual_recompute_transcript_only"
+  },
+  "llm_fallback": {
+    "invoked": false,
+    "reason": "local_confidence_ok"
+  },
+  "llm_end_style": {
+    "invoked": false,
+    "reason": "disabled"
+  },
+  "llm_single_adjudicator": {
+    "start": 2879.37,
+    "end": 5891.14,
+    "confidence": 0.88,
+    "decision": "adjust",
+    "reason": "Chapter + closing-arbiter adjudication applied."
+  }
+}

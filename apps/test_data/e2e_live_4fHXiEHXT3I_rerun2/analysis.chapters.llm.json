@@ -1,0 +1,68 @@
+{
+  "chapters": [
+    {
+      "start": 0,
+      "end": 45,
+      "title": "Pre-service greetings",
+      "type": "pre_service",
+      "confidence": 0.75,
+      "reason": "Initial Spanish greetings and welcome before formal service"
+    },
+    {
+      "start": 45,
+      "end": 675,
+      "title": "Welcome and opening remarks",
+      "type": "welcome",
+      "confidence": 0.8,
+      "reason": "Pastoral welcome, brief instructions and invitation to bring family forward"
+    },
+    {
+      "start": 675,
+      "end": 1350,
+      "title": "Child presentation / dedication",
+      "type": "child_presentation",
+      "confidence": 0.9,
+      "reason": "Family brought child forward, prayers and brief instruction to parents"
+    },
+    {
+      "start": 1350,
+      "end": 3444.571,
+      "title": "Announcements, scripture and congregational worship",
+      "type": "congregational_music",
+      "confidence": 0.7,
+      "reason": "Proverbs verse, announcements, prayers and extended worship singing leading into sermon"
+    },
+    {
+      "start": 3444.571,
+      "end": 5563.06,
+      "title": "Sermon",
+      "type": "sermon",
+      "confidence": 0.95,
+      "reason": "Local sermon bounds provided; sermon content and extended teaching present"
+    },
+    {
+      "start": 5563.06,
+      "end": 5723.06,
+      "title": "Offering",
+      "type": "offering",
+      "confidence": 0.6,
+      "reason": "Typical offering period inferred immediately after sermon end"
+    },
+    {
+      "start": 5723.06,
+      "end": 5823.06,
+      "title": "Post-sermon response / prayer",
+      "type": "post_sermon_response",
+      "confidence": 0.6,
+      "reason": "Time for response prayer and brief ministry after sermon inferred"
+    },
+    {
+      "start": 5823.06,
+      "end": 5891.14,
+      "title": "Closing and benediction",
+      "type": "closing",
+      "confidence": 0.85,
+      "reason": "Service wrap-up and final blessing to end the livestream"
+    }
+  ]
+}

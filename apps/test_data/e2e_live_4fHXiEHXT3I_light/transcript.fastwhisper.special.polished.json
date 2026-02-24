@@ -1,0 +1,4304 @@
+{
+  "meta": {
+    "model": "faster-whisper small (beam=8)",
+    "no_llm": true,
+    "polished_with": "deterministic regex + paragraph gap rules",
+    "sermon_absolute_start_sec": 3811.0,
+    "generated_at": "2026-02-24T23:30:16.407896+00:00"
+  },
+  "segments": [
+    {
+      "start": 0.75,
+      "end": 5.63,
+      "start_abs": 3811.75,
+      "end_abs": 3816.63,
+      "text": "Y nace el hijo y huye de los conflictos en vez de enfrentarlos."
+    },
+    {
+      "start": 6.37,
+      "end": 8.71,
+      "start_abs": 3817.37,
+      "end_abs": 3819.71,
+      "text": "Esto no es una maldición mágica, lo vuelvo a decir."
+    },
+    {
+      "start": 9.15,
+      "end": 11.13,
+      "start_abs": 3820.15,
+      "end_abs": 3822.13,
+      "text": "Es transmisión relacional."
+    },
+    {
+      "start": 11.45,
+      "end": 13.67,
+      "start_abs": 3822.45,
+      "end_abs": 3824.67,
+      "text": "Y mira, aquí hay algunos psicólogos que comprueban esto."
+    },
+    {
+      "start": 14.51,
+      "end": 17.49,
+      "start_abs": 3825.51,
+      "end_abs": 3828.49,
+      "text": "Marían Rojas, esta pequeña psiquiatra que escuchamos con mi esposa."
+    },
+    {
+      "start": 17.55,
+      "end": 17.91,
+      "start_abs": 3828.55,
+      "end_abs": 3828.91,
+      "text": "Ella le encanta."
+    },
+    {
+      "start": 18.03,
+      "end": 20.79,
+      "start_abs": 3829.03,
+      "end_abs": 3831.79,
+      "text": "De hecho, mi esposa estudió psicología por un tiempo."
+    },
+    {
+      "start": 20.79,
+      "end": 22.31,
+      "start_abs": 3831.79,
+      "end_abs": 3833.31,
+      "text": "Y está pendiente todavía a continuar."
+    },
+    {
+      "start": 22.71,
+      "end": 25.03,
+      "start_abs": 3833.71,
+      "end_abs": 3836.03,
+      "text": "Ella le encanta y me gusta hablar de estos temas con ella."
+    },
+    {
+      "start": 25.37,
+      "end": 26.89,
+      "start_abs": 3836.37,
+      "end_abs": 3837.89,
+      "text": "Que ella me lleva más profundo todavía."
+    },
+    {
+      "start": 27.07,
+      "end": 28.33,
+      "start_abs": 3838.07,
+      "end_abs": 3839.33,
+      "text": "Y me dijo, ¡escuchas pocas!"
+    },
+    {
+      "start": 29.05,
+      "end": 34.51,
+      "start_abs": 3840.05,
+      "end_abs": 3845.51,
+      "text": "Y esta psiquiatra española habla sobre algo que yo he pensado en esta semana y lo puso."
+    },
+    {
+      "start": 34.51,
+      "end": 41.01,
+      "start_abs": 3845.51,
+      "end_abs": 3852.01,
+      "text": "En palabras técnicas que dice la transmisión intergeneracional del trauma, es interesante eso."
+    },
+    {
+      "start": 41.77,
+      "end": 46.93,
+      "start_abs": 3852.77,
+      "end_abs": 3857.93,
+      "text": "Y de hecho yo esta semana incluso le pregunté ahí a nuestro querido Chong Alfonso y gracias."
+    },
+    {
+      "start": 46.93,
+      "end": 52.09,
+      "start_abs": 3857.93,
+      "end_abs": 3863.09,
+      "text": "Me mandó un artículo muy interesante de Tim Jennings, también un profesional allí."
+    },
+    {
+      "start": 52.09,
+      "end": 57.27,
+      "start_abs": 3863.09,
+      "end_abs": 3868.27,
+      "text": "De la salud, también cristiano y él dice lo siguiente, dice fuimos diseñados por."
+    },
+    {
+      "start": 57.27,
+      "end": 62.51,
+      "start_abs": 3868.27,
+      "end_abs": 3873.51,
+      "text": "Dios para adaptarnos. Esto significa que fuimos diseñados para cambiar según nuestras experiencias."
+    },
+    {
+      "start": 63.01,
+      "end": 67.79,
+      "start_abs": 3874.01,
+      "end_abs": 3878.79,
+      "text": "Y este cambio no es simplemente un cambio de creencias, sino un cambio físico-real. Esto."
+    },
+    {
+      "start": 67.79,
+      "end": 74.15,
+      "start_abs": 3878.79,
+      "end_abs": 3885.15,
+      "text": "Es interesante. Que incluye modificaciones en las conexiones neuronales y en la expresión."
+    },
+    {
+      "start": 74.15,
+      "end": 74.89,
+      "start_abs": 3885.15,
+      "end_abs": 3885.89,
+      "text": "Genética."
+    },
+    {
+      "start": 75.87,
+      "end": 81.49,
+      "start_abs": 3886.87,
+      "end_abs": 3892.49,
+      "text": "O sea, las decisiones que tú toman incluso en tu composición pueden de alguna."
+    },
+    {
+      "start": 81.49,
+      "end": 84.47,
+      "start_abs": 3892.49,
+      "end_abs": 3895.47,
+      "text": "O otra manera cambiar el destino de tus descendientes."
+    },
+    {
+      "start": 85.27,
+      "end": 86.43,
+      "start_abs": 3896.27,
+      "end_abs": 3897.43,
+      "text": "Hay errores en cadena."
+    },
+    {
+      "start": 86.43,
+      "end": 92.03,
+      "start_abs": 3897.43,
+      "end_abs": 3903.03,
+      "text": "Hay patrones que llevan siglos, generaciones enteras donde tú y yo existimos."
+    },
+    {
+      "start": 93.07,
+      "end": 94.29,
+      "start_abs": 3904.07,
+      "end_abs": 3905.29,
+      "text": "Por eso hoy quiero decirte."
+    },
+    {
+      "start": 94.39,
+      "end": 97.71,
+      "start_abs": 3905.39,
+      "end_abs": 3908.71,
+      "text": "Le damos más cosas de las que nos imaginamos de nuestros padres."
+    },
+    {
+      "start": 98.27,
+      "end": 102.19,
+      "start_abs": 3909.27,
+      "end_abs": 3913.19,
+      "text": "De nuestros abuelos, de nuestros tátar abuelos e incluso más atrás."
+    },
+    {
+      "start": 103.69,
+      "end": 106.53,
+      "start_abs": 3914.69,
+      "end_abs": 3917.53,
+      "text": "Podemos percibir que hay cosas que construyen quienes somos."
+    },
+    {
+      "start": 106.53,
+      "end": 109.85,
+      "start_abs": 3917.53,
+      "end_abs": 3920.85,
+      "text": "Y aquí no quiero irme solo a lo negativo, sean buenas o malas."
+    },
+    {
+      "start": 110.45,
+      "end": 113.51,
+      "start_abs": 3921.45,
+      "end_abs": 3924.51,
+      "text": "Hay decisiones muy buenas que tomaron tus tátar abuelos, por ejemplo."
+    },
+    {
+      "start": 113.51,
+      "end": 120.13,
+      "start_abs": 3924.51,
+      "end_abs": 3931.13,
+      "text": "De abrazar la fe y eso se transmitió y tú quizás hoy estás aquí porque alguien en tu pasado tomó."
+    },
+    {
+      "start": 120.13,
+      "end": 124.83,
+      "start_abs": 3931.13,
+      "end_abs": 3935.83,
+      "text": "La decisión de seguir a Cristo y eso hasta el día de hoy conforma tu identidad, ¿no?"
+    },
+    {
+      "start": 125.53,
+      "end": 126.29,
+      "start_abs": 3936.53,
+      "end_abs": 3937.29,
+      "text": "Dios nos creó."
+    },
+    {
+      "start": 126.29,
+      "end": 134.19,
+      "start_abs": 3937.29,
+      "end_abs": 3945.19,
+      "text": "Así, lo que vivimos nos cambia y lo que no resolvemos o lo que resolvemos se transmite."
+    },
+    {
+      "start": 134.97,
+      "end": 135.53,
+      "start_abs": 3945.97,
+      "end_abs": 3946.53,
+      "text": "Quiero."
+    },
+    {
+      "start": 135.53,
+      "end": 139.75,
+      "start_abs": 3946.53,
+      "end_abs": 3950.75,
+      "text": "Pasar ahora a la historia central bíblica porque esta historia afirmate que se viene algo pero."
+    },
+    {
+      "start": 139.75,
+      "end": 143.13,
+      "start_abs": 3950.75,
+      "end_abs": 3954.13,
+      "text": "Pero yo quizás tú lo sabías, quizás una historia que hayas escuchado."
+    },
+    {
+      "start": 143.37,
+      "end": 149.25,
+      "start_abs": 3954.37,
+      "end_abs": 3960.25,
+      "text": "Pero esta perspectiva que te voy a dar es algo que a mí de verdad que me emociona."
+    },
+    {
+      "start": 150.47,
+      "end": 154.49,
+      "start_abs": 3961.47,
+      "end_abs": 3965.49,
+      "text": "Hay dos maneras de leer la Biblia que yo he practicado últimamente."
+    },
+    {
+      "start": 155.15,
+      "end": 158.15,
+      "start_abs": 3966.15,
+      "end_abs": 3969.15,
+      "text": "Y cuando yo descubrí esto he podido ir más profundo, ¿no?"
+    },
+    {
+      "start": 158.95,
+      "end": 164.11,
+      "start_abs": 3969.95,
+      "end_abs": 3975.11,
+      "text": "Una perspectiva es volar bajo, es simplemente centrarte en una palabra."
+    },
+    {
+      "start": 164.23,
+      "end": 167.53,
+      "start_abs": 3975.23,
+      "end_abs": 3978.53,
+      "text": "En un versículo y ir profundo y profundo y te vas a encontrar."
+    },
+    {
+      "start": 167.53,
+      "end": 172.67,
+      "start_abs": 3978.53,
+      "end_abs": 3983.67,
+      "text": "Con que un pequeño versículo te abre una dimensión extraordinaria."
+    },
+    {
+      "start": 172.75,
+      "end": 175.65,
+      "start_abs": 3983.75,
+      "end_abs": 3986.65,
+      "text": "Eso es cuando te centras en un pequeño detalle de la Biblia."
+    },
+    {
+      "start": 175.65,
+      "end": 177.01,
+      "start_abs": 3986.65,
+      "end_abs": 3988.01,
+      "text": "Y puedes ir más profundo."
+    },
+    {
+      "start": 177.33,
+      "end": 179.49,
+      "start_abs": 3988.33,
+      "end_abs": 3990.49,
+      "text": "Te recomiendo estudiar la Biblia, sí, es buenísimo."
+    },
+    {
+      "start": 180.21,
+      "end": 183.17,
+      "start_abs": 3991.21,
+      "end_abs": 3994.17,
+      "text": "Pero hay una segunda forma de estudiar la Biblia."
+    },
+    {
+      "start": 183.27,
+      "end": 185.05,
+      "start_abs": 3994.27,
+      "end_abs": 3996.05,
+      "text": "Que es volar un poquito más alto."
+    },
+    {
+      "start": 185.83,
+      "end": 188.21,
+      "start_abs": 3996.83,
+      "end_abs": 3999.21,
+      "text": "Yo creo que todos aquí en algún momento hemos tomado un avión."
+    },
+    {
+      "start": 188.55,
+      "end": 190.95,
+      "start_abs": 3999.55,
+      "end_abs": 4001.95,
+      "text": "Yo sé que algunos van a tomar la hora que van a ir a Costa Rica pronto."
+    },
+    {
+      "start": 191.35,
+      "end": 192.37,
+      "start_abs": 4002.35,
+      "end_abs": 4003.37,
+      "text": "Que se van de misión también."
+    },
+    {
+      "start": 193.19,
+      "end": 195.39,
+      "start_abs": 4004.19,
+      "end_abs": 4006.39,
+      "text": "Y cuando tú vuelas alto, todo se ve más pequeño."
+    },
+    {
+      "start": 195.39,
+      "end": 198.57,
+      "start_abs": 4006.39,
+      "end_abs": 4009.57,
+      "text": "Y tú logras ver más cosas de las que tú veías."
+    },
+    {
+      "start": 198.57,
+      "end": 199.81,
+      "start_abs": 4009.57,
+      "end_abs": 4010.81,
+      "text": "Quizás andando solo en tu carro."
+    },
+    {
+      "start": 200.73,
+      "end": 205.65,
+      "start_abs": 4011.73,
+      "end_abs": 4016.65,
+      "text": "Cuando tú miras la Biblia así como una historia narrativa grande."
+    },
+    {
+      "start": 205.65,
+      "end": 207.17,
+      "start_abs": 4016.65,
+      "end_abs": 4018.17,
+      "text": "Que incluyó años y años."
+    },
+    {
+      "start": 207.27,
+      "end": 209.55,
+      "start_abs": 4018.27,
+      "end_abs": 4020.55,
+      "text": "Te vas a dar cuenta también de detalles, de conexiones."
+    },
+    {
+      "start": 209.55,
+      "end": 213.03,
+      "start_abs": 4020.55,
+      "end_abs": 4024.03,
+      "text": "Que volando bajo no te ibas a dar cuenta."
+    },
+    {
+      "start": 213.77,
+      "end": 216.73,
+      "start_abs": 4024.77,
+      "end_abs": 4027.73,
+      "text": "Por eso en esta historia yo quiero invitar a volar un poquito más alto."
+    },
+    {
+      "start": 217.31,
+      "end": 219.73,
+      "start_abs": 4028.31,
+      "end_abs": 4030.73,
+      "text": "Qué es la historia de Abraham y Lotz, ok?"
+    },
+    {
+      "start": 220.59,
+      "end": 225.29,
+      "start_abs": 4031.59,
+      "end_abs": 4036.29,
+      "text": "Y el contexto, si tú abres tu Biblia en Génesis 12 y 19."
+    },
+    {
+      "start": 225.29,
+      "end": 231.95,
+      "start_abs": 4036.29,
+      "end_abs": 4042.95,
+      "text": "9, estos capítulos nos traen el contexto de esta historia. Abram y Lot. ¿Quiénes eran Abram y Lot?"
+    },
+    {
+      "start": 232.21,
+      "end": 233.57,
+      "start_abs": 4043.21,
+      "end_abs": 4044.57,
+      "text": "Eran familiares, no?"
+    },
+    {
+      "start": 235.77,
+      "end": 237.41,
+      "start_abs": 4046.77,
+      "end_abs": 4048.41,
+      "text": "Abram era el tío de Lot, no?"
+    },
+    {
+      "start": 238.17,
+      "end": 241.13,
+      "start_abs": 4049.17,
+      "end_abs": 4052.13,
+      "text": "Y hubo en un momento porque los dos estaban."
+    },
+    {
+      "start": 241.75,
+      "end": 246.41,
+      "start_abs": 4052.75,
+      "end_abs": 4057.41,
+      "text": "Creciendo, cumpliendo este llamado, trabajando juntos por el propósito que Dios había puesto."
+    },
+    {
+      "start": 246.41,
+      "end": 250.55,
+      "start_abs": 4057.41,
+      "end_abs": 4061.55,
+      "text": "En el corazón de Abram, pero llega el conflicto, ok? Llega el problema."
+    },
+    {
+      "start": 251.27,
+      "end": 252.21,
+      "start_abs": 4062.27,
+      "end_abs": 4063.21,
+      "text": "Y este conflicto."
+    },
+    {
+      "start": 252.21,
+      "end": 256.37,
+      "start_abs": 4063.21,
+      "end_abs": 4067.37,
+      "text": "Se nos presenta en Génesis 13 del 5 al 7, donde tú puedes entender."
+    },
+    {
+      "start": 256.57,
+      "end": 258.07,
+      "start_abs": 4067.57,
+      "end_abs": 4069.07,
+      "text": "Si lo lees, lo voy a dejar también de tarea."
+    },
+    {
+      "start": 258.73,
+      "end": 259.99,
+      "start_abs": 4069.73,
+      "end_abs": 4070.99,
+      "text": "Que Loth tenía muchas posesiones."
+    },
+    {
+      "start": 260.47,
+      "end": 263.31,
+      "start_abs": 4071.4700000000003,
+      "end_abs": 4074.31,
+      "text": "Y sus pastores comienzan a pelear con los de Abraham."
+    },
+    {
+      "start": 263.63,
+      "end": 267.89,
+      "start_abs": 4074.63,
+      "end_abs": 4078.89,
+      "text": "Ok, conflicto, y dice Génesis 13-7 que hubo con tienda."
+    },
+    {
+      "start": 267.89,
+      "end": 272.41,
+      "start_abs": 4078.89,
+      "end_abs": 4083.41,
+      "text": "Entre los pastores del ganado de Abraham y los pastores del ganado de Loth."
+    },
+    {
+      "start": 272.41,
+      "end": 273.65,
+      "start_abs": 4083.41,
+      "end_abs": 4084.65,
+      "text": "Y comienza la atención."
+    },
+    {
+      "start": 274.87,
+      "end": 277.63,
+      "start_abs": 4085.87,
+      "end_abs": 4088.63,
+      "text": "Y Abraham surge con una solución."
+    },
+    {
+      "start": 278.53,
+      "end": 286.09,
+      "start_abs": 4089.5299999999997,
+      "end_abs": 4097.09,
+      "text": "Dice, mira, voy a proponerte la paz en Génesis 13 del 8 al 9 y en esos versículos tú vas."
+    },
+    {
+      "start": 286.09,
+      "end": 290.25,
+      "start_abs": 4097.09,
+      "end_abs": 4101.25,
+      "text": "A darte cuenta que Abraham le propone, dice, no haya altercado entre nosotros dos porque."
+    },
+    {
+      "start": 290.25,
+      "end": 295.65,
+      "start_abs": 4101.25,
+      "end_abs": 4106.65,
+      "text": "Somos hermanos, somos familiares. Dice, no está toda la tierra delante de ti, yo te."
+    },
+    {
+      "start": 295.65,
+      "end": 298.19,
+      "start_abs": 4106.65,
+      "end_abs": 4109.19,
+      "text": "Ruego, le dice que te apartes de mí."
+    },
+    {
+      "start": 299.25,
+      "end": 302.77,
+      "start_abs": 4110.25,
+      "end_abs": 4113.77,
+      "text": "Donde yo vaya tú anda en la otra dirección."
+    },
+    {
+      "start": 302.77,
+      "end": 309.61,
+      "start_abs": 4113.77,
+      "end_abs": 4120.61,
+      "text": "Parece un conflicto que fue saludable, porque fue una decisión aparentemente positiva en."
+    },
+    {
+      "start": 309.61,
+      "end": 314.39,
+      "start_abs": 4120.61,
+      "end_abs": 4125.39,
+      "text": "Aquel momento. Abraham sede, él no pelea por control, sino que le dice a Lot, elige."
+    },
+    {
+      "start": 315.31,
+      "end": 316.13,
+      "start_abs": 4126.31,
+      "end_abs": 4127.13,
+      "text": "Y aquí."
+    },
+    {
+      "start": 316.13,
+      "end": 318.21,
+      "start_abs": 4127.13,
+      "end_abs": 4129.21,
+      "text": "Entra algo, porque miren, queridos."
+    },
+    {
+      "start": 318.87,
+      "end": 322.13,
+      "start_abs": 4129.87,
+      "end_abs": 4133.13,
+      "text": "Tus elecciones por lo más pequeñas que parezcan tienen."
+    },
+    {
+      "start": 322.97,
+      "end": 325.23,
+      "start_abs": 4133.97,
+      "end_abs": 4136.23,
+      "text": "Implicaciones, implicancias profundas."
+    },
+    {
+      "start": 326.07,
+      "end": 327.57,
+      "start_abs": 4137.07,
+      "end_abs": 4138.57,
+      "text": "No son cualquier decisión."
+    },
+    {
+      "start": 328.29,
+      "end": 329.19,
+      "start_abs": 4139.29,
+      "end_abs": 4140.19,
+      "text": "Porque tú puedes decir."
+    },
+    {
+      "start": 329.19,
+      "end": 332.35,
+      "start_abs": 4140.19,
+      "end_abs": 4143.35,
+      "text": "No, yo he tomado una dirección un poquito complicada."
+    },
+    {
+      "start": 332.79,
+      "end": 336.99,
+      "start_abs": 4143.79,
+      "end_abs": 4147.99,
+      "text": "Estoy trabajando en esto, pero es un pecado que yo tengo."
+    },
+    {
+      "start": 337.15,
+      "end": 338.47,
+      "start_abs": 4148.15,
+      "end_abs": 4149.47,
+      "text": "Pero lo estoy trabajando, ¿no?"
+    },
+    {
+      "start": 339.67,
+      "end": 343.17,
+      "start_abs": 4150.67,
+      "end_abs": 4154.17,
+      "text": "Pero algo pequeño a la larga puede ser algo completamente."
+    },
+    {
+      "start": 343.17,
+      "end": 344.09,
+      "start_abs": 4154.17,
+      "end_abs": 4155.09,
+      "text": "Destructivo."
+    },
+    {
+      "start": 344.49,
+      "end": 345.25,
+      "start_abs": 4155.49,
+      "end_abs": 4156.25,
+      "text": "Y eso le pasó a Lot."
+    },
+    {
+      "start": 346.41,
+      "end": 349.83,
+      "start_abs": 4157.41,
+      "end_abs": 4160.83,
+      "text": "Lot elige por vista en Génesis 13 del 10 al 11."
+    },
+    {
+      "start": 350.39,
+      "end": 351.55,
+      "start_abs": 4161.39,
+      "end_abs": 4162.55,
+      "text": "Esclave este detalle."
+    },
+    {
+      "start": 351.75,
+      "end": 355.25,
+      "start_abs": 4162.75,
+      "end_abs": 4166.25,
+      "text": "Dice que Lot alzó sus ojos y vio toda la llanuda del."
+    },
+    {
+      "start": 355.25,
+      "end": 357.71,
+      "start_abs": 4166.25,
+      "end_abs": 4168.71,
+      "text": "Jordán, que toda ella era de riego."
+    },
+    {
+      "start": 357.71,
+      "end": 361.49,
+      "start_abs": 4168.71,
+      "end_abs": 4172.49,
+      "text": "Vio tierras que dice, esta tierra, si me das a elegir a Bram, voy a irme para allá, ¿no?"
+    },
+    {
+      "start": 362.35,
+      "end": 369.27,
+      "start_abs": 4173.35,
+      "end_abs": 4180.27,
+      "text": "Alzó sus ojos, eligió por apariencia, por prosperidad, dada, por conveniencia."
+    },
+    {
+      "start": 370.07,
+      "end": 374.45,
+      "start_abs": 4181.07,
+      "end_abs": 4185.45,
+      "text": "Y luego el texto comienza a decir algo inquietante y tú puedes olfatear aquí el conflicto."
+    },
+    {
+      "start": 374.53,
+      "end": 375.29,
+      "start_abs": 4185.53,
+      "end_abs": 4186.29,
+      "text": "Génesis 13, 12."
+    },
+    {
+      "start": 376.41,
+      "end": 381.41,
+      "start_abs": 4187.41,
+      "end_abs": 4192.41,
+      "text": "Dice, Lod fue proponiendo sus tierras hasta donde? Hasta Sodoma."
+    },
+    {
+      "start": 381.41,
+      "end": 382.43,
+      "start_abs": 4192.41,
+      "end_abs": 4193.43,
+      "text": "Y."
+    },
+    {
+      "start": 383.78,
+      "end": 385.92,
+      "start_abs": 4194.78,
+      "end_abs": 4196.92,
+      "text": "Tú sabes, Sodoma y Gomorra, ¿no?"
+    },
+    {
+      "start": 387.28,
+      "end": 395.1,
+      "start_abs": 4198.28,
+      "end_abs": 4206.1,
+      "text": "Estas ciudades donde abundaban los errores, el pecado, no entró de golpe a Sodoma, pero."
+    },
+    {
+      "start": 395.1,
+      "end": 398.48,
+      "start_abs": 4206.1,
+      "end_abs": 4209.48,
+      "text": "Se fue acercando poco a poco."
+    },
+    {
+      "start": 400.1,
+      "end": 401.58,
+      "start_abs": 4211.1,
+      "end_abs": 4212.58,
+      "text": "Así sucede también en nuestra vida."
+    },
+    {
+      "start": 402.66,
+      "end": 405.48,
+      "start_abs": 4213.66,
+      "end_abs": 4216.48,
+      "text": "Algo que parece inofensivo, a primera vista."
+    },
+    {
+      "start": 406.16,
+      "end": 408.86,
+      "start_abs": 4217.16,
+      "end_abs": 4219.86,
+      "text": "Puede ser destructivo, y el pecado no sucede."
+    },
+    {
+      "start": 408.86,
+      "end": 412.08,
+      "start_abs": 4219.86,
+      "end_abs": 4223.08,
+      "text": "De la noche a la mañana, sucede poco a poco."
+    },
+    {
+      "start": 412.9,
+      "end": 415.52,
+      "start_abs": 4223.9,
+      "end_abs": 4226.52,
+      "text": "En Génesis 1313 dice lo siguiente."
+    },
+    {
+      "start": 415.9,
+      "end": 418.76,
+      "start_abs": 4226.9,
+      "end_abs": 4229.76,
+      "text": "Más los hombres de Sodoma eran malos y pecadores."
+    },
+    {
+      "start": 418.76,
+      "end": 420.48,
+      "start_abs": 4229.76,
+      "end_abs": 4231.48,
+      "text": "Contra Jehová en gran manera."
+    },
+    {
+      "start": 420.88,
+      "end": 423.36,
+      "start_abs": 4231.88,
+      "end_abs": 4234.36,
+      "text": "Así que ya sabes que esta decisión va a tener consecuencias."
+    },
+    {
+      "start": 424.46,
+      "end": 427.92,
+      "start_abs": 4235.46,
+      "end_abs": 4238.92,
+      "text": "Ya sabes que esta decisión tú hueles aquí el peligro."
+    },
+    {
+      "start": 429.14,
+      "end": 433.52,
+      "start_abs": 4240.14,
+      "end_abs": 4244.52,
+      "text": "Y tú ves en Génesis 14 ya que ya no está cerca de Sodoma."
+    },
+    {
+      "start": 433.58,
+      "end": 435.96,
+      "start_abs": 4244.58,
+      "end_abs": 4246.96,
+      "text": "Sino que ahora vivía dentro de Sodoma."
+    },
+    {
+      "start": 437.48,
+      "end": 438.94,
+      "start_abs": 4248.48,
+      "end_abs": 4249.94,
+      "text": "Queridos, el pecado es así."
+    },
+    {
+      "start": 440.24,
+      "end": 443.96,
+      "start_abs": 4251.24,
+      "end_abs": 4254.96,
+      "text": "Pueden parecer pequeñas decisiones, te estás acercando a algo que parece."
+    },
+    {
+      "start": 443.96,
+      "end": 446.98,
+      "start_abs": 4254.96,
+      "end_abs": 4257.98,
+      "text": "Inofensivo y riesgoso, pero sin darte cuenta."
+    },
+    {
+      "start": 447.68,
+      "end": 449.94,
+      "start_abs": 4258.68,
+      "end_abs": 4260.94,
+      "text": "Tú estás viviendo ahora adentro, ya no sólo."
+    },
+    {
+      "start": 449.94,
+      "end": 452.98,
+      "start_abs": 4260.94,
+      "end_abs": 4263.98,
+      "text": "Cerca estás viviendo adentro, ya te es difícil salir de allí."
+    },
+    {
+      "start": 454.04,
+      "end": 455.54,
+      "start_abs": 4265.04,
+      "end_abs": 4266.54,
+      "text": "Por eso que entra el conflicto."
+    },
+    {
+      "start": 455.6,
+      "end": 459.54,
+      "start_abs": 4266.6,
+      "end_abs": 4270.54,
+      "text": "Tú sabes que Sodom y Gomorra fue destruida, Génesis 19 del 30 al 36."
+    },
+    {
+      "start": 461.32,
+      "end": 462.28,
+      "start_abs": 4272.32,
+      "end_abs": 4273.28,
+      "text": "Ahí Abraham tiene que."
+    },
+    {
+      "start": 462.28,
+      "end": 467.96,
+      "start_abs": 4273.28,
+      "end_abs": 4278.96,
+      "text": "De rescatarlos, hay destrucción, hay conflicto y aquí entra lo más triste."
+    },
+    {
+      "start": 468.68,
+      "end": 470.04,
+      "start_abs": 4279.68,
+      "end_abs": 4281.04,
+      "text": "Sucedió algo."
+    },
+    {
+      "start": 470.04,
+      "end": 475.54,
+      "start_abs": 4281.04,
+      "end_abs": 4286.54,
+      "text": "Terrible, dice que las hijas se pusieron con mucho miedo de que no iban a tener."
+    },
+    {
+      "start": 475.54,
+      "end": 483.42,
+      "start_abs": 4286.54,
+      "end_abs": 4294.42,
+      "text": "Descendencia y hicieron un plan para embriagar al papá y dice Génesis 1937."
+    },
+    {
+      "start": 483.42,
+      "end": 489.26,
+      "start_abs": 4294.42,
+      "end_abs": 4300.26,
+      "text": "Y la mayor dio a luz a un hijo dice y llamó su nombre Moab, el cual es padre."
+    },
+    {
+      "start": 489.26,
+      "end": 491.56,
+      "start_abs": 4300.26,
+      "end_abs": 4302.56,
+      "text": "De los Moabitas hasta hoy."
+    },
+    {
+      "start": 492.28,
+      "end": 493.12,
+      "start_abs": 4303.28,
+      "end_abs": 4304.12,
+      "text": "Se fue."
+    },
+    {
+      "start": 493.12,
+      "end": 495.46,
+      "start_abs": 4304.12,
+      "end_abs": 4306.46,
+      "text": "Disvirtuando tanto estas decisiones."
+    },
+    {
+      "start": 495.46,
+      "end": 497.66,
+      "start_abs": 4306.46,
+      "end_abs": 4308.66,
+      "text": "Que ahora tienes un descendiente."
+    },
+    {
+      "start": 497.98,
+      "end": 499.88,
+      "start_abs": 4308.98,
+      "end_abs": 4310.88,
+      "text": "Moab, y ahora no solamente tienes."
+    },
+    {
+      "start": 499.88,
+      "end": 502.0,
+      "start_abs": 4310.88,
+      "end_abs": 4313.0,
+      "text": "Un hijo nacido por algo terrible."
+    },
+    {
+      "start": 502.0,
+      "end": 504.16,
+      "start_abs": 4313.0,
+      "end_abs": 4315.16,
+      "text": "Que sucedió, sino que siglos."
+    },
+    {
+      "start": 504.16,
+      "end": 506.1,
+      "start_abs": 4315.16,
+      "end_abs": 4317.1,
+      "text": "Después tienes a los Moabitas."
+    },
+    {
+      "start": 506.42,
+      "end": 507.74,
+      "start_abs": 4317.42,
+      "end_abs": 4318.74,
+      "text": "Y quienes fueron los Moabitas."
+    },
+    {
+      "start": 507.74,
+      "end": 509.6,
+      "start_abs": 4318.74,
+      "end_abs": 4320.6,
+      "text": "Fueron enemigos constantes."
+    },
+    {
+      "start": 509.6,
+      "end": 510.94,
+      "start_abs": 4320.6,
+      "end_abs": 4321.94,
+      "text": "Del pueblo de Israel."
+    },
+    {
+      "start": 511.3,
+      "end": 512.58,
+      "start_abs": 4322.3,
+      "end_abs": 4323.58,
+      "text": "Lo encuentras en números 22."
+    },
+    {
+      "start": 512.86,
+      "end": 514.8,
+      "start_abs": 4323.86,
+      "end_abs": 4325.8,
+      "text": "En jueces 3, y hay un punto."
+    },
+    {
+      "start": 514.8,
+      "end": 516.02,
+      "start_abs": 4325.8,
+      "end_abs": 4327.02,
+      "text": "Tremendo aquí, queridos."
+    },
+    {
+      "start": 517.08,
+      "end": 518.34,
+      "start_abs": 4328.08,
+      "end_abs": 4329.34,
+      "text": "Una decisión."
+    },
+    {
+      "start": 519.46,
+      "end": 520.2,
+      "start_abs": 4330.46,
+      "end_abs": 4331.2,
+      "text": "Una separación."
+    },
+    {
+      "start": 521.02,
+      "end": 524.84,
+      "start_abs": 4332.02,
+      "end_abs": 4335.84,
+      "text": "Una serie de pequeñas decisiones, un conflicto, algo terrible."
+    },
+    {
+      "start": 525.56,
+      "end": 531.02,
+      "start_abs": 4336.5599999999995,
+      "end_abs": 4342.02,
+      "text": "Después desencadenó en algo y tuvo consecuencias generacionales."
+    },
+    {
+      "start": 531.94,
+      "end": 537.52,
+      "start_abs": 4342.9400000000005,
+      "end_abs": 4348.52,
+      "text": "Y que no solamente afectó a Lot y a su familia, sino que afectó al mismo pueblo de Israel."
+    },
+    {
+      "start": 537.72,
+      "end": 539.72,
+      "start_abs": 4348.72,
+      "end_abs": 4350.72,
+      "text": "Los Moabitas fueron enemigos de Israel."
+    },
+    {
+      "start": 539.72,
+      "end": 545.82,
+      "start_abs": 4350.72,
+      "end_abs": 4356.82,
+      "text": "Y aquí yo quiero hablarte queridos una decisión basada en conveniencia terminó."
+    },
+    {
+      "start": 545.82,
+      "end": 550.7,
+      "start_abs": 4356.82,
+      "end_abs": 4361.7,
+      "text": "Generando una nación enemiga del pueblo de dios no fue sólo una mala elección."
+    },
+    {
+      "start": 550.7,
+      "end": 555.9,
+      "start_abs": 4361.7,
+      "end_abs": 4366.9,
+      "text": "Personal fue una historia que afectó a generaciones y aquí yo quiero decirte."
+    },
+    {
+      "start": 555.9,
+      "end": 559.82,
+      "start_abs": 4366.9,
+      "end_abs": 4370.82,
+      "text": "Queridos vamos a admitir algo que puede ser doloroso."
+    },
+    {
+      "start": 561.48,
+      "end": 563.3,
+      "start_abs": 4372.48,
+      "end_abs": 4374.3,
+      "text": "Tú y yo fuimos criados."
+    },
+    {
+      "start": 563.3,
+      "end": 568.64,
+      "start_abs": 4374.3,
+      "end_abs": 4379.64,
+      "text": "Imperfectamente tú puedes ir no yo le agradezco a mi familia por todo lo que."
+    },
+    {
+      "start": 568.64,
+      "end": 569.54,
+      "start_abs": 4379.64,
+      "end_abs": 4380.54,
+      "text": "Me dieron y es cierto."
+    },
+    {
+      "start": 570.7,
+      "end": 573.98,
+      "start_abs": 4381.7,
+      "end_abs": 4384.98,
+      "text": "Yo soy de los primeros en honrar a mis padres, en honrar a mi familia."
+    },
+    {
+      "start": 573.98,
+      "end": 575.78,
+      "start_abs": 4384.98,
+      "end_abs": 4386.78,
+      "text": "Por todo lo que pusieron en mi corazón."
+    },
+    {
+      "start": 576.5,
+      "end": 579.08,
+      "start_abs": 4387.5,
+      "end_abs": 4390.08,
+      "text": "Pero mis padres no eran perfectos. Tú lo vas."
+    },
+    {
+      "start": 579.08,
+      "end": 583.38,
+      "start_abs": 4390.08,
+      "end_abs": 4394.38,
+      "text": "Descubriendo después que vas creciendo, ¿no? Cuando eres niño tus padres son superhéroes."
+    },
+    {
+      "start": 583.84,
+      "end": 588.04,
+      "start_abs": 4394.84,
+      "end_abs": 4399.04,
+      "text": "Pero a medida que creces te das cuenta que no son perfectos. Y como mis padres no."
+    },
+    {
+      "start": 588.04,
+      "end": 592.68,
+      "start_abs": 4399.04,
+      "end_abs": 4403.68,
+      "text": "Eran perfectos, ¿qué generaron hijos no perfectos? Y hay que admitir que tú."
+    },
+    {
+      "start": 592.68,
+      "end": 594.82,
+      "start_abs": 4403.68,
+      "end_abs": 4405.82,
+      "text": "Y yo somos consecuencia de eso."
+    },
+    {
+      "start": 596.04,
+      "end": 598.76,
+      "start_abs": 4407.04,
+      "end_abs": 4409.76,
+      "text": "Todos fuimos criados imperfectamente."
+    },
+    {
+      "start": 598.76,
+      "end": 600.62,
+      "start_abs": 4409.76,
+      "end_abs": 4411.62,
+      "text": "Y todos los que tenemos hijos."
+    },
+    {
+      "start": 600.62,
+      "end": 603.88,
+      "start_abs": 4411.62,
+      "end_abs": 4414.88,
+      "text": "Estamos criando imperfectamente, queridos."
+    },
+    {
+      "start": 605.2,
+      "end": 606.46,
+      "start_abs": 4416.2,
+      "end_abs": 4417.46,
+      "text": "Y eso me cuesta admitirlo a mí."
+    },
+    {
+      "start": 607.16,
+      "end": 609.64,
+      "start_abs": 4418.16,
+      "end_abs": 4420.64,
+      "text": "Porque por más que yo quiera criar a mi hija."
+    },
+    {
+      "start": 609.64,
+      "end": 611.9,
+      "start_abs": 4420.64,
+      "end_abs": 4422.9,
+      "text": "De manera lo mejor que pueda."
+    },
+    {
+      "start": 612.7,
+      "end": 615.4,
+      "start_abs": 4423.7,
+      "end_abs": 4426.4,
+      "text": "Hay cosas que ella va a tener que trabajar después."
+    },
+    {
+      "start": 616.11,
+      "end": 617.56,
+      "start_abs": 4427.11,
+      "end_abs": 4428.5599999999995,
+      "text": "Porque cometemos errores."
+    },
+    {
+      "start": 620.32,
+      "end": 621.78,
+      "start_abs": 4431.32,
+      "end_abs": 4432.78,
+      "text": "Conocí a alguien que me contaba."
+    },
+    {
+      "start": 621.78,
+      "end": 622.6,
+      "start_abs": 4432.78,
+      "end_abs": 4433.6,
+      "text": "Cómo sus padres."
+    },
+    {
+      "start": 623.46,
+      "end": 625.08,
+      "start_abs": 4434.46,
+      "end_abs": 4436.08,
+      "text": "Que hicieron lo mejor posible."
+    },
+    {
+      "start": 626.22,
+      "end": 628.78,
+      "start_abs": 4437.22,
+      "end_abs": 4439.78,
+      "text": "Su hogar aún así tenía mucho conflicto."
+    },
+    {
+      "start": 629.0,
+      "end": 636.42,
+      "start_abs": 4440.0,
+      "end_abs": 4447.42,
+      "text": "Ella creció viendo a sus papás pelear y esos conflictos hasta el día de hoy son peso sobre sus hombros."
+    },
+    {
+      "start": 637.7,
+      "end": 642.94,
+      "start_abs": 4448.7,
+      "end_abs": 4453.9400000000005,
+      "text": "Y esta persona me decía que como constantemente había conflictos en su casa."
+    },
+    {
+      "start": 643.58,
+      "end": 649.7,
+      "start_abs": 4454.58,
+      "end_abs": 4460.7,
+      "text": "Hoy no puede estar en un momento tranquilo en paz porque esa paz aparente que siente."
+    },
+    {
+      "start": 650.3,
+      "end": 654.78,
+      "start_abs": 4461.3,
+      "end_abs": 4465.78,
+      "text": "Piensa que la vuelta de la esquila va a ver un conflicto, aunque no lo va a ver."
+    },
+    {
+      "start": 655.1,
+      "end": 660.9,
+      "start_abs": 4466.1,
+      "end_abs": 4471.9,
+      "text": "Aunque no lo hay, llega paz y como de niña aprendió a anticipar esto, ahora también."
+    },
+    {
+      "start": 660.9,
+      "end": 665.36,
+      "start_abs": 4471.9,
+      "end_abs": 4476.36,
+      "text": "Le generó ese conflicto en su casa, esto que tiene que trabajarlo."
+    },
+    {
+      "start": 666.24,
+      "end": 668.14,
+      "start_abs": 4477.24,
+      "end_abs": 4479.14,
+      "text": "Queridos, esos son."
+    },
+    {
+      "start": 668.14,
+      "end": 669.62,
+      "start_abs": 4479.14,
+      "end_abs": 4480.62,
+      "text": "Pesos que cargamos."
+    },
+    {
+      "start": 670.46,
+      "end": 673.46,
+      "start_abs": 4481.46,
+      "end_abs": 4484.46,
+      "text": "Puede ser que tu hogar no fue conflictivo, ok, ok lindo."
+    },
+    {
+      "start": 674.16,
+      "end": 674.76,
+      "start_abs": 4485.16,
+      "end_abs": 4485.76,
+      "text": "Pero te diera una."
+    },
+    {
+      "start": 674.76,
+      "end": 679.6,
+      "start_abs": 4485.76,
+      "end_abs": 4490.6,
+      "text": "Atención excesiva que te hizo buscar incansablemente la aprobación de los."
+    },
+    {
+      "start": 679.6,
+      "end": 685.02,
+      "start_abs": 4490.6,
+      "end_abs": 4496.02,
+      "text": "Demás en un mundo que no funciona así quizás te aplaudieron todo en tu casa y."
+    },
+    {
+      "start": 685.02,
+      "end": 687.86,
+      "start_abs": 4496.02,
+      "end_abs": 4498.86,
+      "text": "Después tú sales al mundo y te das cuenta que no vas a tener siempre la."
+    },
+    {
+      "start": 687.86,
+      "end": 691.74,
+      "start_abs": 4498.86,
+      "end_abs": 4502.74,
+      "text": "Atención de todos que no vas a ser siempre aplaudido que no siempre vas a."
+    },
+    {
+      "start": 691.74,
+      "end": 695.32,
+      "start_abs": 4502.74,
+      "end_abs": 4506.32,
+      "text": "Ganar queridos y te das cuenta y te chocas con la sociedad."
+    },
+    {
+      "start": 696.62,
+      "end": 701.68,
+      "start_abs": 4507.62,
+      "end_abs": 4512.68,
+      "text": "Sabes esta persona que te estoy hablando un día me contó que ella."
+    },
+    {
+      "start": 701.68,
+      "end": 706.88,
+      "start_abs": 4512.68,
+      "end_abs": 4517.88,
+      "text": "Estaba en pleno conflicto de su casa y dice que su hermano se le acerca."
+    },
+    {
+      "start": 707.42,
+      "end": 709.7,
+      "start_abs": 4518.42,
+      "end_abs": 4520.7,
+      "text": "Estaban los padres discutiendo fuerte."
+    },
+    {
+      "start": 710.44,
+      "end": 712.3,
+      "start_abs": 4521.4400000000005,
+      "end_abs": 4523.3,
+      "text": "Su hermano mayor se le acerca y le dice."
+    },
+    {
+      "start": 712.46,
+      "end": 717.48,
+      "start_abs": 4523.46,
+      "end_abs": 4528.48,
+      "text": "Mira, recordemos esto porque esto es lo que tenemos que evitar en el futuro a."
+    },
+    {
+      "start": 717.48,
+      "end": 720.08,
+      "start_abs": 4528.48,
+      "end_abs": 4531.08,
+      "text": "Toda costa. No tenemos que repetir esto."
+    },
+    {
+      "start": 721.42,
+      "end": 722.26,
+      "start_abs": 4532.42,
+      "end_abs": 4533.26,
+      "text": "Imagínate queridos."
+    },
+    {
+      "start": 723.32,
+      "end": 724.84,
+      "start_abs": 4534.32,
+      "end_abs": 4535.84,
+      "text": "Tus decisiones."
+    },
+    {
+      "start": 724.84,
+      "end": 727.06,
+      "start_abs": 4535.84,
+      "end_abs": 4538.0599999999995,
+      "text": "Marcan la vida de las personas."
+    },
+    {
+      "start": 727.98,
+      "end": 730.4,
+      "start_abs": 4538.98,
+      "end_abs": 4541.4,
+      "text": "Pero ahora ¿cuál es la diferencia de una."
+    },
+    {
+      "start": 730.4,
+      "end": 736.2,
+      "start_abs": 4541.4,
+      "end_abs": 4547.2,
+      "text": "Persona que logra encontrar felicidad aún con todo el peso que carga sobre sus."
+    },
+    {
+      "start": 736.2,
+      "end": 742.76,
+      "start_abs": 4547.2,
+      "end_abs": 4553.76,
+      "text": "Espaldas y alguien que quizás llega hasta altas, hasta tarde en la vida, hasta la."
+    },
+    {
+      "start": 742.76,
+      "end": 747.66,
+      "start_abs": 4553.76,
+      "end_abs": 4558.66,
+      "text": "Vejez y no ha podido lidiar con esto es simplemente una palabra, la responsabilidad."
+    },
+    {
+      "start": 747.66,
+      "end": 748.44,
+      "start_abs": 4558.66,
+      "end_abs": 4559.4400000000005,
+      "text": "Que tomamos."
+    },
+    {
+      "start": 749.94,
+      "end": 753.0,
+      "start_abs": 4560.9400000000005,
+      "end_abs": 4564.0,
+      "text": "Sabe somos personas llenas de cosas por resolver, yo estaba."
+    },
+    {
+      "start": 753.0,
+      "end": 756.88,
+      "start_abs": 4564.0,
+      "end_abs": 4567.88,
+      "text": "Tratando de poner en frase lo que tenía en mi mente, somos personas llenas."
+    },
+    {
+      "start": 756.88,
+      "end": 763.04,
+      "start_abs": 4567.88,
+      "end_abs": 4574.04,
+      "text": "De cosas por resolver y aún así estamos formando la vida de otros, tratando de que carguen menos."
+    },
+    {
+      "start": 763.04,
+      "end": 764.7,
+      "start_abs": 4574.04,
+      "end_abs": 4575.7,
+      "text": "Peso del que nosotros cargamos."
+    },
+    {
+      "start": 765.74,
+      "end": 767.54,
+      "start_abs": 4576.74,
+      "end_abs": 4578.54,
+      "text": "Eso es, esa es la crianza."
+    },
+    {
+      "start": 768.24,
+      "end": 769.62,
+      "start_abs": 4579.24,
+      "end_abs": 4580.62,
+      "text": "Yo creo que mi hija tenga las menos."
+    },
+    {
+      "start": 769.62,
+      "end": 772.46,
+      "start_abs": 4580.62,
+      "end_abs": 4583.46,
+      "text": "Cosas que resolver de las que yo tuve que resolver."
+    },
+    {
+      "start": 774.06,
+      "end": 776.82,
+      "start_abs": 4585.0599999999995,
+      "end_abs": 4587.82,
+      "text": "Pero admitir que no somos perfectos."
+    },
+    {
+      "start": 777.52,
+      "end": 778.86,
+      "start_abs": 4588.52,
+      "end_abs": 4589.86,
+      "text": "Queridos, la historia."
+    },
+    {
+      "start": 779.62,
+      "end": 782.58,
+      "start_abs": 4590.62,
+      "end_abs": 4593.58,
+      "text": "Y yo no quiero dejarte aquí con malas noticias, con un peso en tu."
+    },
+    {
+      "start": 782.58,
+      "end": 788.88,
+      "start_abs": 4593.58,
+      "end_abs": 4599.88,
+      "text": "Casa porque yo te quiero predicar del evangelio y ahora afirmate porque se viene la buena noticia."
+    },
+    {
+      "start": 788.88,
+      "end": 793.36,
+      "start_abs": 4599.88,
+      "end_abs": 4604.36,
+      "text": "Queridos. La historia de Lot y Abraham no termina ahí."
+    },
+    {
+      "start": 794.74,
+      "end": 797.26,
+      "start_abs": 4605.74,
+      "end_abs": 4608.26,
+      "text": "Si tú miras la Biblia y la narrativa Bíblica."
+    },
+    {
+      "start": 797.26,
+      "end": 802.2,
+      "start_abs": 4608.26,
+      "end_abs": 4613.2,
+      "text": "Te vas a dar cuenta de una historia que tiene características muy similares que es la historia."
+    },
+    {
+      "start": 802.2,
+      "end": 803.96,
+      "start_abs": 4613.2,
+      "end_abs": 4614.96,
+      "text": "De Ruth y Noemí."
+    },
+    {
+      "start": 804.72,
+      "end": 808.98,
+      "start_abs": 4615.72,
+      "end_abs": 4619.98,
+      "text": "¿Y qué tendrá de conexión a esta historia? Déjame que te lo explique."
+    },
+    {
+      "start": 808.98,
+      "end": 809.4,
+      "start_abs": 4619.98,
+      "end_abs": 4620.4,
+      "text": "Contexto."
+    },
+    {
+      "start": 810.12,
+      "end": 811.0,
+      "start_abs": 4621.12,
+      "end_abs": 4622.0,
+      "text": "Ruth ¿Quién era?"
+    },
+    {
+      "start": 812.24,
+      "end": 818.5,
+      "start_abs": 4623.24,
+      "end_abs": 4629.5,
+      "text": "Ruth era la no era de Noemí, en Ruth 1.1."
+    },
+    {
+      "start": 819.3,
+      "end": 819.48,
+      "start_abs": 4630.3,
+      "end_abs": 4630.48,
+      "text": "Y se."
+    },
+    {
+      "start": 819.48,
+      "end": 822.74,
+      "start_abs": 4630.48,
+      "end_abs": 4633.74,
+      "text": "Aconteció en los días que gobernaban los jueces, un poco de contexto, era una."
+    },
+    {
+      "start": 822.74,
+      "end": 825.22,
+      "start_abs": 4633.74,
+      "end_abs": 4636.22,
+      "text": "Época caótica para Israel, una época difícil."
+    },
+    {
+      "start": 826.76,
+      "end": 828.76,
+      "start_abs": 4637.76,
+      "end_abs": 4639.76,
+      "text": "Ahora Noemí pierde a su."
+    },
+    {
+      "start": 828.76,
+      "end": 831.92,
+      "start_abs": 4639.76,
+      "end_abs": 4642.92,
+      "text": "Esposo y sus dos hijos, esto está en Ruth 1.20 al 21."
+    },
+    {
+      "start": 832.66,
+      "end": 834.3,
+      "start_abs": 4643.66,
+      "end_abs": 4645.3,
+      "text": "Y Noemí comienza a."
+    },
+    {
+      "start": 834.3,
+      "end": 838.14,
+      "start_abs": 4645.3,
+      "end_abs": 4649.14,
+      "text": "Vivir la consecuencia de esta pérdida, incluso dice en uno de los versículos."
+    },
+    {
+      "start": 838.14,
+      "end": 843.94,
+      "start_abs": 4649.14,
+      "end_abs": 4654.9400000000005,
+      "text": "El 21, no me llaméis 9mí, sino llamadme Mara, porque en grande amargura me ha puesto el todo."
+    },
+    {
+      "start": 843.94,
+      "end": 846.76,
+      "start_abs": 4654.9400000000005,
+      "end_abs": 4657.76,
+      "text": "Poderoso. O sea, 9mí estaba viviendo algo terrible."
+    },
+    {
+      "start": 847.46,
+      "end": 848.96,
+      "start_abs": 4658.46,
+      "end_abs": 4659.96,
+      "text": "Estaba viviendo la pérdida que en."
+    },
+    {
+      "start": 848.96,
+      "end": 852.74,
+      "start_abs": 4659.96,
+      "end_abs": 4663.74,
+      "text": "Esos tiempos, hoy es terrible, pero en esos tiempos el doble, el triple."
+    },
+    {
+      "start": 853.52,
+      "end": 854.02,
+      "start_abs": 4664.52,
+      "end_abs": 4665.02,
+      "text": "Porque si tú."
+    },
+    {
+      "start": 854.02,
+      "end": 859.18,
+      "start_abs": 4665.02,
+      "end_abs": 4670.18,
+      "text": "Perdías a tu esposo y aún tus hijos no eras nadie en esa sociedad, estabas completamente."
+    },
+    {
+      "start": 859.18,
+      "end": 864.7,
+      "start_abs": 4670.18,
+      "end_abs": 4675.7,
+      "text": "Desprotegido, no solamente por la pérdida que esto significaba de dolor, sino también."
+    },
+    {
+      "start": 864.7,
+      "end": 869.48,
+      "start_abs": 4675.7,
+      "end_abs": 4680.48,
+      "text": "Tiene económicamente, socialmente, por eso no de mí, ya en su vejez."
+    },
+    {
+      "start": 869.5,
+      "end": 869.98,
+      "start_abs": 4680.5,
+      "end_abs": 4680.98,
+      "text": "Ella dice."
+    },
+    {
+      "start": 870.78,
+      "end": 873.42,
+      "start_abs": 4681.78,
+      "end_abs": 4684.42,
+      "text": "Llámame amarga, ya no soy dulce, llámame amarga."
+    },
+    {
+      "start": 874.3,
+      "end": 876.34,
+      "start_abs": 4685.3,
+      "end_abs": 4687.34,
+      "text": "Queridos, aquí hay trauma generacional."
+    },
+    {
+      "start": 877.2,
+      "end": 877.78,
+      "start_abs": 4688.2,
+      "end_abs": 4688.78,
+      "text": "Hay pérdida."
+    },
+    {
+      "start": 878.08,
+      "end": 880.1,
+      "start_abs": 4689.08,
+      "end_abs": 4691.1,
+      "text": "Hay amargura, y hay vejez triste."
+    },
+    {
+      "start": 880.34,
+      "end": 883.36,
+      "start_abs": 4691.34,
+      "end_abs": 4694.36,
+      "text": "Y déjenme dedicarle unas pequeñas palabras y tranquilos que."
+    },
+    {
+      "start": 883.36,
+      "end": 885.18,
+      "start_abs": 4694.36,
+      "end_abs": 4696.18,
+      "text": "Ya estamos llegando a la parte final."
+    },
+    {
+      "start": 885.84,
+      "end": 888.08,
+      "start_abs": 4696.84,
+      "end_abs": 4699.08,
+      "text": "Siempre escuchamos aquí que se le dedican mensaje a los."
+    },
+    {
+      "start": 888.08,
+      "end": 888.84,
+      "start_abs": 4699.08,
+      "end_abs": 4699.84,
+      "text": "Jóvenes, ¿no?"
+    },
+    {
+      "start": 888.94,
+      "end": 890.26,
+      "start_abs": 4699.9400000000005,
+      "end_abs": 4701.26,
+      "text": "Este mensaje es para los jóvenes."
+    },
+    {
+      "start": 890.26,
+      "end": 896.66,
+      "start_abs": 4701.26,
+      "end_abs": 4707.66,
+      "text": "Pero yo quisiera dedicar esta parte del mensaje a nuestros queridos adultos y adultos mayores."
+    },
+    {
+      "start": 897.5,
+      "end": 899.26,
+      "start_abs": 4708.5,
+      "end_abs": 4710.26,
+      "text": "Y aquí hay varios en la iglesia."
+    },
+    {
+      "start": 900.56,
+      "end": 903.92,
+      "start_abs": 4711.5599999999995,
+      "end_abs": 4714.92,
+      "text": "¿Sabes que esta semana yo como que empecé a pensar en la vejez?"
+    },
+    {
+      "start": 904.2,
+      "end": 905.48,
+      "start_abs": 4715.2,
+      "end_abs": 4716.48,
+      "text": "Yo soy joven, ¿no?"
+    },
+    {
+      "start": 906.08,
+      "end": 910.0,
+      "start_abs": 4717.08,
+      "end_abs": 4721.0,
+      "text": "Bueno, quizás los adolescentes ahí, los nacidos después del 2000 van a decir."
+    },
+    {
+      "start": 910.0,
+      "end": 911.14,
+      "start_abs": 4721.0,
+      "end_abs": 4722.14,
+      "text": "¡Oh, naciste en el 1991!"
+    },
+    {
+      "start": 912.18,
+      "end": 913.2,
+      "start_abs": 4723.18,
+      "end_abs": 4724.2,
+      "text": "Soy viejo para ellos, ¿no?"
+    },
+    {
+      "start": 914.0,
+      "end": 914.92,
+      "start_abs": 4725.0,
+      "end_abs": 4725.92,
+      "text": "Es el siglo pasado."
+    },
+    {
+      "start": 915.7,
+      "end": 918.56,
+      "start_abs": 4726.7,
+      "end_abs": 4729.5599999999995,
+      "text": "Pero yo me considero todavía joven, 31 años."
+    },
+    {
+      "start": 919.18,
+      "end": 919.78,
+      "start_abs": 4730.18,
+      "end_abs": 4730.78,
+      "text": "Ahora."
+    },
+    {
+      "start": 920.62,
+      "end": 923.22,
+      "start_abs": 4731.62,
+      "end_abs": 4734.22,
+      "text": "Yo hasta hace poquitas semanas."
+    },
+    {
+      "start": 923.88,
+      "end": 927.06,
+      "start_abs": 4734.88,
+      "end_abs": 4738.0599999999995,
+      "text": "Nunca pensé o me imaginé yo cuando viejito."
+    },
+    {
+      "start": 928.04,
+      "end": 932.62,
+      "start_abs": 4739.04,
+      "end_abs": 4743.62,
+      "text": "Porque decía no, Cristo va a venir antes, no me puedo imaginar siendo viejito."
+    },
+    {
+      "start": 933.04,
+      "end": 937.54,
+      "start_abs": 4744.04,
+      "end_abs": 4748.54,
+      "text": "Pero pasaron una serie de cosas en esta semana en donde comencé a pensar."
+    },
+    {
+      "start": 937.54,
+      "end": 939.92,
+      "start_abs": 4748.54,
+      "end_abs": 4750.92,
+      "text": "La vejez puede ser triste, ¿no?"
+    },
+    {
+      "start": 940.94,
+      "end": 945.24,
+      "start_abs": 4751.9400000000005,
+      "end_abs": 4756.24,
+      "text": "Puede estar llena de soledad, puede estar llena de enfermedades."
+    },
+    {
+      "start": 946.86,
+      "end": 951.86,
+      "start_abs": 4757.86,
+      "end_abs": 4762.86,
+      "text": "Yo incluso me acuerdo que estuvimos repartiendo y haciendo algunas visitas no."
+    },
+    {
+      "start": 951.86,
+      "end": 958.1,
+      "start_abs": 4762.86,
+      "end_abs": 4769.1,
+      "text": "La semana antes pasada y yo llegaba a casas en esta misma iglesia donde personas."
+    },
+    {
+      "start": 958.1,
+      "end": 965.72,
+      "start_abs": 4769.1,
+      "end_abs": 4776.72,
+      "text": "Viven solos la soledad la vejez yo pienso será que cuando sea viejito mi hija."
+    },
+    {
+      "start": 965.72,
+      "end": 970.0,
+      "start_abs": 4776.72,
+      "end_abs": 4781.0,
+      "text": "Se va a acordar de mí va a venir a verme me va a llamar no puede sonar."
+    },
+    {
+      "start": 970.0,
+      "end": 973.64,
+      "start_abs": 4781.0,
+      "end_abs": 4784.64,
+      "text": "Tonto lo que estoy diciendo y puede pasar mucho tiempo eso es a futuro pero."
+    },
+    {
+      "start": 974.18,
+      "end": 980.72,
+      "start_abs": 4785.18,
+      "end_abs": 4791.72,
+      "text": "Dígame ustedes los que son ya más adultos o jóvenes adultos, no me gusta llamarle ancianos."
+    },
+    {
+      "start": 980.72,
+      "end": 981.3,
+      "start_abs": 4791.72,
+      "end_abs": 4792.3,
+      "text": "Ni nada, ok?"
+    },
+    {
+      "start": 981.98,
+      "end": 983.98,
+      "start_abs": 4792.98,
+      "end_abs": 4794.98,
+      "text": "Pero dígame, ¿la vida pasa rápido o no?"
+    },
+    {
+      "start": 986.46,
+      "end": 991.3,
+      "start_abs": 4797.46,
+      "end_abs": 4802.3,
+      "text": "Yo hoy quiero decirte queridos, que aunque te sientas mara, que aunque te sientas que."
+    },
+    {
+      "start": 991.3,
+      "end": 995.94,
+      "start_abs": 4802.3,
+      "end_abs": 4806.9400000000005,
+      "text": "Tu vida en esta etapa de tu vida está amarga, miren, yo dedico estas palabras para ustedes."
+    },
+    {
+      "start": 996.42,
+      "end": 997.9,
+      "start_abs": 4807.42,
+      "end_abs": 4808.9,
+      "text": "Dios no ha terminado contigo."
+    },
+    {
+      "start": 998.58,
+      "end": 1003.08,
+      "start_abs": 4809.58,
+      "end_abs": 4814.08,
+      "text": "Dios está contigo, Dios te acompaña, Dios te abraza."
+    },
+    {
+      "start": 1003.08,
+      "end": 1005.0,
+      "start_abs": 4814.08,
+      "end_abs": 4816.0,
+      "text": "Todavía hay mucho que hacer en el mundo."
+    },
+    {
+      "start": 1005.06,
+      "end": 1007.58,
+      "start_abs": 4816.0599999999995,
+      "end_abs": 4818.58,
+      "text": "Si tienes vida, si estás respirando."
+    },
+    {
+      "start": 1008.06,
+      "end": 1009.98,
+      "start_abs": 4819.0599999999995,
+      "end_abs": 4820.98,
+      "text": "Es porque Dios tiene un plan para ti."
+    },
+    {
+      "start": 1010.8,
+      "end": 1012.04,
+      "start_abs": 4821.8,
+      "end_abs": 4823.04,
+      "text": "Toda es nuestra sabiduría."
+    },
+    {
+      "start": 1012.98,
+      "end": 1015.04,
+      "start_abs": 4823.98,
+      "end_abs": 4826.04,
+      "text": "Nosotros como jóvenes te necesitamos."
+    },
+    {
+      "start": 1015.82,
+      "end": 1016.88,
+      "start_abs": 4826.82,
+      "end_abs": 4827.88,
+      "text": "Y si nos unimos."
+    },
+    {
+      "start": 1017.14,
+      "end": 1019.38,
+      "start_abs": 4828.14,
+      "end_abs": 4830.38,
+      "text": "Si mezclamos tu sabiduría con nuestra fuerza."
+    },
+    {
+      "start": 1019.38,
+      "end": 1020.4,
+      "start_abs": 4830.38,
+      "end_abs": 4831.4,
+      "text": "Y ganas de hacer cosas."
+    },
+    {
+      "start": 1020.92,
+      "end": 1023.6,
+      "start_abs": 4831.92,
+      "end_abs": 4834.6,
+      "text": "La iglesia puede levantarse quizás como nunca antes."
+    },
+    {
+      "start": 1024.36,
+      "end": 1025.88,
+      "start_abs": 4835.36,
+      "end_abs": 4836.88,
+      "text": "Creo que es momento de dejar de pelear."
+    },
+    {
+      "start": 1025.88,
+      "end": 1027.68,
+      "start_abs": 4836.88,
+      "end_abs": 4838.68,
+      "text": "Entre ancianos y jóvenes."
+    },
+    {
+      "start": 1027.68,
+      "end": 1029.16,
+      "start_abs": 4838.68,
+      "end_abs": 4840.16,
+      "text": "Y no empezar a vernos como familia."
+    },
+    {
+      "start": 1029.22,
+      "end": 1029.94,
+      "start_abs": 4840.22,
+      "end_abs": 4840.9400000000005,
+      "text": "Trabajar juntos."
+    },
+    {
+      "start": 1029.94,
+      "end": 1033.28,
+      "start_abs": 4840.9400000000005,
+      "end_abs": 4844.28,
+      "text": "Y yo decía, ah, todavía esto está en pañales."
+    },
+    {
+      "start": 1034.0,
+      "end": 1035.9,
+      "start_abs": 4845.0,
+      "end_abs": 4846.9,
+      "text": "Pero decía que lindo sería que como jóvenes."
+    },
+    {
+      "start": 1036.76,
+      "end": 1042.14,
+      "start_abs": 4847.76,
+      "end_abs": 4853.14,
+      "text": "Armemos un ministerio en la iglesia donde acompañemos a nuestros queridos adultos mayores, donde."
+    },
+    {
+      "start": 1042.14,
+      "end": 1047.2,
+      "start_abs": 4853.14,
+      "end_abs": 4858.2,
+      "text": "Un día podamos ir a la semana, vamos a visitar, vamos a visitar, vamos a aprender, vamos a."
+    },
+    {
+      "start": 1047.2,
+      "end": 1050.16,
+      "start_abs": 4858.2,
+      "end_abs": 4861.16,
+      "text": "Escuchar las historias que estas personas nos tienen que contar."
+    },
+    {
+      "start": 1051.06,
+      "end": 1055.12,
+      "start_abs": 4862.0599999999995,
+      "end_abs": 4866.12,
+      "text": "Queridos, quiero dedicarte estas palabras porque noemi quería incluso cambiar su."
+    },
+    {
+      "start": 1055.12,
+      "end": 1059.7,
+      "start_abs": 4866.12,
+      "end_abs": 4870.7,
+      "text": "Identidad pensaba que todo había terminado para su vida pero aquí entra la."
+    },
+    {
+      "start": 1059.7,
+      "end": 1060.52,
+      "start_abs": 4870.7,
+      "end_abs": 4871.52,
+      "text": "Decisión de Ruth."
+    },
+    {
+      "start": 1061.36,
+      "end": 1064.52,
+      "start_abs": 4872.36,
+      "end_abs": 4875.52,
+      "text": "Ruth ¿Qué era? Ustedes me dijeron aquí adelante ya y se me adelantaron."
+    },
+    {
+      "start": 1065.58,
+      "end": 1066.66,
+      "start_abs": 4876.58,
+      "end_abs": 4877.66,
+      "text": "Era Moabita."
+    },
+    {
+      "start": 1067.5,
+      "end": 1072.4,
+      "start_abs": 4878.5,
+      "end_abs": 4883.4,
+      "text": "O sea era descendiente de esta serie de rodes que comenzó con Lot y sus."
+    },
+    {
+      "start": 1072.4,
+      "end": 1072.84,
+      "start_abs": 4883.4,
+      "end_abs": 4883.84,
+      "text": "Hijas."
+    },
+    {
+      "start": 1073.64,
+      "end": 1078.84,
+      "start_abs": 4884.64,
+      "end_abs": 4889.84,
+      "text": "Era parte de esta historia rota pero ella toma una decisión radical."
+    },
+    {
+      "start": 1078.84,
+      "end": 1083.94,
+      "start_abs": 4889.84,
+      "end_abs": 4894.9400000000005,
+      "text": "Queridos y esto está en Ruth 1 16 al 17 queridos y esto es tremendo."
+    },
+    {
+      "start": 1085.0,
+      "end": 1093.58,
+      "start_abs": 4896.0,
+      "end_abs": 4904.58,
+      "text": "Ve a Noemi su suegra sola y le dice no me ruegues que te deje, miren lo contrario a la."
+    },
+    {
+      "start": 1093.58,
+      "end": 1099.3,
+      "start_abs": 4904.58,
+      "end_abs": 4910.3,
+      "text": "Decisión que tomó Lot y Abram le dice no me ruegues que te deje porque a donde."
+    },
+    {
+      "start": 1099.3,
+      "end": 1104.98,
+      "start_abs": 4910.3,
+      "end_abs": 4915.98,
+      "text": "Quiera que tú fuere Sirio y a donde quiera que vivieres viviré tu pueblo."
+    },
+    {
+      "start": 1104.98,
+      "end": 1111.08,
+      "start_abs": 4915.98,
+      "end_abs": 4922.08,
+      "text": "Será mi pueblo y tu dios será mi dios. ¿Por qué me emociona esta parte de la."
+    },
+    {
+      "start": 1111.08,
+      "end": 1115.04,
+      "start_abs": 4922.08,
+      "end_abs": 4926.04,
+      "text": "Historia, queridos, porque esto es impresionante, queridos."
+    },
+    {
+      "start": 1115.52,
+      "end": 1117.16,
+      "start_abs": 4926.52,
+      "end_abs": 4928.16,
+      "text": "Ella rompe con su tierra."
+    },
+    {
+      "start": 1117.86,
+      "end": 1118.62,
+      "start_abs": 4928.86,
+      "end_abs": 4929.62,
+      "text": "Su cultura."
+    },
+    {
+      "start": 1119.28,
+      "end": 1120.42,
+      "start_abs": 4930.28,
+      "end_abs": 4931.42,
+      "text": "Su pasado espiritual."
+    },
+    {
+      "start": 1120.92,
+      "end": 1122.1,
+      "start_abs": 4931.92,
+      "end_abs": 4933.1,
+      "text": "Su identidad ancestral."
+    },
+    {
+      "start": 1122.78,
+      "end": 1127.44,
+      "start_abs": 4933.78,
+      "end_abs": 4938.4400000000005,
+      "text": "Mira, Ruth no eligió su origen, pero sí eligió su destino."
+    },
+    {
+      "start": 1128.02,
+      "end": 1129.88,
+      "start_abs": 4939.02,
+      "end_abs": 4940.88,
+      "text": "Y eso lo cambia todo."
+    },
+    {
+      "start": 1131.1,
+      "end": 1133.48,
+      "start_abs": 4942.1,
+      "end_abs": 4944.48,
+      "text": "Queridos, tú no has elegido tu origen."
+    },
+    {
+      "start": 1133.86,
+      "end": 1136.72,
+      "start_abs": 4944.86,
+      "end_abs": 4947.72,
+      "text": "No elegiste lo que te pesa en tus hombros."
+    },
+    {
+      "start": 1137.04,
+      "end": 1139.4,
+      "start_abs": 4948.04,
+      "end_abs": 4950.4,
+      "text": "No elegiste las cosas que hicieron contigo."
+    },
+    {
+      "start": 1139.4,
+      "end": 1141.54,
+      "start_abs": 4950.4,
+      "end_abs": 4952.54,
+      "text": "No tuviste elección allí."
+    },
+    {
+      "start": 1142.3,
+      "end": 1143.3,
+      "start_abs": 4953.3,
+      "end_abs": 4954.3,
+      "text": "Pero así como Ruth."
+    },
+    {
+      "start": 1144.04,
+      "end": 1147.5,
+      "start_abs": 4955.04,
+      "end_abs": 4958.5,
+      "text": "Tú puedes cambiar tu destino, tú puedes."
+    },
+    {
+      "start": 1147.5,
+      "end": 1154.16,
+      "start_abs": 4958.5,
+      "end_abs": 4965.16,
+      "text": "Cambiar el futuro de tu vida, no estar de si estás vivo, todavía puedes tomar decisiones."
+    },
+    {
+      "start": 1154.16,
+      "end": 1159.28,
+      "start_abs": 4965.16,
+      "end_abs": 4970.28,
+      "text": "Que cambien la dirección, no solamente de tu vida futura, sino de lo que va a venir."
+    },
+    {
+      "start": 1159.28,
+      "end": 1160.92,
+      "start_abs": 4970.28,
+      "end_abs": 4971.92,
+      "text": "En el futuro después de ti."
+    },
+    {
+      "start": 1161.82,
+      "end": 1166.48,
+      "start_abs": 4972.82,
+      "end_abs": 4977.48,
+      "text": "Porque así también si las decisiones negativas tienen consecuencias."
+    },
+    {
+      "start": 1166.48,
+      "end": 1172.84,
+      "start_abs": 4977.48,
+      "end_abs": 4983.84,
+      "text": "Hasta la tercera y cuarta generación como dice Éxodo después Dios dice pero yo hago misericordia a."
+    },
+    {
+      "start": 1172.84,
+      "end": 1181.26,
+      "start_abs": 4983.84,
+      "end_abs": 4992.26,
+      "text": "Millares su misericordia sobrepasa nuestro pecado donde abundó el pecado sobreabundó la gracia de."
+    },
+    {
+      "start": 1181.26,
+      "end": 1190.72,
+      "start_abs": 4992.26,
+      "end_abs": 5001.72,
+      "text": "Dios queridos la rendencia la redención que Ruth vivió no terminó solamente en esa decisión."
+    },
+    {
+      "start": 1190.72,
+      "end": 1197.86,
+      "start_abs": 5001.72,
+      "end_abs": 5008.86,
+      "text": "Tú sabes que Ruth después conoce a Vos y que es interesante que Vos aparece aquí."
+    },
+    {
+      "start": 1197.86,
+      "end": 1201.26,
+      "start_abs": 5008.86,
+      "end_abs": 5012.26,
+      "text": "Con palabras que nos asemejan a Redentor, Joel."
+    },
+    {
+      "start": 1202.0,
+      "end": 1204.22,
+      "start_abs": 5013.0,
+      "end_abs": 5015.22,
+      "text": "Vos pues tomó a Ruth y ella fue su."
+    },
+    {
+      "start": 1204.22,
+      "end": 1209.46,
+      "start_abs": 5015.22,
+      "end_abs": 5020.46,
+      "text": "Mujer, dice Ruth 413 y aquí entra un giro tremendo queridos en la Biblia."
+    },
+    {
+      "start": 1210.2,
+      "end": 1217.42,
+      "start_abs": 5021.2,
+      "end_abs": 5028.42,
+      "text": "Ruth 417 dice que le dieron nombre a los descendentes de Ruth y dice que un hijo lo."
+    },
+    {
+      "start": 1217.42,
+      "end": 1218.28,
+      "start_abs": 5028.42,
+      "end_abs": 5029.28,
+      "text": "Llamaron Obed."
+    },
+    {
+      "start": 1219.16,
+      "end": 1225.66,
+      "start_abs": 5030.16,
+      "end_abs": 5036.66,
+      "text": "Y Obed es padre de Isaí y Isaí es padre de David, y ¿por qué te digo esto?"
+    },
+    {
+      "start": 1226.36,
+      "end": 1230.46,
+      "start_abs": 5037.36,
+      "end_abs": 5041.46,
+      "text": "Porque cuando tú entras a la genealogía de Jesús, que antes me parecía muy aburrío."
+    },
+    {
+      "start": 1230.46,
+      "end": 1231.98,
+      "start_abs": 5041.46,
+      "end_abs": 5042.98,
+      "text": "Y decía ¿por qué está aquí en la Biblia?"
+    },
+    {
+      "start": 1232.6,
+      "end": 1236.18,
+      "start_abs": 5043.6,
+      "end_abs": 5047.18,
+      "text": "En Mateo capítulo 1 aparece ¿quién en la genealogía de Jesús?"
+    },
+    {
+      "start": 1237.52,
+      "end": 1243.6,
+      "start_abs": 5048.52,
+      "end_abs": 5054.6,
+      "text": "Aparece Ruth, mira la misericordia de Dios en la historia."
+    },
+    {
+      "start": 1244.5,
+      "end": 1252.1,
+      "start_abs": 5055.5,
+      "end_abs": 5063.1,
+      "text": "Una decisión. Trajo años de consecuencias terribles, pero una pequeña decisión de una mujer que estuvo."
+    },
+    {
+      "start": 1252.1,
+      "end": 1258.22,
+      "start_abs": 5063.1,
+      "end_abs": 5069.22,
+      "text": "Dispuesta a dejarlo todo para ser fiel a Dios, Ruth, que no importó su pasado, de dónde venía."
+    },
+    {
+      "start": 1258.38,
+      "end": 1263.6,
+      "start_abs": 5069.38,
+      "end_abs": 5074.6,
+      "text": "Cómo era su historia, hizo que no solamente cambiara el futuro de su vida y de sus familias."
+    },
+    {
+      "start": 1263.6,
+      "end": 1269.02,
+      "start_abs": 5074.6,
+      "end_abs": 5080.02,
+      "text": "Sino que ella por esa decisión y ese linaje vino el Mesías, vino Cristo queridos."
+    },
+    {
+      "start": 1269.76,
+      "end": 1270.26,
+      "start_abs": 5080.76,
+      "end_abs": 5081.26,
+      "text": "En la."
+    },
+    {
+      "start": 1270.26,
+      "end": 1274.32,
+      "start_abs": 5081.26,
+      "end_abs": 5085.32,
+      "text": "La genealogía de Jesucristo existe ruptura."
+    },
+    {
+      "start": 1275.02,
+      "end": 1277.4,
+      "start_abs": 5086.02,
+      "end_abs": 5088.4,
+      "text": "Existe y existe redención."
+    },
+    {
+      "start": 1278.46,
+      "end": 1279.3,
+      "start_abs": 5089.46,
+      "end_abs": 5090.3,
+      "text": "Queridos."
+    },
+    {
+      "start": 1280.5,
+      "end": 1283.7,
+      "start_abs": 5091.5,
+      "end_abs": 5094.7,
+      "text": "La descendiente de una relación nacida en una cueva de vergüenza."
+    },
+    {
+      "start": 1284.24,
+      "end": 1287.34,
+      "start_abs": 5095.24,
+      "end_abs": 5098.34,
+      "text": "Terminó siendo parte de la genealogía del Mesías."
+    },
+    {
+      "start": 1288.02,
+      "end": 1292.66,
+      "start_abs": 5099.02,
+      "end_abs": 5103.66,
+      "text": "Eso es redención generacional, eso es romper el ciclo."
+    },
+    {
+      "start": 1293.92,
+      "end": 1296.78,
+      "start_abs": 5104.92,
+      "end_abs": 5107.78,
+      "text": "Genesis 13-9, cuando tú entras a la historia de Lot."
+    },
+    {
+      "start": 1297.34,
+      "end": 1302.76,
+      "start_abs": 5108.34,
+      "end_abs": 5113.76,
+      "text": "Dices, Lodi Abram. Abram le dice, no? Si fueras a la mano izquierda, yo irá a la derecha."
+    },
+    {
+      "start": 1303.1,
+      "end": 1307.02,
+      "start_abs": 5114.1,
+      "end_abs": 5118.02,
+      "text": "Y si tú a la derecha, yo iré a la izquierda. Y contrastalo con Ruth."
+    },
+    {
+      "start": 1307.44,
+      "end": 1310.18,
+      "start_abs": 5118.4400000000005,
+      "end_abs": 5121.18,
+      "text": "No me robes que te deje porque a donde quiera que tú fueras, iré yo."
+    },
+    {
+      "start": 1310.56,
+      "end": 1314.76,
+      "start_abs": 5121.5599999999995,
+      "end_abs": 5125.76,
+      "text": "Donde quiera que vivieras, viviré. Tu pueblo será mi pueblo y tu Dios, mi Dios."
+    },
+    {
+      "start": 1315.16,
+      "end": 1315.56,
+      "start_abs": 5126.16,
+      "end_abs": 5126.5599999999995,
+      "text": "Separación."
+    },
+    {
+      "start": 1316.4,
+      "end": 1316.68,
+      "start_abs": 5127.4,
+      "end_abs": 5127.68,
+      "text": "Unión."
+    },
+    {
+      "start": 1318.52,
+      "end": 1319.78,
+      "start_abs": 5129.52,
+      "end_abs": 5130.78,
+      "text": "Loth eligió por vista."
+    },
+    {
+      "start": 1320.74,
+      "end": 1321.34,
+      "start_abs": 5131.74,
+      "end_abs": 5132.34,
+      "text": "Vio esas tierras."
+    },
+    {
+      "start": 1322.44,
+      "end": 1323.6,
+      "start_abs": 5133.4400000000005,
+      "end_abs": 5134.6,
+      "text": "Ruth eligió por fe."
+    },
+    {
+      "start": 1324.6,
+      "end": 1330.32,
+      "start_abs": 5135.6,
+      "end_abs": 5141.32,
+      "text": "Loth se acercó a Sodoma. Ruth se acercó al dios de Israel."
+    },
+    {
+      "start": 1331.4,
+      "end": 1333.22,
+      "start_abs": 5142.4,
+      "end_abs": 5144.22,
+      "text": "De Loth nació Moab y por."
+    },
+    {
+      "start": 1333.22,
+      "end": 1334.54,
+      "start_abs": 5144.22,
+      "end_abs": 5145.54,
+      "text": "Descendencia a los Moabitas."
+    },
+    {
+      "start": 1335.3,
+      "end": 1338.98,
+      "start_abs": 5146.3,
+      "end_abs": 5149.98,
+      "text": "Y de Ruth nació el linaje del rey, del Mesías."
+    },
+    {
+      "start": 1339.8,
+      "end": 1340.98,
+      "start_abs": 5150.8,
+      "end_abs": 5151.98,
+      "text": "Uno dejó que la."
+    },
+    {
+      "start": 1340.98,
+      "end": 1347.62,
+      "start_abs": 5151.98,
+      "end_abs": 5158.62,
+      "text": "Historia lo arrastrara y la otra, Ruth, decidió escribir una nueva."
+    },
+    {
+      "start": 1348.86,
+      "end": 1354.2,
+      "start_abs": 5159.86,
+      "end_abs": 5165.2,
+      "text": "Queridos, nosotros podemos romper estos ciclos generacionales y te vuelvo a decir lo que este."
+    },
+    {
+      "start": 1354.2,
+      "end": 1360.08,
+      "start_abs": 5165.2,
+      "end_abs": 5171.08,
+      "text": "Amigo le dijo a su amigo que estaba cargando con tantas cosas. No tiene por qué ser igual."
+    },
+    {
+      "start": 1360.56,
+      "end": 1365.86,
+      "start_abs": 5171.5599999999995,
+      "end_abs": 5176.86,
+      "text": "No tienes por qué seguir viviendo así, no tienes por qué seguir viviendo así."
+    },
+    {
+      "start": 1366.2,
+      "end": 1371.62,
+      "start_abs": 5177.2,
+      "end_abs": 5182.62,
+      "text": "No tienes por qué seguir viviendo así, porque hay redención."
+    },
+    {
+      "start": 1372.46,
+      "end": 1373.32,
+      "start_abs": 5183.46,
+      "end_abs": 5184.32,
+      "text": "Porque hay perdón."
+    },
+    {
+      "start": 1373.32,
+      "end": 1379.1,
+      "start_abs": 5184.32,
+      "end_abs": 5190.1,
+      "text": "Porque una decisión lo puede cambiar todo y yo quiero terminar con esto queridos."
+    },
+    {
+      "start": 1379.58,
+      "end": 1382.96,
+      "start_abs": 5190.58,
+      "end_abs": 5193.96,
+      "text": "Y me gustaría que el worksheet pueda ir pasando porque vamos a terminar."
+    },
+    {
+      "start": 1382.96,
+      "end": 1388.8,
+      "start_abs": 5193.96,
+      "end_abs": 5199.8,
+      "text": "Cantando maravillosa gracia si se puede si no están todos bueno ahí dan y si no."
+    },
+    {
+      "start": 1388.8,
+      "end": 1394.04,
+      "start_abs": 5199.8,
+      "end_abs": 5205.04,
+      "text": "Si nos acompañas ahí con el piano puede ser solo ahí con piano queridos."
+    },
+    {
+      "start": 1395.2,
+      "end": 1398.44,
+      "start_abs": 5206.2,
+      "end_abs": 5209.4400000000005,
+      "text": "Disculpen que no les avise los tomé sorpresa pero aquí así es mi equipo."
+    },
+    {
+      "start": 1398.44,
+      "end": 1399.26,
+      "start_abs": 5209.4400000000005,
+      "end_abs": 5210.26,
+      "text": "Bueno, bueno."
+    },
+    {
+      "start": 1400.5,
+      "end": 1401.22,
+      "start_abs": 5211.5,
+      "end_abs": 5212.22,
+      "text": "Miren."
+    },
+    {
+      "start": 1402.1,
+      "end": 1407.54,
+      "start_abs": 5213.1,
+      "end_abs": 5218.54,
+      "text": "Salvación, lo que les dije al principio, también tiene que ver con sanidad."
+    },
+    {
+      "start": 1408.64,
+      "end": 1411.24,
+      "start_abs": 5219.64,
+      "end_abs": 5222.24,
+      "text": "De hecho, en griego son la misma palabra."
+    },
+    {
+      "start": 1412.4,
+      "end": 1416.6,
+      "start_abs": 5223.4,
+      "end_abs": 5227.6,
+      "text": "Salvación no es solamente suplicar misericordia ante un juez."
+    },
+    {
+      "start": 1416.7,
+      "end": 1422.08,
+      "start_abs": 5227.7,
+      "end_abs": 5233.08,
+      "text": "La visión de leyes y de jueces, sino abrir tu alma ante el doctor."
+    },
+    {
+      "start": 1423.46,
+      "end": 1426.88,
+      "start_abs": 5234.46,
+      "end_abs": 5237.88,
+      "text": "Sabías que los cristianos."
+    },
+    {
+      "start": 1426.88,
+      "end": 1432.54,
+      "start_abs": 5237.88,
+      "end_abs": 5243.54,
+      "text": "Primitimos llamaban a Jesús el médico del alma y me gusta esta expresión un."
+    },
+    {
+      "start": 1434.01,
+      "end": 1437.69,
+      "start_abs": 5245.01,
+      "end_abs": 5248.6900000000005,
+      "text": "Padre de la iglesia llamado Ignacio de Antioquía que fue guiado por el mismo."
+    },
+    {
+      "start": 1437.69,
+      "end": 1444.09,
+      "start_abs": 5248.6900000000005,
+      "end_abs": 5255.09,
+      "text": "Apóstol Juan él describe algo en Jesús que me encanta porque generalmente vemos."
+    },
+    {
+      "start": 1444.09,
+      "end": 1449.59,
+      "start_abs": 5255.09,
+      "end_abs": 5260.59,
+      "text": "A Jesús en términos merecíamos el castigo merecíamos la muerte el vino nos."
+    },
+    {
+      "start": 1449.59,
+      "end": 1455.13,
+      "start_abs": 5260.59,
+      "end_abs": 5266.13,
+      "text": "Rescató y gracias a él tenemos acceso al cielo que es hermoso pero no termina."
+    },
+    {
+      "start": 1455.13,
+      "end": 1459.59,
+      "start_abs": 5266.13,
+      "end_abs": 5270.59,
+      "text": "Allí queridos, los primeros cristianos veían a Jesús, yo sé que esta iglesia."
+    },
+    {
+      "start": 1459.59,
+      "end": 1463.37,
+      "start_abs": 5270.59,
+      "end_abs": 5274.37,
+      "text": "Tenemos muchos profesionales de la salud, Jesús era el médico por."
+    },
+    {
+      "start": 1463.37,
+      "end": 1469.03,
+      "start_abs": 5274.37,
+      "end_abs": 5280.03,
+      "text": "Excelencia, porque no solamente vino a salvarnos, sino que vino a sanarnos."
+    },
+    {
+      "start": 1470.59,
+      "end": 1470.81,
+      "start_abs": 5281.59,
+      "end_abs": 5281.8099999999995,
+      "text": "Mira."
+    },
+    {
+      "start": 1470.81,
+      "end": 1474.75,
+      "start_abs": 5281.8099999999995,
+      "end_abs": 5285.75,
+      "text": "Esta frase de Ignacio de Antioquía dice, pero nuestro médico es el único Dios."
+    },
+    {
+      "start": 1474.75,
+      "end": 1477.07,
+      "start_abs": 5285.75,
+      "end_abs": 5288.07,
+      "text": "Verdadero, Jesús el Cristo."
+    },
+    {
+      "start": 1477.85,
+      "end": 1480.63,
+      "start_abs": 5288.85,
+      "end_abs": 5291.63,
+      "text": "Él se sujetó a corrupción para poder liberar."
+    },
+    {
+      "start": 1480.63,
+      "end": 1486.45,
+      "start_abs": 5291.63,
+      "end_abs": 5297.45,
+      "text": "Nuestras almas de la muerte y la corrupción y sanarlas y poder restaurarlas a su salud."
+    },
+    {
+      "start": 1486.83,
+      "end": 1489.75,
+      "start_abs": 5297.83,
+      "end_abs": 5300.75,
+      "text": "Cuando estaban muertas en impiedad y malos deseos."
+    },
+    {
+      "start": 1490.35,
+      "end": 1490.95,
+      "start_abs": 5301.35,
+      "end_abs": 5301.95,
+      "text": "Queridos."
+    },
+    {
+      "start": 1491.73,
+      "end": 1495.31,
+      "start_abs": 5302.73,
+      "end_abs": 5306.3099999999995,
+      "text": "No todo lo que enfrentamos puede cambiar."
+    },
+    {
+      "start": 1496.11,
+      "end": 1498.19,
+      "start_abs": 5307.11,
+      "end_abs": 5309.1900000000005,
+      "text": "Pero nada puede cambiar hasta que."
+    },
+    {
+      "start": 1498.19,
+      "end": 1498.99,
+      "start_abs": 5309.1900000000005,
+      "end_abs": 5309.99,
+      "text": "Lo enfrentamos."
+    },
+    {
+      "start": 1500.19,
+      "end": 1502.55,
+      "start_abs": 5311.1900000000005,
+      "end_abs": 5313.55,
+      "text": "Esa es una frase que dijo James Bowie."
+    },
+    {
+      "start": 1503.47,
+      "end": 1508.19,
+      "start_abs": 5314.47,
+      "end_abs": 5319.1900000000005,
+      "text": "¿Por qué no hoy decides enfrentar aquello que sabes que tienes que enfrentar?"
+    },
+    {
+      "start": 1508.91,
+      "end": 1513.77,
+      "start_abs": 5319.91,
+      "end_abs": 5324.77,
+      "text": "Porque no hoy decides encontrarte con la maravillosa gracia de Jesús."
+    },
+    {
+      "start": 1514.63,
+      "end": 1519.27,
+      "start_abs": 5325.63,
+      "end_abs": 5330.27,
+      "text": "Que aunque tu origen sea difícil, que aunque lo que cargas sea difícil."
+    },
+    {
+      "start": 1520.19,
+      "end": 1521.25,
+      "start_abs": 5331.1900000000005,
+      "end_abs": 5332.25,
+      "text": "Está en tus manos."
+    },
+    {
+      "start": 1522.03,
+      "end": 1525.15,
+      "start_abs": 5333.03,
+      "end_abs": 5336.15,
+      "text": "Abrirte para que el médico del alma desane."
+    },
+    {
+      "start": 1526.07,
+      "end": 1528.39,
+      "start_abs": 5337.07,
+      "end_abs": 5339.39,
+      "text": "Y que él pueda producir un milagro en tu vida."
+    },
+    {
+      "start": 1529.23,
+      "end": 1532.79,
+      "start_abs": 5340.23,
+      "end_abs": 5343.79,
+      "text": "Te quiero dejar con cinco puntos y vamos a terminar cantando."
+    },
+    {
+      "start": 1532.79,
+      "end": 1534.79,
+      "start_abs": 5343.79,
+      "end_abs": 5345.79,
+      "text": "¿Qué puedo hacer el día de mañana?"
+    },
+    {
+      "start": 1535.29,
+      "end": 1539.11,
+      "start_abs": 5346.29,
+      "end_abs": 5350.11,
+      "text": "Habiendo escuchado este mensaje que resonó conmigo, pero cómo lo puedo aplicar?"
+    },
+    {
+      "start": 1539.19,
+      "end": 1539.49,
+      "start_abs": 5350.1900000000005,
+      "end_abs": 5350.49,
+      "text": "Primero."
+    },
+    {
+      "start": 1540.17,
+      "end": 1541.35,
+      "start_abs": 5351.17,
+      "end_abs": 5352.35,
+      "text": "Toma responsabilidad."
+    },
+    {
+      "start": 1542.39,
+      "end": 1546.03,
+      "start_abs": 5353.39,
+      "end_abs": 5357.03,
+      "text": "No le pongas la culpa a las personas, a las instituciones, a la iglesia."
+    },
+    {
+      "start": 1547.03,
+      "end": 1549.75,
+      "start_abs": 5358.03,
+      "end_abs": 5360.75,
+      "text": "Toma responsabilidad de lo que has hecho bien y lo que has hecho mal."
+    },
+    {
+      "start": 1551.33,
+      "end": 1557.05,
+      "start_abs": 5362.33,
+      "end_abs": 5368.05,
+      "text": "Comienza a tomar responsabilidad de anombrar las cosas por las cuales estás luchando."
+    },
+    {
+      "start": 1557.93,
+      "end": 1558.89,
+      "start_abs": 5368.93,
+      "end_abs": 5369.89,
+      "text": "Toma responsabilidad."
+    },
+    {
+      "start": 1559.05,
+      "end": 1562.45,
+      "start_abs": 5370.05,
+      "end_abs": 5373.45,
+      "text": "Segundo, no le temas a las conversaciones incómodas."
+    },
+    {
+      "start": 1562.45,
+      "end": 1569.07,
+      "start_abs": 5373.45,
+      "end_abs": 5380.07,
+      "text": "Puede ser que esta semana Dios te esté llamando a hacer ese llamado incómodo pero una conversación."
+    },
+    {
+      "start": 1569.07,
+      "end": 1572.47,
+      "start_abs": 5380.07,
+      "end_abs": 5383.47,
+      "text": "Incómoda puede sanar toda una generación."
+    },
+    {
+      "start": 1573.15,
+      "end": 1574.71,
+      "start_abs": 5384.15,
+      "end_abs": 5385.71,
+      "text": "¿Por qué no hayas ese llamado?"
+    },
+    {
+      "start": 1575.67,
+      "end": 1575.99,
+      "start_abs": 5386.67,
+      "end_abs": 5386.99,
+      "text": "¿Por qué."
+    },
+    {
+      "start": 1575.99,
+      "end": 1581.11,
+      "start_abs": 5386.99,
+      "end_abs": 5392.11,
+      "text": "No esta semana le dices, mira tenemos que hablar tenemos que tocar este tema incómodo porque."
+    },
+    {
+      "start": 1581.11,
+      "end": 1582.37,
+      "start_abs": 5392.11,
+      "end_abs": 5393.37,
+      "text": "Tenemos que sanar."
+    },
+    {
+      "start": 1583.17,
+      "end": 1587.31,
+      "start_abs": 5394.17,
+      "end_abs": 5398.3099999999995,
+      "text": "Tercero, identifica qué comportamientos vienen de algo en tu pasado."
+    },
+    {
+      "start": 1587.31,
+      "end": 1588.89,
+      "start_abs": 5398.3099999999995,
+      "end_abs": 5399.89,
+      "text": "Que hay que resolver."
+    },
+    {
+      "start": 1589.75,
+      "end": 1590.77,
+      "start_abs": 5400.75,
+      "end_abs": 5401.77,
+      "text": "Aprenda a nombrarlo."
+    },
+    {
+      "start": 1591.81,
+      "end": 1594.97,
+      "start_abs": 5402.8099999999995,
+      "end_abs": 5405.97,
+      "text": "Por eso cuando Jesús iba con las personas y muchos."
+    },
+    {
+      "start": 1594.97,
+      "end": 1596.67,
+      "start_abs": 5405.97,
+      "end_abs": 5407.67,
+      "text": "Milagros le decía, ¿qué quieres que te haga?"
+    },
+    {
+      "start": 1597.77,
+      "end": 1600.35,
+      "start_abs": 5408.77,
+      "end_abs": 5411.35,
+      "text": "Jesús sabía lo que ellos necesitaban, pero por qué."
+    },
+    {
+      "start": 1600.35,
+      "end": 1600.79,
+      "start_abs": 5411.35,
+      "end_abs": 5411.79,
+      "text": "Pregunta?"
+    },
+    {
+      "start": 1601.49,
+      "end": 1603.97,
+      "start_abs": 5412.49,
+      "end_abs": 5414.97,
+      "text": "Porque quiere que tú también nombres lo que tú necesitas."
+    },
+    {
+      "start": 1604.73,
+      "end": 1605.49,
+      "start_abs": 5415.73,
+      "end_abs": 5416.49,
+      "text": "Cuando le das nombre."
+    },
+    {
+      "start": 1605.51,
+      "end": 1611.73,
+      "start_abs": 5416.51,
+      "end_abs": 5422.73,
+      "text": "Cuando lo nombras, comienzas el primer paso para trabajar con aquello que te duele. Y querido."
+    },
+    {
+      "start": 1611.73,
+      "end": 1619.05,
+      "start_abs": 5422.73,
+      "end_abs": 5430.05,
+      "text": "Decirte esto va a doler esto duele romper ciclos generacionales duele y una frase."
+    },
+    {
+      "start": 1619.05,
+      "end": 1624.13,
+      "start_abs": 5430.05,
+      "end_abs": 5435.13,
+      "text": "Que me mandó esta semana mi esposa querida y que me la mandó así como."
+    },
+    {
+      "start": 1624.13,
+      "end": 1628.63,
+      "start_abs": 5435.13,
+      "end_abs": 5439.63,
+      "text": "Dedicado a mí como como esposo dice tú y tu esposa están quebrando ciclos de."
+    },
+    {
+      "start": 1628.63,
+      "end": 1633.65,
+      "start_abs": 5439.63,
+      "end_abs": 5444.65,
+      "text": "Varias generaciones por eso las cosas no son fáciles ustedes son los que un."
+    },
+    {
+      "start": 1633.65,
+      "end": 1640.29,
+      "start_abs": 5444.65,
+      "end_abs": 5451.29,
+      "text": "Linaje entero estaba esperando no pare me encantó un brasileño."
+    },
+    {
+      "start": 1640.29,
+      "end": 1642.35,
+      "start_abs": 5451.29,
+      "end_abs": 5453.35,
+      "text": "Profesional Marcus Araujo, escribo esta frase."
+    },
+    {
+      "start": 1643.05,
+      "end": 1645.51,
+      "start_abs": 5454.05,
+      "end_abs": 5456.51,
+      "text": "Y por eso quiero ir al último consejo."
+    },
+    {
+      "start": 1646.45,
+      "end": 1646.79,
+      "start_abs": 5457.45,
+      "end_abs": 5457.79,
+      "text": "No."
+    },
+    {
+      "start": 1646.79,
+      "end": 1648.25,
+      "start_abs": 5457.79,
+      "end_abs": 5459.25,
+      "text": "Le temas a buscar ayuda profesional."
+    },
+    {
+      "start": 1649.57,
+      "end": 1652.91,
+      "start_abs": 5460.57,
+      "end_abs": 5463.91,
+      "text": "Jesús te sana con milagros, pero también con el."
+    },
+    {
+      "start": 1652.91,
+      "end": 1654.27,
+      "start_abs": 5463.91,
+      "end_abs": 5465.27,
+      "text": "Milagro de profesionales."
+    }
+  ],
+  "paragraphs": [
+    {
+      "start": 0.75,
+      "end": 5.63,
+      "start_abs": 3811.75,
+      "end_abs": 3816.63,
+      "text": "Y nace el hijo y huye de los conflictos en vez de enfrentarlos."
+    },
+    {
+      "start": 6.37,
+      "end": 13.67,
+      "start_abs": 3817.37,
+      "end_abs": 3824.67,
+      "text": "Esto no es una maldición mágica, lo vuelvo a decir. Es transmisión relacional. Y mira, aquí hay algunos psicólogos que comprueban esto."
+    },
+    {
+      "start": 14.51,
+      "end": 28.33,
+      "start_abs": 3825.51,
+      "end_abs": 3839.33,
+      "text": "Marían Rojas, esta pequeña psiquiatra que escuchamos con mi esposa. Ella le encanta. De hecho, mi esposa estudió psicología por un tiempo. Y está pendiente todavía a continuar. Ella le encanta y me gusta hablar de estos temas con ella. Que ella me lleva más profundo todavía. Y me dijo, ¡escuchas pocas!"
+    },
+    {
+      "start": 29.05,
+      "end": 41.01,
+      "start_abs": 3840.05,
+      "end_abs": 3852.01,
+      "text": "Y esta psiquiatra española habla sobre algo que yo he pensado en esta semana y lo puso. En palabras técnicas que dice la transmisión intergeneracional del trauma, es interesante eso."
+    },
+    {
+      "start": 41.77,
+      "end": 74.89,
+      "start_abs": 3852.77,
+      "end_abs": 3885.89,
+      "text": "Y de hecho yo esta semana incluso le pregunté ahí a nuestro querido Chong Alfonso y gracias. Me mandó un artículo muy interesante de Tim Jennings, también un profesional allí. De la salud, también cristiano y él dice lo siguiente, dice fuimos diseñados por. Dios para adaptarnos. Esto significa que fuimos diseñados para cambiar según nuestras experiencias. Y este cambio no es simplemente un cambio de creencias, sino un cambio físico-real. Esto. Es interesante. Que incluye modificaciones en las conexiones neuronales y en la expresión. Genética."
+    },
+    {
+      "start": 75.87,
+      "end": 84.47,
+      "start_abs": 3886.87,
+      "end_abs": 3895.47,
+      "text": "O sea, las decisiones que tú toman incluso en tu composición pueden de alguna. O otra manera cambiar el destino de tus descendientes."
+    },
+    {
+      "start": 85.27,
+      "end": 92.03,
+      "start_abs": 3896.27,
+      "end_abs": 3903.03,
+      "text": "Hay errores en cadena. Hay patrones que llevan siglos, generaciones enteras donde tú y yo existimos."
+    },
+    {
+      "start": 93.07,
+      "end": 102.19,
+      "start_abs": 3904.07,
+      "end_abs": 3913.19,
+      "text": "Por eso hoy quiero decirte. Le damos más cosas de las que nos imaginamos de nuestros padres. De nuestros abuelos, de nuestros tátar abuelos e incluso más atrás."
+    },
+    {
+      "start": 103.69,
+      "end": 124.83,
+      "start_abs": 3914.69,
+      "end_abs": 3935.83,
+      "text": "Podemos percibir que hay cosas que construyen quienes somos. Y aquí no quiero irme solo a lo negativo, sean buenas o malas. Hay decisiones muy buenas que tomaron tus tátar abuelos, por ejemplo. De abrazar la fe y eso se transmitió y tú quizás hoy estás aquí porque alguien en tu pasado tomó. La decisión de seguir a Cristo y eso hasta el día de hoy conforma tu identidad, ¿no?"
+    },
+    {
+      "start": 125.53,
+      "end": 134.19,
+      "start_abs": 3936.53,
+      "end_abs": 3945.19,
+      "text": "Dios nos creó. Así, lo que vivimos nos cambia y lo que no resolvemos o lo que resolvemos se transmite."
+    },
+    {
+      "start": 134.97,
+      "end": 149.25,
+      "start_abs": 3945.97,
+      "end_abs": 3960.25,
+      "text": "Quiero. Pasar ahora a la historia central bíblica porque esta historia afirmate que se viene algo pero. Pero yo quizás tú lo sabías, quizás una historia que hayas escuchado. Pero esta perspectiva que te voy a dar es algo que a mí de verdad que me emociona."
+    },
+    {
+      "start": 150.47,
+      "end": 158.15,
+      "start_abs": 3961.47,
+      "end_abs": 3969.15,
+      "text": "Hay dos maneras de leer la Biblia que yo he practicado últimamente. Y cuando yo descubrí esto he podido ir más profundo, ¿no?"
+    },
+    {
+      "start": 158.95,
+      "end": 179.49,
+      "start_abs": 3969.95,
+      "end_abs": 3990.49,
+      "text": "Una perspectiva es volar bajo, es simplemente centrarte en una palabra. En un versículo y ir profundo y profundo y te vas a encontrar. Con que un pequeño versículo te abre una dimensión extraordinaria. Eso es cuando te centras en un pequeño detalle de la Biblia. Y puedes ir más profundo. Te recomiendo estudiar la Biblia, sí, es buenísimo."
+    },
+    {
+      "start": 180.21,
+      "end": 185.05,
+      "start_abs": 3991.21,
+      "end_abs": 3996.05,
+      "text": "Pero hay una segunda forma de estudiar la Biblia. Que es volar un poquito más alto."
+    },
+    {
+      "start": 185.83,
+      "end": 192.37,
+      "start_abs": 3996.83,
+      "end_abs": 4003.37,
+      "text": "Yo creo que todos aquí en algún momento hemos tomado un avión. Yo sé que algunos van a tomar la hora que van a ir a Costa Rica pronto. Que se van de misión también."
+    },
+    {
+      "start": 193.19,
+      "end": 199.81,
+      "start_abs": 4004.19,
+      "end_abs": 4010.81,
+      "text": "Y cuando tú vuelas alto, todo se ve más pequeño. Y tú logras ver más cosas de las que tú veías. Quizás andando solo en tu carro."
+    },
+    {
+      "start": 200.73,
+      "end": 213.03,
+      "start_abs": 4011.73,
+      "end_abs": 4024.03,
+      "text": "Cuando tú miras la Biblia así como una historia narrativa grande. Que incluyó años y años. Te vas a dar cuenta también de detalles, de conexiones. Que volando bajo no te ibas a dar cuenta."
+    },
+    {
+      "start": 213.77,
+      "end": 219.73,
+      "start_abs": 4024.77,
+      "end_abs": 4030.73,
+      "text": "Por eso en esta historia yo quiero invitar a volar un poquito más alto. Qué es la historia de Abraham y Lotz, ok?"
+    },
+    {
+      "start": 220.59,
+      "end": 233.57,
+      "start_abs": 4031.59,
+      "end_abs": 4044.57,
+      "text": "Y el contexto, si tú abres tu Biblia en Génesis 12 y 19. 9, estos capítulos nos traen el contexto de esta historia. Abram y Lot. ¿Quiénes eran Abram y Lot? Eran familiares, no?"
+    },
+    {
+      "start": 235.77,
+      "end": 237.41,
+      "start_abs": 4046.77,
+      "end_abs": 4048.41,
+      "text": "Abram era el tío de Lot, no?"
+    },
+    {
+      "start": 238.17,
+      "end": 250.55,
+      "start_abs": 4049.17,
+      "end_abs": 4061.55,
+      "text": "Y hubo en un momento porque los dos estaban. Creciendo, cumpliendo este llamado, trabajando juntos por el propósito que Dios había puesto. En el corazón de Abram, pero llega el conflicto, ok? Llega el problema."
+    },
+    {
+      "start": 251.27,
+      "end": 273.65,
+      "start_abs": 4062.27,
+      "end_abs": 4084.65,
+      "text": "Y este conflicto. Se nos presenta en Génesis 13 del 5 al 7, donde tú puedes entender. Si lo lees, lo voy a dejar también de tarea. Que Loth tenía muchas posesiones. Y sus pastores comienzan a pelear con los de Abraham. Ok, conflicto, y dice Génesis 13-7 que hubo con tienda. Entre los pastores del ganado de Abraham y los pastores del ganado de Loth. Y comienza la atención."
+    },
+    {
+      "start": 274.87,
+      "end": 277.63,
+      "start_abs": 4085.87,
+      "end_abs": 4088.63,
+      "text": "Y Abraham surge con una solución."
+    },
+    {
+      "start": 278.53,
+      "end": 298.19,
+      "start_abs": 4089.5299999999997,
+      "end_abs": 4109.19,
+      "text": "Dice, mira, voy a proponerte la paz en Génesis 13 del 8 al 9 y en esos versículos tú vas. A darte cuenta que Abraham le propone, dice, no haya altercado entre nosotros dos porque. Somos hermanos, somos familiares. Dice, no está toda la tierra delante de ti, yo te. Ruego, le dice que te apartes de mí."
+    },
+    {
+      "start": 299.25,
+      "end": 314.39,
+      "start_abs": 4110.25,
+      "end_abs": 4125.39,
+      "text": "Donde yo vaya tú anda en la otra dirección. Parece un conflicto que fue saludable, porque fue una decisión aparentemente positiva en. Aquel momento. Abraham sede, él no pelea por control, sino que le dice a Lot, elige."
+    },
+    {
+      "start": 315.31,
+      "end": 322.13,
+      "start_abs": 4126.31,
+      "end_abs": 4133.13,
+      "text": "Y aquí. Entra algo, porque miren, queridos. Tus elecciones por lo más pequeñas que parezcan tienen."
+    },
+    {
+      "start": 322.97,
+      "end": 325.23,
+      "start_abs": 4133.97,
+      "end_abs": 4136.23,
+      "text": "Implicaciones, implicancias profundas."
+    },
+    {
+      "start": 326.07,
+      "end": 327.57,
+      "start_abs": 4137.07,
+      "end_abs": 4138.57,
+      "text": "No son cualquier decisión."
+    },
+    {
+      "start": 328.29,
+      "end": 338.47,
+      "start_abs": 4139.29,
+      "end_abs": 4149.47,
+      "text": "Porque tú puedes decir. No, yo he tomado una dirección un poquito complicada. Estoy trabajando en esto, pero es un pecado que yo tengo. Pero lo estoy trabajando, ¿no?"
+    },
+    {
+      "start": 339.67,
+      "end": 345.25,
+      "start_abs": 4150.67,
+      "end_abs": 4156.25,
+      "text": "Pero algo pequeño a la larga puede ser algo completamente. Destructivo. Y eso le pasó a Lot."
+    },
+    {
+      "start": 346.41,
+      "end": 361.49,
+      "start_abs": 4157.41,
+      "end_abs": 4172.49,
+      "text": "Lot elige por vista en Génesis 13 del 10 al 11. Esclave este detalle. Dice que Lot alzó sus ojos y vio toda la llanuda del. Jordán, que toda ella era de riego. Vio tierras que dice, esta tierra, si me das a elegir a Bram, voy a irme para allá, ¿no?"
+    },
+    {
+      "start": 362.35,
+      "end": 369.27,
+      "start_abs": 4173.35,
+      "end_abs": 4180.27,
+      "text": "Alzó sus ojos, eligió por apariencia, por prosperidad, dada, por conveniencia."
+    },
+    {
+      "start": 370.07,
+      "end": 375.29,
+      "start_abs": 4181.07,
+      "end_abs": 4186.29,
+      "text": "Y luego el texto comienza a decir algo inquietante y tú puedes olfatear aquí el conflicto. Génesis 13, 12."
+    },
+    {
+      "start": 376.41,
+      "end": 382.43,
+      "start_abs": 4187.41,
+      "end_abs": 4193.43,
+      "text": "Dice, Lod fue proponiendo sus tierras hasta donde? Hasta Sodoma. Y."
+    },
+    {
+      "start": 383.78,
+      "end": 385.92,
+      "start_abs": 4194.78,
+      "end_abs": 4196.92,
+      "text": "Tú sabes, Sodoma y Gomorra, ¿no?"
+    },
+    {
+      "start": 387.28,
+      "end": 398.48,
+      "start_abs": 4198.28,
+      "end_abs": 4209.48,
+      "text": "Estas ciudades donde abundaban los errores, el pecado, no entró de golpe a Sodoma, pero. Se fue acercando poco a poco."
+    },
+    {
+      "start": 400.1,
+      "end": 401.58,
+      "start_abs": 4211.1,
+      "end_abs": 4212.58,
+      "text": "Así sucede también en nuestra vida."
+    },
+    {
+      "start": 402.66,
+      "end": 412.08,
+      "start_abs": 4213.66,
+      "end_abs": 4223.08,
+      "text": "Algo que parece inofensivo, a primera vista. Puede ser destructivo, y el pecado no sucede. De la noche a la mañana, sucede poco a poco."
+    },
+    {
+      "start": 412.9,
+      "end": 423.36,
+      "start_abs": 4223.9,
+      "end_abs": 4234.36,
+      "text": "En Génesis 1313 dice lo siguiente. Más los hombres de Sodoma eran malos y pecadores. Contra Jehová en gran manera. Así que ya sabes que esta decisión va a tener consecuencias."
+    },
+    {
+      "start": 424.46,
+      "end": 427.92,
+      "start_abs": 4235.46,
+      "end_abs": 4238.92,
+      "text": "Ya sabes que esta decisión tú hueles aquí el peligro."
+    },
+    {
+      "start": 429.14,
+      "end": 435.96,
+      "start_abs": 4240.14,
+      "end_abs": 4246.96,
+      "text": "Y tú ves en Génesis 14 ya que ya no está cerca de Sodoma. Sino que ahora vivía dentro de Sodoma."
+    },
+    {
+      "start": 437.48,
+      "end": 438.94,
+      "start_abs": 4248.48,
+      "end_abs": 4249.94,
+      "text": "Queridos, el pecado es así."
+    },
+    {
+      "start": 440.24,
+      "end": 452.98,
+      "start_abs": 4251.24,
+      "end_abs": 4263.98,
+      "text": "Pueden parecer pequeñas decisiones, te estás acercando a algo que parece. Inofensivo y riesgoso, pero sin darte cuenta. Tú estás viviendo ahora adentro, ya no sólo. Cerca estás viviendo adentro, ya te es difícil salir de allí."
+    },
+    {
+      "start": 454.04,
+      "end": 459.54,
+      "start_abs": 4265.04,
+      "end_abs": 4270.54,
+      "text": "Por eso que entra el conflicto. Tú sabes que Sodom y Gomorra fue destruida, Génesis 19 del 30 al 36."
+    },
+    {
+      "start": 461.32,
+      "end": 467.96,
+      "start_abs": 4272.32,
+      "end_abs": 4278.96,
+      "text": "Ahí Abraham tiene que. De rescatarlos, hay destrucción, hay conflicto y aquí entra lo más triste."
+    },
+    {
+      "start": 468.68,
+      "end": 491.56,
+      "start_abs": 4279.68,
+      "end_abs": 4302.56,
+      "text": "Sucedió algo. Terrible, dice que las hijas se pusieron con mucho miedo de que no iban a tener. Descendencia y hicieron un plan para embriagar al papá y dice Génesis 1937. Y la mayor dio a luz a un hijo dice y llamó su nombre Moab, el cual es padre. De los Moabitas hasta hoy."
+    },
+    {
+      "start": 492.28,
+      "end": 516.02,
+      "start_abs": 4303.28,
+      "end_abs": 4327.02,
+      "text": "Se fue. Disvirtuando tanto estas decisiones. Que ahora tienes un descendiente. Moab, y ahora no solamente tienes. Un hijo nacido por algo terrible. Que sucedió, sino que siglos. Después tienes a los Moabitas. Y quienes fueron los Moabitas. Fueron enemigos constantes. Del pueblo de Israel. Lo encuentras en números 22. En jueces 3, y hay un punto. Tremendo aquí, queridos."
+    },
+    {
+      "start": 517.08,
+      "end": 518.34,
+      "start_abs": 4328.08,
+      "end_abs": 4329.34,
+      "text": "Una decisión."
+    },
+    {
+      "start": 519.46,
+      "end": 520.2,
+      "start_abs": 4330.46,
+      "end_abs": 4331.2,
+      "text": "Una separación."
+    },
+    {
+      "start": 521.02,
+      "end": 524.84,
+      "start_abs": 4332.02,
+      "end_abs": 4335.84,
+      "text": "Una serie de pequeñas decisiones, un conflicto, algo terrible."
+    },
+    {
+      "start": 525.56,
+      "end": 531.02,
+      "start_abs": 4336.5599999999995,
+      "end_abs": 4342.02,
+      "text": "Después desencadenó en algo y tuvo consecuencias generacionales."
+    },
+    {
+      "start": 531.94,
+      "end": 559.82,
+      "start_abs": 4342.9400000000005,
+      "end_abs": 4370.82,
+      "text": "Y que no solamente afectó a Lot y a su familia, sino que afectó al mismo pueblo de Israel. Los Moabitas fueron enemigos de Israel. Y aquí yo quiero hablarte queridos una decisión basada en conveniencia terminó. Generando una nación enemiga del pueblo de dios no fue sólo una mala elección. Personal fue una historia que afectó a generaciones y aquí yo quiero decirte. Queridos vamos a admitir algo que puede ser doloroso."
+    },
+    {
+      "start": 561.48,
+      "end": 569.54,
+      "start_abs": 4372.48,
+      "end_abs": 4380.54,
+      "text": "Tú y yo fuimos criados. Imperfectamente tú puedes ir no yo le agradezco a mi familia por todo lo que. Me dieron y es cierto."
+    },
+    {
+      "start": 570.7,
+      "end": 575.78,
+      "start_abs": 4381.7,
+      "end_abs": 4386.78,
+      "text": "Yo soy de los primeros en honrar a mis padres, en honrar a mi familia. Por todo lo que pusieron en mi corazón."
+    },
+    {
+      "start": 576.5,
+      "end": 594.82,
+      "start_abs": 4387.5,
+      "end_abs": 4405.82,
+      "text": "Pero mis padres no eran perfectos. Tú lo vas. Descubriendo después que vas creciendo, ¿no? Cuando eres niño tus padres son superhéroes. Pero a medida que creces te das cuenta que no son perfectos. Y como mis padres no. Eran perfectos, ¿qué generaron hijos no perfectos? Y hay que admitir que tú. Y yo somos consecuencia de eso."
+    },
+    {
+      "start": 596.04,
+      "end": 603.88,
+      "start_abs": 4407.04,
+      "end_abs": 4414.88,
+      "text": "Todos fuimos criados imperfectamente. Y todos los que tenemos hijos. Estamos criando imperfectamente, queridos."
+    },
+    {
+      "start": 605.2,
+      "end": 611.9,
+      "start_abs": 4416.2,
+      "end_abs": 4422.9,
+      "text": "Y eso me cuesta admitirlo a mí. Porque por más que yo quiera criar a mi hija. De manera lo mejor que pueda."
+    },
+    {
+      "start": 612.7,
+      "end": 615.4,
+      "start_abs": 4423.7,
+      "end_abs": 4426.4,
+      "text": "Hay cosas que ella va a tener que trabajar después."
+    },
+    {
+      "start": 616.11,
+      "end": 617.56,
+      "start_abs": 4427.11,
+      "end_abs": 4428.5599999999995,
+      "text": "Porque cometemos errores."
+    },
+    {
+      "start": 620.32,
+      "end": 622.6,
+      "start_abs": 4431.32,
+      "end_abs": 4433.6,
+      "text": "Conocí a alguien que me contaba. Cómo sus padres."
+    },
+    {
+      "start": 623.46,
+      "end": 625.08,
+      "start_abs": 4434.46,
+      "end_abs": 4436.08,
+      "text": "Que hicieron lo mejor posible."
+    },
+    {
+      "start": 626.22,
+      "end": 636.42,
+      "start_abs": 4437.22,
+      "end_abs": 4447.42,
+      "text": "Su hogar aún así tenía mucho conflicto. Ella creció viendo a sus papás pelear y esos conflictos hasta el día de hoy son peso sobre sus hombros."
+    },
+    {
+      "start": 637.7,
+      "end": 665.36,
+      "start_abs": 4448.7,
+      "end_abs": 4476.36,
+      "text": "Y esta persona me decía que como constantemente había conflictos en su casa. Hoy no puede estar en un momento tranquilo en paz porque esa paz aparente que siente. Piensa que la vuelta de la esquila va a ver un conflicto, aunque no lo va a ver. Aunque no lo hay, llega paz y como de niña aprendió a anticipar esto, ahora también. Le generó ese conflicto en su casa, esto que tiene que trabajarlo."
+    },
+    {
+      "start": 666.24,
+      "end": 669.62,
+      "start_abs": 4477.24,
+      "end_abs": 4480.62,
+      "text": "Queridos, esos son. Pesos que cargamos."
+    },
+    {
+      "start": 670.46,
+      "end": 695.32,
+      "start_abs": 4481.46,
+      "end_abs": 4506.32,
+      "text": "Puede ser que tu hogar no fue conflictivo, ok, ok lindo. Pero te diera una. Atención excesiva que te hizo buscar incansablemente la aprobación de los. Demás en un mundo que no funciona así quizás te aplaudieron todo en tu casa y. Después tú sales al mundo y te das cuenta que no vas a tener siempre la. Atención de todos que no vas a ser siempre aplaudido que no siempre vas a. Ganar queridos y te das cuenta y te chocas con la sociedad."
+    },
+    {
+      "start": 696.62,
+      "end": 709.7,
+      "start_abs": 4507.62,
+      "end_abs": 4520.7,
+      "text": "Sabes esta persona que te estoy hablando un día me contó que ella. Estaba en pleno conflicto de su casa y dice que su hermano se le acerca. Estaban los padres discutiendo fuerte."
+    },
+    {
+      "start": 710.44,
+      "end": 720.08,
+      "start_abs": 4521.4400000000005,
+      "end_abs": 4531.08,
+      "text": "Su hermano mayor se le acerca y le dice. Mira, recordemos esto porque esto es lo que tenemos que evitar en el futuro a. Toda costa. No tenemos que repetir esto."
+    },
+    {
+      "start": 721.42,
+      "end": 722.26,
+      "start_abs": 4532.42,
+      "end_abs": 4533.26,
+      "text": "Imagínate queridos."
+    },
+    {
+      "start": 723.32,
+      "end": 727.06,
+      "start_abs": 4534.32,
+      "end_abs": 4538.0599999999995,
+      "text": "Tus decisiones. Marcan la vida de las personas."
+    },
+    {
+      "start": 727.98,
+      "end": 748.44,
+      "start_abs": 4538.98,
+      "end_abs": 4559.4400000000005,
+      "text": "Pero ahora ¿cuál es la diferencia de una. Persona que logra encontrar felicidad aún con todo el peso que carga sobre sus. Espaldas y alguien que quizás llega hasta altas, hasta tarde en la vida, hasta la. Vejez y no ha podido lidiar con esto es simplemente una palabra, la responsabilidad. Que tomamos."
+    },
+    {
+      "start": 749.94,
+      "end": 764.7,
+      "start_abs": 4560.9400000000005,
+      "end_abs": 4575.7,
+      "text": "Sabe somos personas llenas de cosas por resolver, yo estaba. Tratando de poner en frase lo que tenía en mi mente, somos personas llenas. De cosas por resolver y aún así estamos formando la vida de otros, tratando de que carguen menos. Peso del que nosotros cargamos."
+    },
+    {
+      "start": 765.74,
+      "end": 767.54,
+      "start_abs": 4576.74,
+      "end_abs": 4578.54,
+      "text": "Eso es, esa es la crianza."
+    },
+    {
+      "start": 768.24,
+      "end": 772.46,
+      "start_abs": 4579.24,
+      "end_abs": 4583.46,
+      "text": "Yo creo que mi hija tenga las menos. Cosas que resolver de las que yo tuve que resolver."
+    },
+    {
+      "start": 774.06,
+      "end": 778.86,
+      "start_abs": 4585.0599999999995,
+      "end_abs": 4589.86,
+      "text": "Pero admitir que no somos perfectos. Queridos, la historia."
+    },
+    {
+      "start": 779.62,
+      "end": 793.36,
+      "start_abs": 4590.62,
+      "end_abs": 4604.36,
+      "text": "Y yo no quiero dejarte aquí con malas noticias, con un peso en tu. Casa porque yo te quiero predicar del evangelio y ahora afirmate porque se viene la buena noticia. Queridos. La historia de Lot y Abraham no termina ahí."
+    },
+    {
+      "start": 794.74,
+      "end": 803.96,
+      "start_abs": 4605.74,
+      "end_abs": 4614.96,
+      "text": "Si tú miras la Biblia y la narrativa Bíblica. Te vas a dar cuenta de una historia que tiene características muy similares que es la historia. De Ruth y Noemí."
+    },
+    {
+      "start": 804.72,
+      "end": 809.4,
+      "start_abs": 4615.72,
+      "end_abs": 4620.4,
+      "text": "¿Y qué tendrá de conexión a esta historia? Déjame que te lo explique. Contexto."
+    },
+    {
+      "start": 810.12,
+      "end": 811.0,
+      "start_abs": 4621.12,
+      "end_abs": 4622.0,
+      "text": "Ruth ¿Quién era?"
+    },
+    {
+      "start": 812.24,
+      "end": 818.5,
+      "start_abs": 4623.24,
+      "end_abs": 4629.5,
+      "text": "Ruth era la no era de Noemí, en Ruth 1.1."
+    },
+    {
+      "start": 819.3,
+      "end": 825.22,
+      "start_abs": 4630.3,
+      "end_abs": 4636.22,
+      "text": "Y se. Aconteció en los días que gobernaban los jueces, un poco de contexto, era una. Época caótica para Israel, una época difícil."
+    },
+    {
+      "start": 826.76,
+      "end": 831.92,
+      "start_abs": 4637.76,
+      "end_abs": 4642.92,
+      "text": "Ahora Noemí pierde a su. Esposo y sus dos hijos, esto está en Ruth 1.20 al 21."
+    },
+    {
+      "start": 832.66,
+      "end": 846.76,
+      "start_abs": 4643.66,
+      "end_abs": 4657.76,
+      "text": "Y Noemí comienza a. Vivir la consecuencia de esta pérdida, incluso dice en uno de los versículos. El 21, no me llaméis 9mí, sino llamadme Mara, porque en grande amargura me ha puesto el todo. Poderoso. O sea, 9mí estaba viviendo algo terrible."
+    },
+    {
+      "start": 847.46,
+      "end": 852.74,
+      "start_abs": 4658.46,
+      "end_abs": 4663.74,
+      "text": "Estaba viviendo la pérdida que en. Esos tiempos, hoy es terrible, pero en esos tiempos el doble, el triple."
+    },
+    {
+      "start": 853.52,
+      "end": 869.98,
+      "start_abs": 4664.52,
+      "end_abs": 4680.98,
+      "text": "Porque si tú. Perdías a tu esposo y aún tus hijos no eras nadie en esa sociedad, estabas completamente. Desprotegido, no solamente por la pérdida que esto significaba de dolor, sino también. Tiene económicamente, socialmente, por eso no de mí, ya en su vejez. Ella dice."
+    },
+    {
+      "start": 870.78,
+      "end": 873.42,
+      "start_abs": 4681.78,
+      "end_abs": 4684.42,
+      "text": "Llámame amarga, ya no soy dulce, llámame amarga."
+    },
+    {
+      "start": 874.3,
+      "end": 876.34,
+      "start_abs": 4685.3,
+      "end_abs": 4687.34,
+      "text": "Queridos, aquí hay trauma generacional."
+    },
+    {
+      "start": 877.2,
+      "end": 896.66,
+      "start_abs": 4688.2,
+      "end_abs": 4707.66,
+      "text": "Hay pérdida. Hay amargura, y hay vejez triste. Y déjenme dedicarle unas pequeñas palabras y tranquilos que. Ya estamos llegando a la parte final. Siempre escuchamos aquí que se le dedican mensaje a los. Jóvenes, ¿no? Este mensaje es para los jóvenes. Pero yo quisiera dedicar esta parte del mensaje a nuestros queridos adultos y adultos mayores."
+    },
+    {
+      "start": 897.5,
+      "end": 899.26,
+      "start_abs": 4708.5,
+      "end_abs": 4710.26,
+      "text": "Y aquí hay varios en la iglesia."
+    },
+    {
+      "start": 900.56,
+      "end": 911.14,
+      "start_abs": 4711.5599999999995,
+      "end_abs": 4722.14,
+      "text": "¿Sabes que esta semana yo como que empecé a pensar en la vejez? Yo soy joven, ¿no? Bueno, quizás los adolescentes ahí, los nacidos después del 2000 van a decir. ¡Oh, naciste en el 1991!"
+    },
+    {
+      "start": 912.18,
+      "end": 913.2,
+      "start_abs": 4723.18,
+      "end_abs": 4724.2,
+      "text": "Soy viejo para ellos, ¿no?"
+    },
+    {
+      "start": 914.0,
+      "end": 914.92,
+      "start_abs": 4725.0,
+      "end_abs": 4725.92,
+      "text": "Es el siglo pasado."
+    },
+    {
+      "start": 915.7,
+      "end": 919.78,
+      "start_abs": 4726.7,
+      "end_abs": 4730.78,
+      "text": "Pero yo me considero todavía joven, 31 años. Ahora."
+    },
+    {
+      "start": 920.62,
+      "end": 927.06,
+      "start_abs": 4731.62,
+      "end_abs": 4738.0599999999995,
+      "text": "Yo hasta hace poquitas semanas. Nunca pensé o me imaginé yo cuando viejito."
+    },
+    {
+      "start": 928.04,
+      "end": 939.92,
+      "start_abs": 4739.04,
+      "end_abs": 4750.92,
+      "text": "Porque decía no, Cristo va a venir antes, no me puedo imaginar siendo viejito. Pero pasaron una serie de cosas en esta semana en donde comencé a pensar. La vejez puede ser triste, ¿no?"
+    },
+    {
+      "start": 940.94,
+      "end": 945.24,
+      "start_abs": 4751.9400000000005,
+      "end_abs": 4756.24,
+      "text": "Puede estar llena de soledad, puede estar llena de enfermedades."
+    },
+    {
+      "start": 946.86,
+      "end": 983.98,
+      "start_abs": 4757.86,
+      "end_abs": 4794.98,
+      "text": "Yo incluso me acuerdo que estuvimos repartiendo y haciendo algunas visitas no. La semana antes pasada y yo llegaba a casas en esta misma iglesia donde personas. Viven solos la soledad la vejez yo pienso será que cuando sea viejito mi hija. Se va a acordar de mí va a venir a verme me va a llamar no puede sonar. Tonto lo que estoy diciendo y puede pasar mucho tiempo eso es a futuro pero. Dígame ustedes los que son ya más adultos o jóvenes adultos, no me gusta llamarle ancianos. Ni nada, ok? Pero dígame, ¿la vida pasa rápido o no?"
+    },
+    {
+      "start": 986.46,
+      "end": 1009.98,
+      "start_abs": 4797.46,
+      "end_abs": 4820.98,
+      "text": "Yo hoy quiero decirte queridos, que aunque te sientas mara, que aunque te sientas que. Tu vida en esta etapa de tu vida está amarga, miren, yo dedico estas palabras para ustedes. Dios no ha terminado contigo. Dios está contigo, Dios te acompaña, Dios te abraza. Todavía hay mucho que hacer en el mundo. Si tienes vida, si estás respirando. Es porque Dios tiene un plan para ti."
+    },
+    {
+      "start": 1010.8,
+      "end": 1012.04,
+      "start_abs": 4821.8,
+      "end_abs": 4823.04,
+      "text": "Toda es nuestra sabiduría."
+    },
+    {
+      "start": 1012.98,
+      "end": 1015.04,
+      "start_abs": 4823.98,
+      "end_abs": 4826.04,
+      "text": "Nosotros como jóvenes te necesitamos."
+    },
+    {
+      "start": 1015.82,
+      "end": 1023.6,
+      "start_abs": 4826.82,
+      "end_abs": 4834.6,
+      "text": "Y si nos unimos. Si mezclamos tu sabiduría con nuestra fuerza. Y ganas de hacer cosas. La iglesia puede levantarse quizás como nunca antes."
+    },
+    {
+      "start": 1024.36,
+      "end": 1033.28,
+      "start_abs": 4835.36,
+      "end_abs": 4844.28,
+      "text": "Creo que es momento de dejar de pelear. Entre ancianos y jóvenes. Y no empezar a vernos como familia. Trabajar juntos. Y yo decía, ah, todavía esto está en pañales."
+    },
+    {
+      "start": 1034.0,
+      "end": 1035.9,
+      "start_abs": 4845.0,
+      "end_abs": 4846.9,
+      "text": "Pero decía que lindo sería que como jóvenes."
+    },
+    {
+      "start": 1036.76,
+      "end": 1050.16,
+      "start_abs": 4847.76,
+      "end_abs": 4861.16,
+      "text": "Armemos un ministerio en la iglesia donde acompañemos a nuestros queridos adultos mayores, donde. Un día podamos ir a la semana, vamos a visitar, vamos a visitar, vamos a aprender, vamos a. Escuchar las historias que estas personas nos tienen que contar."
+    },
+    {
+      "start": 1051.06,
+      "end": 1060.52,
+      "start_abs": 4862.0599999999995,
+      "end_abs": 4871.52,
+      "text": "Queridos, quiero dedicarte estas palabras porque noemi quería incluso cambiar su. Identidad pensaba que todo había terminado para su vida pero aquí entra la. Decisión de Ruth."
+    },
+    {
+      "start": 1061.36,
+      "end": 1064.52,
+      "start_abs": 4872.36,
+      "end_abs": 4875.52,
+      "text": "Ruth ¿Qué era? Ustedes me dijeron aquí adelante ya y se me adelantaron."
+    },
+    {
+      "start": 1065.58,
+      "end": 1066.66,
+      "start_abs": 4876.58,
+      "end_abs": 4877.66,
+      "text": "Era Moabita."
+    },
+    {
+      "start": 1067.5,
+      "end": 1072.84,
+      "start_abs": 4878.5,
+      "end_abs": 4883.84,
+      "text": "O sea era descendiente de esta serie de rodes que comenzó con Lot y sus. Hijas."
+    },
+    {
+      "start": 1073.64,
+      "end": 1083.94,
+      "start_abs": 4884.64,
+      "end_abs": 4894.9400000000005,
+      "text": "Era parte de esta historia rota pero ella toma una decisión radical. Queridos y esto está en Ruth 1 16 al 17 queridos y esto es tremendo."
+    },
+    {
+      "start": 1085.0,
+      "end": 1129.88,
+      "start_abs": 4896.0,
+      "end_abs": 4940.88,
+      "text": "Ve a Noemi su suegra sola y le dice no me ruegues que te deje, miren lo contrario a la. Decisión que tomó Lot y Abram le dice no me ruegues que te deje porque a donde. Quiera que tú fuere Sirio y a donde quiera que vivieres viviré tu pueblo. Será mi pueblo y tu dios será mi dios. ¿Por qué me emociona esta parte de la. Historia, queridos, porque esto es impresionante, queridos. Ella rompe con su tierra. Su cultura. Su pasado espiritual. Su identidad ancestral. Mira, Ruth no eligió su origen, pero sí eligió su destino. Y eso lo cambia todo."
+    },
+    {
+      "start": 1131.1,
+      "end": 1141.54,
+      "start_abs": 4942.1,
+      "end_abs": 4952.54,
+      "text": "Queridos, tú no has elegido tu origen. No elegiste lo que te pesa en tus hombros. No elegiste las cosas que hicieron contigo. No tuviste elección allí."
+    },
+    {
+      "start": 1142.3,
+      "end": 1143.3,
+      "start_abs": 4953.3,
+      "end_abs": 4954.3,
+      "text": "Pero así como Ruth."
+    },
+    {
+      "start": 1144.04,
+      "end": 1160.92,
+      "start_abs": 4955.04,
+      "end_abs": 4971.92,
+      "text": "Tú puedes cambiar tu destino, tú puedes. Cambiar el futuro de tu vida, no estar de si estás vivo, todavía puedes tomar decisiones. Que cambien la dirección, no solamente de tu vida futura, sino de lo que va a venir. En el futuro después de ti."
+    },
+    {
+      "start": 1161.82,
+      "end": 1201.26,
+      "start_abs": 4972.82,
+      "end_abs": 5012.26,
+      "text": "Porque así también si las decisiones negativas tienen consecuencias. Hasta la tercera y cuarta generación como dice Éxodo después Dios dice pero yo hago misericordia a. Millares su misericordia sobrepasa nuestro pecado donde abundó el pecado sobreabundó la gracia de. Dios queridos la rendencia la redención que Ruth vivió no terminó solamente en esa decisión. Tú sabes que Ruth después conoce a Vos y que es interesante que Vos aparece aquí. Con palabras que nos asemejan a Redentor, Joel."
+    },
+    {
+      "start": 1202.0,
+      "end": 1209.46,
+      "start_abs": 5013.0,
+      "end_abs": 5020.46,
+      "text": "Vos pues tomó a Ruth y ella fue su. Mujer, dice Ruth 413 y aquí entra un giro tremendo queridos en la Biblia."
+    },
+    {
+      "start": 1210.2,
+      "end": 1218.28,
+      "start_abs": 5021.2,
+      "end_abs": 5029.28,
+      "text": "Ruth 417 dice que le dieron nombre a los descendentes de Ruth y dice que un hijo lo. Llamaron Obed."
+    },
+    {
+      "start": 1219.16,
+      "end": 1236.18,
+      "start_abs": 5030.16,
+      "end_abs": 5047.18,
+      "text": "Y Obed es padre de Isaí y Isaí es padre de David, y ¿por qué te digo esto? Porque cuando tú entras a la genealogía de Jesús, que antes me parecía muy aburrío. Y decía ¿por qué está aquí en la Biblia? En Mateo capítulo 1 aparece ¿quién en la genealogía de Jesús?"
+    },
+    {
+      "start": 1237.52,
+      "end": 1243.6,
+      "start_abs": 5048.52,
+      "end_abs": 5054.6,
+      "text": "Aparece Ruth, mira la misericordia de Dios en la historia."
+    },
+    {
+      "start": 1244.5,
+      "end": 1269.02,
+      "start_abs": 5055.5,
+      "end_abs": 5080.02,
+      "text": "Una decisión. Trajo años de consecuencias terribles, pero una pequeña decisión de una mujer que estuvo. Dispuesta a dejarlo todo para ser fiel a Dios, Ruth, que no importó su pasado, de dónde venía. Cómo era su historia, hizo que no solamente cambiara el futuro de su vida y de sus familias. Sino que ella por esa decisión y ese linaje vino el Mesías, vino Cristo queridos."
+    },
+    {
+      "start": 1269.76,
+      "end": 1274.32,
+      "start_abs": 5080.76,
+      "end_abs": 5085.32,
+      "text": "En la. La genealogía de Jesucristo existe ruptura."
+    },
+    {
+      "start": 1275.02,
+      "end": 1277.4,
+      "start_abs": 5086.02,
+      "end_abs": 5088.4,
+      "text": "Existe y existe redención."
+    },
+    {
+      "start": 1278.46,
+      "end": 1279.3,
+      "start_abs": 5089.46,
+      "end_abs": 5090.3,
+      "text": "Queridos."
+    },
+    {
+      "start": 1280.5,
+      "end": 1292.66,
+      "start_abs": 5091.5,
+      "end_abs": 5103.66,
+      "text": "La descendiente de una relación nacida en una cueva de vergüenza. Terminó siendo parte de la genealogía del Mesías. Eso es redención generacional, eso es romper el ciclo."
+    },
+    {
+      "start": 1293.92,
+      "end": 1315.56,
+      "start_abs": 5104.92,
+      "end_abs": 5126.5599999999995,
+      "text": "Genesis 13-9, cuando tú entras a la historia de Lot. Dices, Lodi Abram. Abram le dice, no? Si fueras a la mano izquierda, yo irá a la derecha. Y si tú a la derecha, yo iré a la izquierda. Y contrastalo con Ruth. No me robes que te deje porque a donde quiera que tú fueras, iré yo. Donde quiera que vivieras, viviré. Tu pueblo será mi pueblo y tu Dios, mi Dios. Separación."
+    },
+    {
+      "start": 1316.4,
+      "end": 1316.68,
+      "start_abs": 5127.4,
+      "end_abs": 5127.68,
+      "text": "Unión."
+    },
+    {
+      "start": 1318.52,
+      "end": 1319.78,
+      "start_abs": 5129.52,
+      "end_abs": 5130.78,
+      "text": "Loth eligió por vista."
+    },
+    {
+      "start": 1320.74,
+      "end": 1321.34,
+      "start_abs": 5131.74,
+      "end_abs": 5132.34,
+      "text": "Vio esas tierras."
+    },
+    {
+      "start": 1322.44,
+      "end": 1323.6,
+      "start_abs": 5133.4400000000005,
+      "end_abs": 5134.6,
+      "text": "Ruth eligió por fe."
+    },
+    {
+      "start": 1324.6,
+      "end": 1330.32,
+      "start_abs": 5135.6,
+      "end_abs": 5141.32,
+      "text": "Loth se acercó a Sodoma. Ruth se acercó al dios de Israel."
+    },
+    {
+      "start": 1331.4,
+      "end": 1334.54,
+      "start_abs": 5142.4,
+      "end_abs": 5145.54,
+      "text": "De Loth nació Moab y por. Descendencia a los Moabitas."
+    },
+    {
+      "start": 1335.3,
+      "end": 1338.98,
+      "start_abs": 5146.3,
+      "end_abs": 5149.98,
+      "text": "Y de Ruth nació el linaje del rey, del Mesías."
+    },
+    {
+      "start": 1339.8,
+      "end": 1347.62,
+      "start_abs": 5150.8,
+      "end_abs": 5158.62,
+      "text": "Uno dejó que la. Historia lo arrastrara y la otra, Ruth, decidió escribir una nueva."
+    },
+    {
+      "start": 1348.86,
+      "end": 1371.62,
+      "start_abs": 5159.86,
+      "end_abs": 5182.62,
+      "text": "Queridos, nosotros podemos romper estos ciclos generacionales y te vuelvo a decir lo que este. Amigo le dijo a su amigo que estaba cargando con tantas cosas. No tiene por qué ser igual. No tienes por qué seguir viviendo así, no tienes por qué seguir viviendo así. No tienes por qué seguir viviendo así, porque hay redención."
+    },
+    {
+      "start": 1372.46,
+      "end": 1394.04,
+      "start_abs": 5183.46,
+      "end_abs": 5205.04,
+      "text": "Porque hay perdón. Porque una decisión lo puede cambiar todo y yo quiero terminar con esto queridos. Y me gustaría que el worksheet pueda ir pasando porque vamos a terminar. Cantando maravillosa gracia si se puede si no están todos bueno ahí dan y si no. Si nos acompañas ahí con el piano puede ser solo ahí con piano queridos."
+    },
+    {
+      "start": 1395.2,
+      "end": 1399.26,
+      "start_abs": 5206.2,
+      "end_abs": 5210.26,
+      "text": "Disculpen que no les avise los tomé sorpresa pero aquí así es mi equipo. Bueno, bueno."
+    },
+    {
+      "start": 1400.5,
+      "end": 1401.22,
+      "start_abs": 5211.5,
+      "end_abs": 5212.22,
+      "text": "Miren."
+    },
+    {
+      "start": 1402.1,
+      "end": 1407.54,
+      "start_abs": 5213.1,
+      "end_abs": 5218.54,
+      "text": "Salvación, lo que les dije al principio, también tiene que ver con sanidad."
+    },
+    {
+      "start": 1408.64,
+      "end": 1411.24,
+      "start_abs": 5219.64,
+      "end_abs": 5222.24,
+      "text": "De hecho, en griego son la misma palabra."
+    },
+    {
+      "start": 1412.4,
+      "end": 1422.08,
+      "start_abs": 5223.4,
+      "end_abs": 5233.08,
+      "text": "Salvación no es solamente suplicar misericordia ante un juez. La visión de leyes y de jueces, sino abrir tu alma ante el doctor."
+    },
+    {
+      "start": 1423.46,
+      "end": 1432.54,
+      "start_abs": 5234.46,
+      "end_abs": 5243.54,
+      "text": "Sabías que los cristianos. Primitimos llamaban a Jesús el médico del alma y me gusta esta expresión un."
+    },
+    {
+      "start": 1434.01,
+      "end": 1469.03,
+      "start_abs": 5245.01,
+      "end_abs": 5280.03,
+      "text": "Padre de la iglesia llamado Ignacio de Antioquía que fue guiado por el mismo. Apóstol Juan él describe algo en Jesús que me encanta porque generalmente vemos. A Jesús en términos merecíamos el castigo merecíamos la muerte el vino nos. Rescató y gracias a él tenemos acceso al cielo que es hermoso pero no termina. Allí queridos, los primeros cristianos veían a Jesús, yo sé que esta iglesia. Tenemos muchos profesionales de la salud, Jesús era el médico por. Excelencia, porque no solamente vino a salvarnos, sino que vino a sanarnos."
+    },
+    {
+      "start": 1470.59,
+      "end": 1477.07,
+      "start_abs": 5281.59,
+      "end_abs": 5288.07,
+      "text": "Mira. Esta frase de Ignacio de Antioquía dice, pero nuestro médico es el único Dios. Verdadero, Jesús el Cristo."
+    },
+    {
+      "start": 1477.85,
+      "end": 1490.95,
+      "start_abs": 5288.85,
+      "end_abs": 5301.95,
+      "text": "Él se sujetó a corrupción para poder liberar. Nuestras almas de la muerte y la corrupción y sanarlas y poder restaurarlas a su salud. Cuando estaban muertas en impiedad y malos deseos. Queridos."
+    },
+    {
+      "start": 1491.73,
+      "end": 1495.31,
+      "start_abs": 5302.73,
+      "end_abs": 5306.3099999999995,
+      "text": "No todo lo que enfrentamos puede cambiar."
+    },
+    {
+      "start": 1496.11,
+      "end": 1498.99,
+      "start_abs": 5307.11,
+      "end_abs": 5309.99,
+      "text": "Pero nada puede cambiar hasta que. Lo enfrentamos."
+    },
+    {
+      "start": 1500.19,
+      "end": 1502.55,
+      "start_abs": 5311.1900000000005,
+      "end_abs": 5313.55,
+      "text": "Esa es una frase que dijo James Bowie."
+    },
+    {
+      "start": 1503.47,
+      "end": 1508.19,
+      "start_abs": 5314.47,
+      "end_abs": 5319.1900000000005,
+      "text": "¿Por qué no hoy decides enfrentar aquello que sabes que tienes que enfrentar?"
+    },
+    {
+      "start": 1508.91,
+      "end": 1513.77,
+      "start_abs": 5319.91,
+      "end_abs": 5324.77,
+      "text": "Porque no hoy decides encontrarte con la maravillosa gracia de Jesús."
+    },
+    {
+      "start": 1514.63,
+      "end": 1519.27,
+      "start_abs": 5325.63,
+      "end_abs": 5330.27,
+      "text": "Que aunque tu origen sea difícil, que aunque lo que cargas sea difícil."
+    },
+    {
+      "start": 1520.19,
+      "end": 1521.25,
+      "start_abs": 5331.1900000000005,
+      "end_abs": 5332.25,
+      "text": "Está en tus manos."
+    },
+    {
+      "start": 1522.03,
+      "end": 1525.15,
+      "start_abs": 5333.03,
+      "end_abs": 5336.15,
+      "text": "Abrirte para que el médico del alma desane."
+    },
+    {
+      "start": 1526.07,
+      "end": 1528.39,
+      "start_abs": 5337.07,
+      "end_abs": 5339.39,
+      "text": "Y que él pueda producir un milagro en tu vida."
+    },
+    {
+      "start": 1529.23,
+      "end": 1541.35,
+      "start_abs": 5340.23,
+      "end_abs": 5352.35,
+      "text": "Te quiero dejar con cinco puntos y vamos a terminar cantando. ¿Qué puedo hacer el día de mañana? Habiendo escuchado este mensaje que resonó conmigo, pero cómo lo puedo aplicar? Primero. Toma responsabilidad."
+    },
+    {
+      "start": 1542.39,
+      "end": 1546.03,
+      "start_abs": 5353.39,
+      "end_abs": 5357.03,
+      "text": "No le pongas la culpa a las personas, a las instituciones, a la iglesia."
+    },
+    {
+      "start": 1547.03,
+      "end": 1549.75,
+      "start_abs": 5358.03,
+      "end_abs": 5360.75,
+      "text": "Toma responsabilidad de lo que has hecho bien y lo que has hecho mal."
+    },
+    {
+      "start": 1551.33,
+      "end": 1557.05,
+      "start_abs": 5362.33,
+      "end_abs": 5368.05,
+      "text": "Comienza a tomar responsabilidad de anombrar las cosas por las cuales estás luchando."
+    },
+    {
+      "start": 1557.93,
+      "end": 1574.71,
+      "start_abs": 5368.93,
+      "end_abs": 5385.71,
+      "text": "Toma responsabilidad. Segundo, no le temas a las conversaciones incómodas. Puede ser que esta semana Dios te esté llamando a hacer ese llamado incómodo pero una conversación. Incómoda puede sanar toda una generación. ¿Por qué no hayas ese llamado?"
+    },
+    {
+      "start": 1575.67,
+      "end": 1582.37,
+      "start_abs": 5386.67,
+      "end_abs": 5393.37,
+      "text": "¿Por qué. No esta semana le dices, mira tenemos que hablar tenemos que tocar este tema incómodo porque. Tenemos que sanar."
+    },
+    {
+      "start": 1583.17,
+      "end": 1588.89,
+      "start_abs": 5394.17,
+      "end_abs": 5399.89,
+      "text": "Tercero, identifica qué comportamientos vienen de algo en tu pasado. Que hay que resolver."
+    },
+    {
+      "start": 1589.75,
+      "end": 1590.77,
+      "start_abs": 5400.75,
+      "end_abs": 5401.77,
+      "text": "Aprenda a nombrarlo."
+    },
+    {
+      "start": 1591.81,
+      "end": 1596.67,
+      "start_abs": 5402.8099999999995,
+      "end_abs": 5407.67,
+      "text": "Por eso cuando Jesús iba con las personas y muchos. Milagros le decía, ¿qué quieres que te haga?"
+    },
+    {
+      "start": 1597.77,
+      "end": 1600.79,
+      "start_abs": 5408.77,
+      "end_abs": 5411.79,
+      "text": "Jesús sabía lo que ellos necesitaban, pero por qué. Pregunta?"
+    },
+    {
+      "start": 1601.49,
+      "end": 1603.97,
+      "start_abs": 5412.49,
+      "end_abs": 5414.97,
+      "text": "Porque quiere que tú también nombres lo que tú necesitas."
+    },
+    {
+      "start": 1604.73,
+      "end": 1642.35,
+      "start_abs": 5415.73,
+      "end_abs": 5453.35,
+      "text": "Cuando le das nombre. Cuando lo nombras, comienzas el primer paso para trabajar con aquello que te duele. Y querido. Decirte esto va a doler esto duele romper ciclos generacionales duele y una frase. Que me mandó esta semana mi esposa querida y que me la mandó así como. Dedicado a mí como como esposo dice tú y tu esposa están quebrando ciclos de. Varias generaciones por eso las cosas no son fáciles ustedes son los que un. Linaje entero estaba esperando no pare me encantó un brasileño. Profesional Marcus Araujo, escribo esta frase."
+    },
+    {
+      "start": 1643.05,
+      "end": 1645.51,
+      "start_abs": 5454.05,
+      "end_abs": 5456.51,
+      "text": "Y por eso quiero ir al último consejo."
+    },
+    {
+      "start": 1646.45,
+      "end": 1648.25,
+      "start_abs": 5457.45,
+      "end_abs": 5459.25,
+      "text": "No. Le temas a buscar ayuda profesional."
+    },
+    {
+      "start": 1649.57,
+      "end": 1654.27,
+      "start_abs": 5460.57,
+      "end_abs": 5465.27,
+      "text": "Jesús te sana con milagros, pero también con el. Milagro de profesionales."
+    }
+  ]
+}

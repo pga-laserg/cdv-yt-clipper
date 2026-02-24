@@ -17,6 +17,8 @@ interface BoundaryResult {
     speaker_end_sec: number;
     confidence: number;
     notes?: string;
+    start_candidates?: Array<{ sec: number; confidence: number; note?: string }>;
+    end_candidates?: Array<{ sec: number; confidence: number; note?: string }>;
 }
 
 const openaiKey = process.env.OPENAI_API_KEY;
@@ -158,7 +160,17 @@ Rules:
   "speaker_start_sec": number,
   "speaker_end_sec": number,
   "confidence": number,
-  "notes": "short explanation"
+  "notes": "short explanation",
+  "start_candidates": [
+    {"sec": number, "confidence": number, "note": "primary"},
+    {"sec": number, "confidence": number, "note": "alt-1"},
+    {"sec": number, "confidence": number, "note": "alt-2"}
+  ],
+  "end_candidates": [
+    {"sec": number, "confidence": number, "note": "primary"},
+    {"sec": number, "confidence": number, "note": "alt-1"},
+    {"sec": number, "confidence": number, "note": "alt-2"}
+  ]
 }
 
 Timeline blocks:
@@ -183,11 +195,48 @@ ${timeline}
         throw new Error(`Invalid boundary response: ${content}`);
     }
 
+    const normalizeCandidates = (
+        input: unknown,
+        fallbackSec: number,
+        fallbackConfidence: number
+    ): Array<{ sec: number; confidence: number; note?: string }> => {
+        const items = Array.isArray(input) ? input : [];
+        const normalized = items
+            .map((item) => {
+                if (!item || typeof item !== 'object') return null;
+                const obj = item as Record<string, unknown>;
+                const sec = Number(obj.sec);
+                const conf = Number(obj.confidence);
+                if (!Number.isFinite(sec)) return null;
+                return {
+                    sec,
+                    confidence: Number.isFinite(conf) ? Math.max(0, Math.min(1, conf)) : fallbackConfidence,
+                    note: typeof obj.note === 'string' ? obj.note : undefined
+                };
+            })
+            .filter((v) => Boolean(v)) as Array<{ sec: number; confidence: number; note?: string }>;
+
+        normalized.push({ sec: fallbackSec, confidence: fallbackConfidence, note: 'fallback-primary' });
+
+        const seen = new Set<number>();
+        return normalized
+            .sort((a, b) => b.confidence - a.confidence)
+            .filter((c) => {
+                const key = Math.round(c.sec * 100) / 100;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            })
+            .slice(0, 3);
+    };
+
     return {
         speaker_start_sec,
         speaker_end_sec,
         confidence: Math.max(0, Math.min(1, confidence)),
-        notes: parsed.notes ? String(parsed.notes) : ''
+        notes: parsed.notes ? String(parsed.notes) : '',
+        start_candidates: normalizeCandidates(parsed.start_candidates, speaker_start_sec, confidence),
+        end_candidates: normalizeCandidates(parsed.end_candidates, speaker_end_sec, confidence)
     };
 }
 

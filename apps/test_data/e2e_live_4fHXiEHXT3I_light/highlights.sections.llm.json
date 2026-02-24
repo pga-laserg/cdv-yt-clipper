@@ -1,0 +1,157 @@
+{
+  "generated_at": "2026-02-24T22:01:36.388Z",
+  "work_dir": "/Volumes/SSD Daniel/CDV/apps/test_data/e2e_live_4fHXiEHXT3I_light",
+  "model": "gpt-5-mini",
+  "bounds": {
+    "start": 2869.37,
+    "end": 5901.14,
+    "duration_sec": 3031.77
+  },
+  "input_counts": {
+    "transcript_segments_in_bounds": 764,
+    "polished_paragraphs_in_bounds": 298,
+    "polished_chapters_in_bounds": 5
+  },
+  "clips": [
+    {
+      "start": 5301.73,
+      "end": 5361.73,
+      "title": "Pasos para romper ciclos",
+      "excerpt": "No todo lo que enfrentamos puede cambiar, pero nada puede cambiar hasta que lo enfrentamos... Primero, toma responsabilidad. Segundo, no le temas a las conversaciones incómodas... Jesús sabía lo que ellos necesitaban... Romper ciclos generacionales duele.",
+      "hook": "Romper un ciclo empieza con nombrarlo, responsabilizarte y atreverse a conversar.",
+      "confidence": 0.92,
+      "score": 0.972,
+      "score_breakdown": {
+        "model_confidence": 0.92,
+        "duration_preference": 1,
+        "ending_completeness": 1
+      }
+    },
+    {
+      "start": 2885.75,
+      "end": 2947,
+      "title": "Cuando la alabanza se vuelve oración",
+      "excerpt": "Tanto predicamos el descanso de este séptimo día... Hay un peso allí. Las alabanzas que ya cantamos, si tú lo permites hacer de estas alabanzas tu oración también, sin duda Dios las puede usar para tener un encuentro contigo.",
+      "hook": "Cuando la alabanza se convierte en oración, Dios puede encontrarte en medio del descanso.",
+      "confidence": 0.93,
+      "score": 0.968,
+      "score_breakdown": {
+        "model_confidence": 0.93,
+        "duration_preference": 0.969,
+        "ending_completeness": 1
+      }
+    },
+    {
+      "start": 3132.1,
+      "end": 3192.1,
+      "title": "Distracción y desconexión",
+      "excerpt": "Uno de ellos estaba estresado, se le anotaban sus ojos, estaba lleno de apuro... parecía que la decepción, el estar desconectado del momento estaba muy evidente en él y a pesar de todo seguía en el celular, seguía atendiendo asuntos... ¿Cuánto de las cosas que vivimos, hábitos que tenemos, reacciones que tenemos vienen de algo mucho más atrás en la historia?",
+      "hook": "Tu desconexión puede ser la pista de una herida heredada — atiéndela.",
+      "confidence": 0.89,
+      "score": 0.962,
+      "score_breakdown": {
+        "model_confidence": 0.89,
+        "duration_preference": 1,
+        "ending_completeness": 1
+      }
+    },
+    {
+      "start": 3687.09,
+      "end": 3747.09,
+      "title": "Cuando el dolor se convierte en legado",
+      "excerpt": "¿Te has preguntado de dónde viene eso?... la repito: en qué momento el dolor que te hicieron a ti se convirtió en el dolor que tú haces a los demás? Queridos, hay algo que es muy importante y que quiero dejar en claro.",
+      "hook": "El dolor no resuelto se transforma en herencia relacional — y debemos detenerlo.",
+      "confidence": 0.92,
+      "score": 0.832,
+      "score_breakdown": {
+        "model_confidence": 0.92,
+        "duration_preference": 1,
+        "ending_completeness": 0.65
+      }
+    },
+    {
+      "start": 2950.3,
+      "end": 3011,
+      "title": "Herencias que no imaginamos",
+      "excerpt": "Yo mientras iba creciendo, me di cuenta que incluso no solamente les tenía miedo, sino que me desmayaba cada vez que me iba a sacar sangre... en realidad cuando lo descubrí no fue tan chistoso porque me acuerdo que llegué, puse el brazo y me vino una sensación extraña...",
+      "hook": "Muchas de nuestras reacciones hoy nacen de historias que no recordamos del todo.",
+      "confidence": 0.9,
+      "score": 0.821,
+      "score_breakdown": {
+        "model_confidence": 0.9,
+        "duration_preference": 0.983,
+        "ending_completeness": 0.65
+      }
+    },
+    {
+      "start": 5006.92,
+      "end": 5066.92,
+      "title": "Redención generacional",
+      "excerpt": "La redención que Ruth vivió no terminó solamente en esa decisión... en la genealogía de Jesucristo aparece Ruth... Mira la misericordia de Dios en la historia. En la genealogía de Jesucristo existe ruptura y existe redención. Eso es redención generacional, eso es romper el ciclo.",
+      "hook": "Tu historia puede entrar en la línea de redención que cambia generaciones.",
+      "confidence": 0.95,
+      "score": 0.763,
+      "score_breakdown": {
+        "model_confidence": 0.95,
+        "duration_preference": 1,
+        "ending_completeness": 0.45
+      }
+    },
+    {
+      "start": 4606.04,
+      "end": 4666.04,
+      "title": "Ruth: una decisión que cambia todo",
+      "excerpt": "Si miras la Biblia y la narrativa bíblica te vas a dar cuenta de una historia que tiene características muy similares, que es la historia de Ruth y Noemí... Noemí pierde a su esposo y sus dos hijos... y aquí entra la decisión de Ruth, Ruth... 'Donde quiera que tú fueras, iré yo.' Y eso lo cambia todo.",
+      "hook": "Una decisión de lealtad puede romper cadenas que parecían inevitables.",
+      "confidence": 0.94,
+      "score": 0.759,
+      "score_breakdown": {
+        "model_confidence": 0.94,
+        "duration_preference": 1,
+        "ending_completeness": 0.45
+      }
+    },
+    {
+      "start": 3231.9,
+      "end": 3292,
+      "title": "¿Qué es el pecado?",
+      "excerpt": "¿Qué es el pecado? Nosotros tenemos una visión, que es correcta que está en la Biblia, una visión judicial del pecado... pero podemos perder de vista algo muy importante y más abarcante, que el pecado tiene dimensiones mucho más profundas... El primero es el pecado que cometemos.",
+      "hook": "El pecado no es sólo acción judicial: tiene capas más profundas que necesitamos ver.",
+      "confidence": 0.9,
+      "score": 0.744,
+      "score_breakdown": {
+        "model_confidence": 0.9,
+        "duration_preference": 0.998,
+        "ending_completeness": 0.45
+      }
+    },
+    {
+      "start": 4028.81,
+      "end": 4088.81,
+      "title": "Abram y Lot: una elección que revela",
+      "excerpt": "Cuando miras la Biblia así como una historia narrativa grande... qué es la historia de Abraham y Lot? En Génesis 13, Lot tenía muchas posesiones, y sus pastores... Abraham cede, él no pelea por control, sino que le dice a Lot, elige.",
+      "hook": "A veces ceder revela quiénes somos y las futuras consecuencias de una elección.",
+      "confidence": 0.88,
+      "score": 0.738,
+      "score_breakdown": {
+        "model_confidence": 0.88,
+        "duration_preference": 1,
+        "ending_completeness": 0.45
+      }
+    },
+    {
+      "start": 4161.85,
+      "end": 4223.85,
+      "title": "Elegir por apariencia",
+      "excerpt": "Es clave este detalle. Dice que Lot alzó sus ojos y vio toda la llanura del Jordán, que toda ella era de riego. Alzó sus ojos, eligió por apariencia, por prosperidad... No entró de golpe a Sodoma, pero se fue acercando poco a poco.",
+      "hook": "Elegir por lo que se ve puede llevarte paso a paso hacia una ruina mayor.",
+      "confidence": 0.9,
+      "score": 0.733,
+      "score_breakdown": {
+        "model_confidence": 0.9,
+        "duration_preference": 0.95,
+        "ending_completeness": 0.45
+      }
+    }
+  ]
+}

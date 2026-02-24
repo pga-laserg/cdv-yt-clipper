@@ -53,7 +53,7 @@ async function runPipeline(jobId: string, source: string) {
         console.log('--- Stage 3: Analyze ---');
         currentStage = 'analyze';
         await updateJobStatus(jobId, 'processing:analyze');
-        const { boundaries, clips } = await analyze(segments);
+        const { boundaries, clips } = await analyze(segments, { workDir, audioPath, videoPath });
         console.log(`Stage analyze completed in ${Math.round((Date.now() - startedAt) / 1000)}s`);
 
         // 4. Render

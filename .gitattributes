@@ -1,0 +1,4 @@
+apps/test_data/**/*.mp4 filter=lfs diff=lfs merge=lfs -text
+apps/test_data/**/*.wav filter=lfs diff=lfs merge=lfs -text
+apps/worker/apps/test_data/**/*.mp4 filter=lfs diff=lfs merge=lfs -text
+apps/worker/apps/test_data/**/*.wav filter=lfs diff=lfs merge=lfs -text

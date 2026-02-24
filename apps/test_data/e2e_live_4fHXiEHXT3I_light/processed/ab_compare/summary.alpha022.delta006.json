@@ -1,0 +1,55 @@
+{
+  "generated_at": "2026-02-24T21:35:46.345Z",
+  "elapsed_sec": 77.4,
+  "center_x": 0.4859375,
+  "clips_rendered": 5,
+  "track_stats": [
+    {
+      "clip_index": 1,
+      "track": {
+        "points": 62,
+        "avg_step": 0.0074,
+        "max_step": 0.0285
+      }
+    },
+    {
+      "clip_index": 2,
+      "track": {
+        "points": 62,
+        "avg_step": 0.0122,
+        "max_step": 0.0325
+      }
+    },
+    {
+      "clip_index": 3,
+      "track": {
+        "points": 62,
+        "avg_step": 0.0047,
+        "max_step": 0.0165
+      }
+    },
+    {
+      "clip_index": 4,
+      "track": {
+        "points": 62,
+        "avg_step": 0.0021,
+        "max_step": 0.0128
+      }
+    },
+    {
+      "clip_index": 5,
+      "track": {
+        "points": 62,
+        "avg_step": 0.0029,
+        "max_step": 0.0153
+      }
+    }
+  ],
+  "outputs": [
+    "/Volumes/SSD Daniel/CDV/apps/test_data/e2e_live_4fHXiEHXT3I_light/processed/highlights_vertical/highlight_01.vertical.mp4",
+    "/Volumes/SSD Daniel/CDV/apps/test_data/e2e_live_4fHXiEHXT3I_light/processed/highlights_vertical/highlight_02.vertical.mp4",
+    "/Volumes/SSD Daniel/CDV/apps/test_data/e2e_live_4fHXiEHXT3I_light/processed/highlights_vertical/highlight_03.vertical.mp4",
+    "/Volumes/SSD Daniel/CDV/apps/test_data/e2e_live_4fHXiEHXT3I_light/processed/highlights_vertical/highlight_04.vertical.mp4",
+    "/Volumes/SSD Daniel/CDV/apps/test_data/e2e_live_4fHXiEHXT3I_light/processed/highlights_vertical/highlight_05.vertical.mp4"
+  ]
+}

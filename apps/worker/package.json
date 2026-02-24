@@ -9,25 +9,37 @@
         "test:ingest": "ts-node-dev src/test-ingest.ts",
         "test:transcribe": "ts-node-dev src/test-transcribe.ts",
         "test:analyze": "ts-node-dev src/test-analyze.ts",
+        "test:analysis-doc": "ts-node-dev src/test-analysis-doc.ts",
         "test:openai-analysis": "ts-node-dev src/test-openai-analysis.ts",
         "test:diarization": "ts-node-dev src/test-diarization.ts",
         "test:targeted-diarization": "ts-node-dev src/test-targeted-diarization.ts",
         "test:autocrop": "ts-node-dev src/test-autocrop.ts",
         "test:render": "ts-node-dev src/test-render.ts",
+        "test:render-highlights-isolated": "ts-node-dev src/test-render-highlights-isolated.ts",
+        "test:e2e": "ts-node-dev src/test-e2e.ts",
+        "test:cloud-diarization": "ts-node-dev src/test-cloud-sermon-diarization.ts",
+        "test:face-targeted-sermon": "ts-node-dev src/test-face-targeted-sermon.ts",
+        "test:google-stt-diarization": "ts-node-dev src/test-google-stt-diarization.ts",
+        "test:google-v1-diarization": "ts-node-dev src/test-google-v1-diarization.ts",
+        "test:boundary-adjudicator": "ts-node-dev src/test-boundary-adjudicator.ts",
+        "test:highlights-llm-isolated": "ts-node-dev src/test-highlights-llm-isolated.ts",
+        "test:llm-cue-telemetry-health": "ts-node-dev src/test-llm-cue-telemetry-health.ts",
         "init-storage": "ts-node-dev src/init-storage.ts",
         "seed": "ts-node-dev src/seed.ts"
     },
     "dependencies": {
-        "dotenv": "^16.3.1",
+        "@google-cloud/speech": "^7.2.1",
+        "@google-cloud/storage": "^7.19.0",
         "@supabase/supabase-js": "^2.39.0",
+        "dotenv": "^16.3.1",
         "fluent-ffmpeg": "^2.1.2",
-        "ytdl-core": "^4.11.5",
-        "openai": "^4.20.1"
+        "openai": "^4.20.1",
+        "ytdl-core": "^4.11.5"
     },
     "devDependencies": {
-        "typescript": "^5.2.2",
+        "@types/fluent-ffmpeg": "^2.1.22",
         "@types/node": "^20.9.0",
         "ts-node-dev": "^2.0.0",
-        "@types/fluent-ffmpeg": "^2.1.22"
+        "typescript": "^5.2.2"
     }
 }

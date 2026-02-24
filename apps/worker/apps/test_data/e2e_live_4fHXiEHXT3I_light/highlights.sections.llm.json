@@ -1,0 +1,57 @@
+{
+  "generated_at": "2026-02-24T20:45:17.579Z",
+  "work_dir": "/Volumes/SSD Daniel/CDV/apps/worker/apps/test_data/e2e_live_4fHXiEHXT3I_light",
+  "model": "gpt-5-mini",
+  "bounds": {
+    "start": 3811.47,
+    "end": 5465.97,
+    "duration_sec": 1654.5
+  },
+  "input_counts": {
+    "transcript_segments_in_bounds": 451,
+    "polished_paragraphs_in_bounds": 179,
+    "polished_chapters_in_bounds": 3
+  },
+  "clips": [
+    {
+      "start": 3812.23,
+      "end": 3825.17,
+      "title": "Huir de los conflictos se transmite",
+      "excerpt": "Y nace el hijo y huye de los conflictos en vez de enfrentarlos. Esto no es una maldición mágica, que a lo vuelvo a decir, es transmisión relacional.",
+      "hook": "¿Lo que evitas hoy lo heredan tus hijos mañana?",
+      "confidence": 0.9
+    },
+    {
+      "start": 3865.99,
+      "end": 3886.35,
+      "title": "Diseñados para cambiar",
+      "excerpt": "Y él dice lo siguiente: fuimos diseñados por Dios para adaptarnos. Esto significa que fuimos diseñados para cambiar según nuestras experiencias; este cambio no es simplemente un cambio de creencias, sino un cambio físico real que incluye modificaciones en las conexiones neuronales.",
+      "hook": "Nuestra historia cambia nuestro cuerpo y nuestro futuro.",
+      "confidence": 0.91
+    },
+    {
+      "start": 4086.13,
+      "end": 4125.87,
+      "title": "La propuesta de paz de Abraham",
+      "excerpt": "Abraham surge con una solución, dice, mira, voy a proponerte la paz. Parece un conflicto que fue saludable, porque fue una decisión aparentemente positiva en aquel momento; Abraham cede, él no pelea por control, sino que le dice a Lot, elige.",
+      "hook": "Renunciar al control y elegir la paz: una lección de liderazgo y fe.",
+      "confidence": 0.89
+    },
+    {
+      "start": 4161.85,
+      "end": 4203.01,
+      "title": "Lot eligió por vista",
+      "excerpt": "Lot elige por vista. Alzó sus ojos y vio toda la llanura del Jordán... Alzó sus ojos, eligió por apariencia, por prosperidad, por conveniencia. Estas ciudades donde abundaban los errores, el pecado.",
+      "hook": "Elegir por lo que se ve rara vez lleva a lo que vale la pena.",
+      "confidence": 0.9
+    },
+    {
+      "start": 5021.68,
+      "end": 5055.02,
+      "title": "Redención en la genealogía",
+      "excerpt": "Obed es padre de Isaí y Isaí es padre de David. Porque cuando tú entras a la genealogía de Jesús aparece Ruth. Mira la misericordia de Dios en la historia.",
+      "hook": "Del dolor a la redención: cómo una decisión cambió la línea del Mesías.",
+      "confidence": 0.93
+    }
+  ]
+}

@@ -10,6 +10,7 @@ def resolve_token(cli_token: str | None) -> str | None:
         return cli_token
     return (
         os.getenv("PYANNOTE_ACCESS_TOKEN")
+        or os.getenv("HUGGINGFACE_ACCESS_TOKEN")
         or os.getenv("HUGGINGFACE_TOKEN")
         or os.getenv("HF_TOKEN")
     )

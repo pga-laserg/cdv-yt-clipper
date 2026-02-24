@@ -1,0 +1,1186 @@
+/Users/pablogallardo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Loading Whisper model 'small' on cpu...
+Transcribing apps/test_data/e2e_live_4fHXiEHXT3I_rerun2/audio.wav (Forcing Spanish)...
+Detected language 'es' with probability 1
+[44.91s -> 46.85s] Buenos días hermanos. Feliz sábado.
+[48.13s -> 50.79s] Buenos días. Feliz a todos nuestros hermanos.
+[51.41s -> 53.13s] Bienvenidos a la casa de nuestro señor.
+[54.01s -> 59.79s] Le damos una cordial bienvenida a todos nuestros hermanos, especialmente a las visitas y a todas las personas que nos ven en línea.
+[60.67s -> 62.43s] Que se den cordial bienvenido.
+[64.01s -> 67.67s] Les invito a inclinar el rostro para tener una palabra de oración.
+[70.76s -> 75.42s] Padre nuestro que estás en el cielo, santificado y glorificado, sea tu santo nombre.
+[76.06s -> 76.96s] Te damos gracias
+[76.96s -> 78.40s] señor por la oportunidad que
+[78.40s -> 79.82s] nos das de poder venir a
+[79.82s -> 81.58s] adorar tu nombre en tu
+[81.58s -> 83.80s] iglesia y te pedimos que
+[83.80s -> 85.34s] prepares nuestra mente para
+[85.34s -> 87.00s] poder recibir el mensaje que
+[87.00s -> 88.04s] tienes preparado para
+[88.04s -> 88.48s] nosotros.
+[89.16s -> 89.76s] Quédate con
+[89.76s -> 92.42s] nosotros y con cada uno de
+[92.42s -> 94.04s] los presentes. Te lo pedimos
+[94.04s -> 95.10s] en Cristo Jesús.
+[114.11s -> 114.75s] Amén.
+[115.45s -> 119.81s] Y luego se sientan ahí enfrente para la historia, gracias.
+[120.79s -> 121.01s] Nos
+[200.88s -> 202.18s] regresamos a nuestros lugares.
+[210.39s -> 211.79s] Asistentes, vamos, vamos.
+[212.37s -> 213.83s] Que vamos tarde a nuestra clase.
+[214.47s -> 214.89s] Vengan,
+[218.46s -> 219.60s] niños, ¿cómo están?
+[220.50s -> 222.24s] Ah, no, no son niños, estudian.
+[222.54s -> 225.80s] ¿Cómo están? Bienvenidos a Ciencias 101.
+[236.82s -> 240.54s] Hola, yo soy profesor Clumsy.
+[240.54s -> 243.98s] Sí, este es mi asistente, asistente Rizaz,
+[245.47s -> 248.97s] y esta es mi asistente, bonita, bonita, bonita.
+[250.78s -> 251.94s] ¿Cómo están el día de hoy?
+[252.78s -> 255.50s] Hoy les voy a enseñar algo muy importante,
+[256.24s -> 261.50s] la ciencia más importante que van a conocer en toda su vida, ok?
+[262.16s -> 264.96s] Porque yo soy un profesor muy reconocido,
+[265.80s -> 271.90s] soy bueno, más o menos reconocido, he agarrado muchos trofeos como uno que empieza con la N,
+[271.90s -> 277.14s] no sé si alguien me puede ayudar, no no
+[278.38s -> 283.00s] no ese no ese me lo dieron aquí en Macalón el no sé
+[283.00s -> 289.56s] ese me lo dieron porque no sé mucho ok bueno hoy esta mena
+[290.94s -> 293.66s] les voy a hablar de el
+[295.96s -> 296.94s] cuidado
+[318.13s -> 328.49s] un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado, un parado
+[328.49s -> 330.23s] tener la mejor familia, va a tener niños,
+[330.85s -> 334.55s] yo personalmente pienso que la carrera más
+[334.55s -> 342.93s] hermosa es ser una madre, que yo no soy mamá, yo soy papá, pero esa es una carrera
+[342.93s -> 347.33s] muy difícil y ustedes que tienen mami saben que es algo muy difícil, imagino
+[347.33s -> 353.57s] para sus mami, ok, pero entonces en la vida vamos a hacer muchas cosas, entonces
+[353.57s -> 357.15s] entonces imagínense que aquí empieza su vida, ok,
+[357.87s -> 362.09s] y luego en la vida vamos creciendo y nacimos y andamos en pañales, ¿correcto?
+[362.97s -> 363.83s] Sí, en pañales,
+[364.59s -> 374.21s] ok, y luego vivimos, vivimos, vivimos, vivimos, vivimos, vivimos, vivimos y luego otra vez nos quedamos en pañales, ok
+[374.21s -> 385.09s] y morimos lamentablemente, entonces nuestra vida aquí queda solito sin nada muerto, que triste
+[385.09s -> 386.29s] asistente
+[390.68s -> 399.10s] aquí vamos a bueno acá está el punto no se lo puse ustedes entonces aquí acaba nuestra
+[399.10s -> 399.40s] la vida.
+[400.48s -> 401.70s] Les ponemos una carita
+[401.70s -> 402.10s] triste,
+[407.21s -> 408.77s] triste ahí Mero,
+[412.05s -> 412.33s] ustedes
+[412.33s -> 415.77s] saben que alguien vino a
+[417.72s -> 418.34s] salvarnos
+[418.34s -> 419.32s] de esa tristeza.
+[420.20s -> 421.36s] ¿Saben quién es?
+[422.02s -> 422.50s] ¿Alguien sabe?
+[423.30s -> 424.00s] Dios,
+[425.26s -> 425.76s] papá Dios
+[425.76s -> 429.10s] mandó a alguien y esta
+[429.10s -> 430.64s] representación es de ese alguien
+[430.64s -> 432.34s] que se llama. ¿Alguien sabe su
+[432.34s -> 432.62s] nombre?
+[435.14s -> 436.52s] Sí, y es
+[436.52s -> 445.58s] importante tener a Jesús en nuestra vida entonces Jesús vino y nos dio un
+[445.58s -> 451.32s] poquito de a ver a ver si lo puede encontrar no lo tengo aquí a ver a ver
+[451.94s -> 460.62s] aquí está un poquito de gracia aquí la tenemos a ver alguien más un poquito
+[460.62s -> 463.56s] de fe y a ver a ver
+[465.68s -> 471.24s] y un poquito hay que creer en Jesús entonces aquí tenemos la
+[471.24s -> 475.24s] herramienta que necesitamos entonces así está entonces
+[491.52s -> 492.46s] lo que pasó cuando vino
+[492.46s -> 492.90s] Jesús
+[494.50s -> 497.48s] que creen que está pasando a Jesús estaba
+[500.68s -> 504.54s] en la cruz verdad y luego el malo
+[504.54s -> 511.78s] pensó que ya había ganado pero ganó no ganó y aquí está su fe
+[511.78s -> 524.12s] su gracia, creer en Jesús y luego hay que apretarlo bien bien para no salirnos de
+[524.12s -> 524.56s] Jesús,
+[527.71s -> 529.69s] y
+[533.14s -> 536.16s] ahora imagínense
+[538.64s -> 545.18s] regresamos a nuestra vida pero ahora no estamos solos ahora tenemos a quién
+[545.86s -> 548.42s] a Dios tenemos a Jesús. Y se
+[548.42s -> 549.94s] acuerda donde se terminó nuestra
+[549.94s -> 550.18s] vida?
+[550.84s -> 552.04s] Ahí me he olvidado de
+[552.04s -> 552.84s] donde está la carita triste,
+[553.34s -> 557.12s] pero si seguimos, y seguimos, y
+[557.12s -> 560.88s] seguimos, pasamos nuestra muerte
+[561.70s -> 563.40s] o nos quedamos en nuestra muerte,
+[564.38s -> 565.98s] pasamos nuestra muerte, y
+[565.98s -> 567.38s] vamos, y vamos, y vamos, y
+[567.38s -> 567.66s] vamos.
+[568.78s -> 570.64s] Y acá está el cielo,
+[571.54s -> 574.26s] acá está la vida eterna, y
+[574.26s -> 576.06s] acá vivimos por siempre con Dios.
+[577.76s -> 578.32s] Amén.
+[579.38s -> 579.94s] Ok.
+[582.28s -> 583.58s] Si hay a la gente inteligente me
+[583.58s -> 584.82s] puedo poner el versículo por favor.
+[587.77s -> 589.07s] Juan tres dieciséis.
+[590.13s -> 590.57s] Ok.
+[591.19s -> 592.31s] Y si los papás y los
+[592.31s -> 595.35s] adultos nos pueden decir el versículo acá a los niños.
+[608.86s -> 610.76s] Amén. Ok. Si pueden
+[610.76s -> 612.40s] inclinar su rostro para una oración.
+[613.42s -> 617.06s] Para el celestial señor te damos gracias por
+[617.06s -> 621.02s] este sábado hermoso que nos has dado por tener una iglesia llena de niños,
+[621.18s -> 627.70s] sonrisas y carcajadas señor que podamos tener un buen sermón,
+[627.92s -> 631.62s] bendice el pastor que va a predicar y todo lo decimos en el nombre de Jesús.
+[632.32s -> 632.88s] Amen.
+[708.50s -> 708.84s] Muy buenos
+[708.84s -> 716.80s] días hermanos, estamos felices de estar esta mañana aquí en la casa de Dios y Adriana y
+[716.80s -> 719.90s] Y le decimos Pepe, nosotros,
+[720.90s -> 721.28s] ¿verdad?
+[721.80s -> 725.14s] Ellos traen para presentar delante de Dios a su hijita,
+[725.40s -> 727.70s] Alexandra Ramírez.
+[727.98s -> 733.30s] Y les voy a pedir que por favor pasen acá para que juntos
+[733.30s -> 737.60s] podamos ponerla delante del todo poderoso Dios.
+[738.86s -> 744.40s] Es una costumbre, buena costumbre, no es un mandato,
+[744.40s -> 752.48s] Esto es una costumbre que los padres traigamos delante de Dios a nuestros hijos para pedir
+[752.48s -> 754.70s] que Dios los bendiga.
+[755.14s -> 758.20s] Hacemos una presentación delante de Dios.
+[758.88s -> 767.38s] Y no tenemos mucho tiempo, pero quiero compartirles a Adriana y a Pepe.
+[768.60s -> 774.56s] se llama Pedro Antonio, pero nosotros lo apodamos Pepe, ok.
+[776.42s -> 778.94s] Le quiero compartir a ellos algunas
+[779.60s -> 785.62s] instrucciones muy importantes que la palabra de Dios tiene para ellos y también para todos los
+[785.62s -> 789.30s] que hemos sido, o somos padres, hoy o iremos hacer padres.
+[790.20s -> 793.20s] En primer lugar quiero decirle
+[793.20s -> 799.06s] que hay dos registros que quiero compartirles. El primero de ellos lo
+[799.06s -> 807.02s] encontramos nosotros en la palabra de Dios en el libro primero de Samuel y es el
+[807.02s -> 809.80s] caso bien conocido de Ana, verdad.
+[810.70s -> 813.86s] Ana dice el relato que era una mujer
+[813.86s -> 814.86s] estéril.
+[817.17s -> 819.13s] No podía tener hijos, verdad,
+[819.81s -> 823.27s] pero dice el relato del capítulo 1 de
+[823.27s -> 825.79s] primera de Samuel,
+[826.67s -> 834.43s] que Ana fue al templo y oró a Dios, hizo un pacto, hizo un voto delante
+[834.43s -> 841.57s] de Dios y le pidió que le quitaras afrenta de ser estéril y le concediera un hijo.
+[842.31s -> 848.61s] Y ese hijo lo iba a dedicar todos los días de su vida al servicio de Dios.
+[848.61s -> 862.61s] Dios escuchó la oración de Ana y le concedió a Samuelito, que fue un excelente profeta en el pueblo de Israel,
+[863.01s -> 871.95s] pero fue gracias a la dedicación de sus padres en corresponderle a Dios,
+[872.79s -> 875.77s] presentándolo delante de Dios para el servicio de Dios.
+[876.75s -> 883.61s] En el libro de los jueces, en el capítulo 13, hay otro relato,
+[884.39s -> 891.39s] y es un relato también de una persona que no podía tener hijos, era estéril también.
+[892.35s -> 895.61s] Y no fue ella a orar delante de Dios,
+[896.35s -> 903.73s] fue Dios el que vino a visitar a esta familia para decirles que iban a concebir un hijo.
+[903.73s -> 912.15s] y ese fue Sansón, a quien pusieron por nombre Sansón, pero llama la atención que en el capítulo 13
+[912.15s -> 916.73s] de jueces en el versículo 8 manó a,
+[917.33s -> 920.39s] porque la madre sanónima no se menciona el nombre de ella
+[920.39s -> 928.61s] sanónima, pero manó a el padre una vez que la esposa fue y le contó que alguien había venido
+[928.61s -> 933.43s] un ángel del señor había venido y le había hablado y le había anunciado que ella iba
+[933.43s -> 934.17s] tener un hijo.
+[935.17s -> 945.55s] Entonces Manoa hizo una oración el versículo 8 y le pidió a Dios que le permitiera
+[945.55s -> 953.51s] que ese ángel de Jehová viniese a ellos para que les dijera o les diera indicaciones de qué
+[953.51s -> 957.65s] cuidado debían de tener para ese hijo que iban a hacer.
+[959.76s -> 961.72s] Todavía no nacía, era apenas una
+[961.72s -> 965.60s] promesa, pero una promesa abrazada con fe,
+[966.96s -> 967.72s] con fe.
+[968.30s -> 971.56s] Y cuando el niño venga, nazca,
+[972.12s -> 972.48s] ¿cuáles
+[972.48s -> 973.74s] cuidados vamos a tener?
+[974.30s -> 979.20s] le preguntó. Y entonces el ángel le dijo, ya le dije a tu esposa los
+[979.20s -> 980.36s] cuidados que debes tener.
+[981.04s -> 987.54s] Y saben, es increíble que en el versículo 24 de ese capítulo 13 de
+[987.54s -> 995.66s] jueces, dijera que Dios bendijo a ese, a ese niño que nació
+[995.66s -> 998.88s] Sansón. Conocemos su historia, ¿verdad? Tuvo sus, sus
+[998.88s -> 1002.18s] problemitas en la vida, etcétera, pero ahí está.
+[1003.00s -> 1003.84s] Bueno, es muy
+[1003.84s -> 1006.50s] importante, Adriana y Pepe,
+[1007.34s -> 1009.84s] que entendamos que tenemos que
+[1009.84s -> 1014.40s] saber cómo debemos educar, cómo debemos crear a nuestros
+[1014.40s -> 1016.78s] nuestros hijos, es muy importante ¿verdad?
+[1017.44s -> 1019.22s] En Deuteronómio capítulo seis,
+[1019.98s -> 1020.68s] los versículos
+[1020.68s -> 1022.46s] del cinco hasta el nueve,
+[1023.24s -> 1027.54s] hay una instrucción que es maravillosa para todos los que somos
+[1027.54s -> 1033.92s] padres o abuelos ¿verdad? Porque dice, número uno, y escúchenlo bien, dice,
+[1034.70s -> 1036.46s] amarás al
+[1036.46s -> 1040.12s] Señor tu Dios con todo tu corazón,
+[1042.13s -> 1045.43s] amarás al Señor con, a tu Dios con todo el corazón,
+[1045.43s -> 1049.01s] sabe, cuando amamos, cuando amamos a Dios,
+[1049.95s -> 1053.73s] automáticamente amamos a nuestro prójimo,
+[1055.13s -> 1059.71s] ¿verdad? Y ¿quién más próximo puede haber en una familia aquí un hijo?
+[1060.71s -> 1062.05s] Que es parte de mi
+[1062.05s -> 1064.15s] carne, ¿verdad? Podría decir la madre.
+[1066.40s -> 1070.92s] Entonces, el Señor le dice, bueno, estas palabras que yo
+[1070.92s -> 1076.00s] te pongo hoy aquí, las vas a enseñar a tu hijo,
+[1076.56s -> 1077.34s] a tu hija,
+[1078.14s -> 1081.30s] las vas a enseñar y las vas a repetir
+[1081.90s -> 1084.80s] porque se aprende por medio de la repetición, ¿no es cierto?
+[1085.44s -> 1088.04s] Es el mejor método de aprendizaje,
+[1088.18s -> 1089.82s] la repetición.
+[1090.68s -> 1094.58s] En todo momento, cuando entres, cuando salgas, cuando estés de viaje,
+[1094.58s -> 1095.92s] cuando estés de camino y todo,
+[1096.52s -> 1101.28s] cuélgalos en los mandamientos o las enseñanzas, las instrucciones,
+[1101.62s -> 1108.56s] pon las visibles en donde ellos continuamente estén viendo y aprendiendo acerca del Dios
+[1108.56s -> 1110.34s] Todopoderoso, del Creador.
+[1111.20s -> 1112.50s] Y termino.
+[1113.82s -> 1119.00s] Termino con Efesios capítulo seis versículo cuatro,
+[1119.00s -> 1122.54s] donde el Apóstol San Pablo dice,
+[1125.25s -> 1125.69s] padres,
+[1127.07s -> 1129.51s] padres, no irritéis a vuestros hijos,
+[1130.41s -> 1135.67s] sino criadlos en disciplina y en amonestación del Señor.
+[1138.32s -> 1139.86s] Escuchen bien lo que les voy a decir,
+[1140.74s -> 1150.80s] la mayor manifestación de amor que un día ustedes le van a hacer a su hijita.
+[1151.60s -> 1152.84s] ¿saben cuál es?
+[1153.50s -> 1154.26s] Disciplinarla.
+[1159.03s -> 1163.33s] Disciplinarla es la mayor manifestación de amor que un padre
+[1163.33s -> 1165.65s] puede hacer a sus hijos.
+[1166.97s -> 1169.23s] Y Hebreos capítulo 12,
+[1169.83s -> 1173.75s] que después van a leerlo ustedes, dice que disciplinar
+[1173.75s -> 1176.81s] no es fácil, que no es agradable.
+[1177.63s -> 1181.53s] Corregir a un hijo, enseñarle el camino correcto que tiene que
+[1181.53s -> 1186.83s] hacer, indicarle que está haciendo mal delante de Dios las cosas, eso es, no es, dice el doctor
+[1186.83s -> 1188.89s] Domson, eso no es para cobardes,
+[1190.09s -> 1194.17s] eso es para padres que aman y quieren ver a sus hijos
+[1194.17s -> 1195.57s] en el reino de los cielos.
+[1196.37s -> 1197.13s] Así que,
+[1197.79s -> 1201.79s] con esos consejos, ok, vamos a poner Alexandra
+[1201.79s -> 1206.15s] el al mano del todopoderoso Dios, ¿Ok? ¿Nos podemos arrodillar?
+[1214.00s -> 1214.62s] Pásamela,
+[1218.92s -> 1219.90s] por así ponmeme el micrófono.
+[1220.30s -> 1220.68s] Oremos.
+[1221.66s -> 1227.62s] Querido Dios y Padre Celestial, en esta mañana de su día santo,
+[1228.22s -> 1230.70s] Adriana y Antonio,
+[1231.40s -> 1238.66s] han venido delante de su presencia trayendo consigo a su hijita, Alexandra.
+[1238.66s -> 1248.28s] y Señor quieren dedicarla para que usted la bendiga, la cuide, la proteja, la haga crecer en los
+[1248.28s -> 1253.34s] caminos de Dios y Padre le pido sabiduría para ellos,
+[1253.98s -> 1256.88s] para que la sepan guiar, para que un día
+[1256.88s -> 1263.28s] puedan presentarse delante de Dios y decirle he aquí nosotros y los hijos que nos concediste.
+[1263.28s -> 1267.00s] Padre santo, que esta niña crezca sana,
+[1267.80s -> 1271.94s] crezca consagrada usted y crezca para la gloria de
+[1271.94s -> 1273.44s] su bendito y santo nombre.
+[1274.06s -> 1275.90s] Sea con toda la familia Ramírez,
+[1276.56s -> 1278.72s] guárdeles en su gracia y en su amor.
+[1279.16s -> 1280.94s] Se lo pedimos y agradecemos en Jesús.
+[1281.66s -> 1282.98s] Amén y amén.
+[1284.64s -> 1287.22s] desconociste los brazos, ¿Verdad?
+[1288.96s -> 1289.86s] Se me queda viendo.
+[1294.57s -> 1295.21s] OK.
+[1295.89s -> 1298.59s] Bueno, aquí de parte del departamento de Cuna,
+[1298.77s -> 1303.15s] hay un regalito para Alexandra,
+[1303.63s -> 1305.19s] que Dios te bendiga, mi amorcito.
+[1305.79s -> 1309.19s] Pueden pasar, que Dios los acompañe y muchas felicidades.
+[1309.69s -> 1309.89s] Gracias.
+[1336.48s -> 1339.42s] Invitó a los diáconos a tomar sus lugares.
+[1340.34s -> 1348.30s] Saben que ayer Sara y Natalia y yo estábamos en una paradería y al lado de la caja registradora
+[1348.30s -> 1354.56s] había un pequeño pizarrón con un versículo que nos impactó y quiero compartirlo con ustedes
+[1354.56s -> 1361.20s] en esta mañana si quieren buscar en sus biblias en Proverbios 16 versículo 3.
+[1365.66s -> 1367.02s] Proverbios capítulo
+[1367.02s -> 1376.12s] que estaba escrito decía así ponen manos de Dios todas tus obras y tus proyectos se
+[1376.12s -> 1376.84s] cumplirán.
+[1377.86s -> 1384.86s] Poner o encomendar en las manos de Dios nuestras obras incluye la
+[1384.86s -> 1388.82s] correcta administración de nuestros recursos financieros.
+[1389.46s -> 1391.42s] Si nosotros damos
+[1391.42s -> 1400.90s] con alegría, somos generosos y ponemos toda nuestra absoluta confianza en que Dios va a dirigir
+[1400.90s -> 1403.96s] nuestro camino, va a cumplir nuestros planes,
+[1404.56s -> 1407.40s] va a multiplicar sus bendiciones en nuestros hogares.
+[1408.16s -> 1414.63s] Así que hoy te invito a que puedas practicar este versículo de proverbios y puedas poner en
+[1414.63s -> 1420.71s] manos de Dios todos tus planes para que puedan ser cumplidos, porque cuando
+[1420.71s -> 1428.55s] estamos tomados de la mano de Cristo, nunca perdemos o ganamos o aprendemos,
+[1429.21s -> 1429.43s] pero
+[1429.43s -> 1430.57s] nunca perdemos.
+[1431.23s -> 1433.75s] Les invito a enclinar su rostro para tener una oración.
+[1434.67s -> 1436.75s] Padre nuestro, que estás en el cielo,
+[1437.37s -> 1439.69s] gracias te damos Señor porque eres tan
+[1439.69s -> 1440.79s] bueno con nosotros.
+[1441.97s -> 1446.55s] Te enconvenamos nuestros planes y nuestros proyectos a tus pies.
+[1447.93s -> 1454.01s] Ayúdanos a ser generosos y dar con alegría regresar lo que te pertenece.
+[1454.61s -> 1456.59s] En el nombre de Cristo Jesús. Amén.
+[1484.64s -> 1489.08s] Deseamos feliz sábado a todos nuestros hermanos que están aquí presentes,
+[1489.08s -> 1492.40s] a los que nos están acompañando por internet también.
+[1492.88s -> 1495.34s] Le mandamos un abrazo a la distancia.
+[1495.34s -> 1498.18s] y bueno llegó el momento de alabar al Señor.
+[1499.72s -> 1503.22s] En la Biblia en Jeremías dice,
+[1503.66s -> 1508.22s] bendito el hombre que confía en el Señor y pone su confianza en él,
+[1508.82s -> 1509.92s] será como un árbol
+[1509.92s -> 1514.96s] plantado junto al agua que extiende sus raíces hacia la corriente.
+[1515.54s -> 1517.86s] No teme que llegue el calor y
+[1517.86s -> 1524.78s] sus hojas siempre están verdes. En época de sequía no se angustia y nunca deja de dar fruto.
+[1525.62s -> 1532.30s] A veces es difícil cuando pasamos por épocas de sequía, por momentos de calor extremo,
+[1532.32s -> 1538.10s] por momentos difíciles y parece que nuestras hojas se van marchitando, que no tienen fuerza,
+[1538.70s -> 1544.00s] pero es ahí el momento que Dios es nuestra fuente de agua que nos deja de correr,
+[1544.62s -> 1544.76s] una
+[1544.76s -> 1549.82s] fuente que está siempre corriendo de aguas vivas y que hoy podamos alabar al nombre
+[1549.82s -> 1557.02s] del Señor que a pesar de todo que estés viviendo para lavar siempre es tiempo que Dios los bendiga
+[1557.02s -> 1559.04s] pongámonos de pie para lavar el Señor.
+[1573.41s -> 1573.93s] Cantemos.
+[1873.29s -> 1877.05s] Vences, capítulo 4, versículo 6 al 7 dice,
+[1877.73s -> 1880.39s] no se preocupen por nada, más bien en todas
+[1880.39s -> 1888.35s] ocasiones con oración y ruego, presenten sus peticiones a Dios y denle gracias y la paz
+[1888.35s -> 1893.13s] de Dios que sobrepasa todo entendimiento, cuidará sus corazones y sus pensamientos
+[1893.13s -> 1900.21s] en Cristo Jesús. A veces se nos llega a olvidar la profundidad de este versículo, ¿saben?
+[1901.23s -> 1901.75s] El autor
+[1901.75s -> 1903.69s] de este versículo, Pablo,
+[1904.57s -> 1910.59s] mientras estaba escribiendo este libro junto con otros estaba debajo de un
+[1910.59s -> 1920.69s] arresto domiciliario, domiciliario y él estaba limitado a lo que él podía hacer, lo que él
+[1920.69s -> 1921.21s] voy a decir,
+[1921.77s -> 1928.13s] pero aun así debajo de esta circunstancia se le encontró paz y no solo
+[1928.13s -> 1936.33s] esto, pero este versículo, este libro fue mandado a la primera iglesia que él fundó
+[1936.33s -> 1942.03s] y esta iglesia estaba pasando por muchos problemas.
+[1943.29s -> 1945.55s] Ellos estaban siendo perseguidos
+[1945.55s -> 1949.89s] y estaban debajo de mucho dolor,
+[1950.77s -> 1951.99s] estaban detrás,
+[1952.57s -> 1955.17s] estaban en un momento de persecución.
+[1955.95s -> 1964.29s] Y cuando pensamos para qué fue usado este versículo, estas palabras que él dedicó
+[1964.29s -> 1970.61s] hacia ellos, podemos ver que este versículo es más profundo de lo que a primera vista
+[1970.61s -> 1970.99s] o sea,
+[1971.63s -> 1972.77s] lo hacemos,
+[1973.49s -> 1976.27s] que sea, entonces,
+[1977.11s -> 1984.03s] yo pienso que tenemos que celebrar esta paz que Dios nos da,
+[1984.11s -> 1987.49s] aún en los momentos de angustia y en los momentos de dolor,
+[1988.41s -> 1991.17s] entonces les invitamos a que canten
+[1991.17s -> 1991.69s] con nosotros,
+[1992.51s -> 1994.47s] esta canción Juan Dulce Paz.
+[2027.44s -> 2030.02s] Dulce que tú se
+[2032.20s -> 2033.90s] difuncés.
+[2063.47s -> 2064.59s] Siempre que
+[2067.21s -> 2070.71s] en sus olas de amor se lee.
+[2076.89s -> 2077.89s] Este solo
+[2085.92s -> 2086.98s] está
+[2089.09s -> 2090.39s] tan seguro
+[2095.67s -> 2097.03s] mientras mire.
+[2108.65s -> 2109.75s] Es aquella
+[2124.40s -> 2125.32s] estrella.
+[2198.04s -> 2201.26s] Amén, qué maravillosa paz tenemos en Cristo.
+[2203.06s -> 2206.74s] Esa paz solo es posible por la gracia de Cristo,
+[2206.74s -> 2214.60s] que vino y murió por nosotros, no hay otra forma de que tú y yo tengamos bendición y paz si no fuera
+[2214.60s -> 2216.00s] por el sacrificio de Jesús.
+[2216.84s -> 2222.38s] Alabemos a Cristo, quien murió por nosotros, se entregó y está presente aquí.
+[2224.91s -> 2229.85s] Si tienes algún pedido especial, te invitamos también a medias que cantamos, ir pasando aquí al frente
+[2229.85s -> 2233.41s] para entregar todo lo que somos a los pies de Cristo. Vamos a cantar.
+[2315.17s -> 2318.27s] Es tu eterno amor,
+[2322.21s -> 2325.45s] tus manos midan
+[2328.42s -> 2335.06s] Y las sepultaste en el fondo del mar
+[2335.06s -> 2335.54s] Por
+[2353.65s -> 2357.23s] eso estoy ante ti
+[2357.23s -> 2357.33s] Yo
+[2527.41s -> 2529.97s] me emociona muchísimo cantar esta lavanza
+[2531.29s -> 2534.57s] Porque ¿qué seríamos nosotros sin la maravillosa gracia de nuestro Señor?
+[2534.57s -> 2542.57s] Esa sublime gracia que impactó el mundo y que hoy gracias a esa gracia estamos aquí.
+[2543.63s -> 2545.77s] Hoy hay muchos motivos de oración.
+[2546.79s -> 2550.89s] Hay motivos que ya públicamente se conocen.
+[2550.97s -> 2553.97s] Hemos estado orando por diversas situaciones de salud,
+[2554.85s -> 2557.83s] diversas situaciones que nuestro cuerpo,
+[2558.51s -> 2562.93s] nuestros miembros del cuerpo están pasando y están sufriendo.
+[2562.93s -> 2570.87s] y sabemos que aunque nos duele a un dedo todo el cuerpo sufre y así es esta figura de la iglesia
+[2570.87s -> 2576.99s] cuando un miembro de este cuerpo sufre a todos nos duele, es por eso que hoy nos unimos en oración
+[2576.99s -> 2580.55s] y seguimos pidiendo por ese milagro que Dios está haciendo en la vida del pastor Stout
+[2580.55s -> 2584.87s] y tantas personas que están también pasando por situaciones de salud complejas.
+[2586.11s -> 2589.73s] Permite que podamos juntos y especialmente lo que están aquí adelante
+[2589.73s -> 2593.39s] tienen motivos y han expresado pasando aquí a este lugar.
+[2594.67s -> 2597.77s] Puede decirte, Dios está al control de tu vida.
+[2598.29s -> 2601.67s] Dios sabe que está en lo profundo de tu corazón
+[2601.67s -> 2604.09s] y Él está trabajando a tu favor.
+[2604.97s -> 2607.61s] Es por eso que hoy en este acto de arrodillarnos y dorar
+[2607.61s -> 2610.59s] simplemente hemos venido a rendirnos a Su voluntad.
+[2610.91s -> 2613.67s] Sabiendo que así podemos encontrar esa paz
+[2613.67s -> 2615.15s] que Aaron también nos mencionaba,
+[2615.59s -> 2616.77s] que no es por la situación,
+[2616.77s -> 2619.89s] sino es por el Dios en el quien servimos.
+[2620.29s -> 2622.83s] Vamos a inclinarnos, vamos a rodillarnos y podes
+[2622.83s -> 2624.71s] y vamos a hacer esta oración especial.
+[2633.39s -> 2635.25s] Amado Padre, que estás en los cielos
+[2635.25s -> 2638.19s] y según tu promesa también estás aquí en medio de nosotros.
+[2640.60s -> 2643.30s] Hoy oramos con fe de que tú nos escuchas,
+[2643.30s -> 2646.50s] a pesar de nuestros errores, a pesar de nuestro pasado,
+[2648.00s -> 2649.98s] sabiendo que tú eres un Dios misericordioso,
+[2651.02s -> 2652.92s] sabiendo que tú eres un Dios perdonador,
+[2653.82s -> 2655.64s] sabiendo que tú eres un Dios real.
+[2656.80s -> 2658.44s] Hoy, Señor, queremos seguir
+[2658.44s -> 2661.88s] pidiéndote por nuestro querido pastor Stout, por su salud.
+[2662.88s -> 2664.06s] Se ven mejoras
+[2664.06s -> 2667.62s] considerables y eso solamente obra de tus manos.
+[2668.30s -> 2670.20s] Queremos seguir orando por él, por
+[2670.20s -> 2674.96s] su vida, por nuestra hermana Inés, por fortaleza y también queremos orar por
+[2674.96s -> 2682.30s] Ivana Morales, orar por la salud de la niña, de su niña, para que Dios pueda
+[2682.30s -> 2683.26s] fortalecer allí.
+[2684.40s -> 2687.40s] También hablamos por nuestro querido Pastor Riso que está en este viaje
+[2687.40s -> 2692.84s] emisionero a Cuba, permite que él con todos los que están yendo puedan ser una gran bendición
+[2692.84s -> 2697.88s] en donde estén y puedan llevar ese evangelio que es buena noticia aún en esa situación
+[2697.88s -> 2698.62s] tan compleja.
+[2699.68s -> 2704.12s] Seguir pidiéndote por estas situaciones migratorias, situaciones económicas
+[2704.62s -> 2706.64s] que tus hijos están cargando hoy.
+[2707.52s -> 2710.50s] Tenemos un padre que conoce nuestras necesidades
+[2710.50s -> 2713.70s] y que él lo prometió, tú lo prometiste, señor,
+[2714.46s -> 2717.86s] si te buscamos primero todas estas cosas van a
+[2717.86s -> 2724.48s] ser añadidas y es por eso que hoy postrados aquí hemos venido a decidir buscarte primero,
+[2725.22s -> 2727.82s] ponerte primero, rendirnos a ti,
+[2728.60s -> 2732.32s] sabiendo que tú estás y vas a seguir trabajando en las vidas
+[2732.32s -> 2733.72s] aquí de tu pueblo.
+[2734.98s -> 2739.54s] Señor, queremos terminar esta oración agradeciéndote por esas maravillosas
+[2739.54s -> 2740.76s] gracias y pidiéndote, señor,
+[2741.46s -> 2743.62s] que este mensaje que vamos a escuchar y que todos
+[2743.62s -> 2750.58s] vamos a abrazar el día de hoy, si sí lo queremos, señor, si sí lo disponemos, que
+[2750.58s -> 2754.66s] sea un mensaje dirigido por ti y que pueda ser transformador para nuestras
+[2754.66s -> 2755.24s] vidas.
+[2755.98s -> 2757.90s] Lo pedimos en el maravilloso nombre de Jesús.
+[2758.68s -> 2759.36s] Amén, señor.
+[2770.70s -> 2771.12s] Así como
+[2772.66s -> 2777.16s] Y incomparable estuete,
+[2777.98s -> 2778.58s] no
+[2781.59s -> 2783.13s] haste en tus
+[2784.82s -> 2788.02s] mil niquidad
+[2789.36s -> 2796.74s] Y las sepultaste en el fondo del mar
+[2796.84s -> 2800.88s] Nunca podré, nunca podré
+[2813.14s -> 2813.58s] ser
+[2818.60s -> 2819.86s] ante te
+[2821.56s -> 2822.32s] en su...
+[2879.37s -> 2880.89s] Feliz sábado nuevamente.
+[2881.65s -> 2885.01s] Espero que el día de hoy pueda ser un sábado de descanso.
+[2885.75s -> 2890.93s] Tanto predicamos el descanso de este séptimo día.
+[2891.93s -> 2895.75s] Y quizás hoy nuestro corazón no está descansado.
+[2896.09s -> 2897.03s] Hay un peso allí.
+[2898.49s -> 2901.49s] Y mi oración es que desde todo lo que vimos aquí,
+[2901.71s -> 2904.89s] desde la presentación de esta hermosa niña,
+[2904.91s -> 2908.11s] hermosa bebé, también aquí la historia de los niños,
+[2908.11s -> 2914.61s] las ofrendas, todo lo que hacemos aquí es para tener un encuentro con Jesús.
+[2917.14s -> 2917.70s] Las
+[2917.70s -> 2923.88s] alabanzas que ya cantamos, si lugar a dudas, si tú lo permites hacer de estas
+[2923.88s -> 2925.64s] alabanzas tu oración también,
+[2926.44s -> 2930.04s] sin duda también Dios las puede usar para tener
+[2930.04s -> 2931.28s] un encuentro contigo también.
+[2932.56s -> 2934.64s] Y hoy que vamos a estudiar la palabra, quiero
+[2934.64s -> 2936.48s] preguntarte, ¿estás listo para el mensaje de hoy?
+[2937.26s -> 2937.92s] ¿Estás preparado?
+[2939.22s -> 2942.20s] Quiero comenzar diciéndote algo y quizás ya lo mencionado aquí.
+[2943.56s -> 2945.98s] Ustedes ya saben que me dan mucho miedo las agujas.
+[2946.38s -> 2948.72s] No sé si lo mencionado aquí o si se recuerdan ustedes.
+[2950.30s -> 2953.58s] Yo mientras iba creciendo, me di cuenta que incluso no
+[2953.58s -> 2956.74s] solamente les tenía miedo, sino que me desmayaba cada vez
+[2956.74s -> 2958.24s] que me iba a sacar sangre.
+[2959.72s -> 2962.00s] Mira, se ríen algunos, son un poco crueles.
+[2963.30s -> 2970.10s] en realidad cuando lo descubrí no fue tan chistoso porque me acuerdo que llegué puse el brazo y me
+[2970.10s -> 2974.94s] vino una sensación extraña que cuando me llegaba a la cabeza yo sabía que iba a estar fuera de
+[2974.94s -> 2983.50s] si no y me desmayé y de hecho el día de ayer Stacy no que estuvimos ensayando aquí en el
+[2983.50s -> 2988.14s] world she ella me dice no porque yo estoy un poquito refriado todavía y me he durado bastantes
+[2988.14s -> 2994.58s] semanas ya está de la tos, la congestión seca y muchos también así y ella me dice no pero mira
+[2995.12s -> 3003.20s] anda aquí a la clínica de mi tío que te pinchen y ya se te pasará rápido una inyección y listo
+[3003.20s -> 3010.58s] yo dije mira la verdad prefiero seguir una o dos semanas más con esto tampoco es tan grave la
+[3010.58s -> 3017.00s] tos que tengo no sabe yo yo me he preguntado de dónde viene esto no tendré alguna evidencia
+[3017.00s -> 3017.72s] del pasado,
+[3018.94s -> 3023.14s] tendría algún trauma que de niño no sé, habré visto sangre,
+[3023.86s -> 3024.26s] pero sabes
+[3024.26s -> 3024.94s] que descubrí,
+[3025.70s -> 3029.08s] descubrí que a mí lo personal no hubo una vivencia que yo
+[3029.08s -> 3036.52s] haya experimentado, que me haya dado esta fobia a las agujas, pero sí
+[3036.52s -> 3040.28s] descubrí que a mi papá le pasa exactamente lo mismo.
+[3041.96s -> 3042.86s] ¿Será que esto es
+[3042.86s -> 3045.34s] parte de una especie de herencia, ¿no?
+[3046.66s -> 3049.88s] Y él me contó que sí, él tuvo una experiencia bien complicada
+[3049.88s -> 3053.24s] cuando estaba jugando de pequeño, él se crió en el campo y él
+[3053.24s -> 3056.34s] dice que estaba haciendo un juguete tallándolo ahí y se
+[3056.34s -> 3057.36s] pasa a cortar, ¿no?
+[3058.16s -> 3061.60s] Y se corte y le salió mucha sangre y en ese momento un
+[3061.60s -> 3065.48s] grupo de adultos chistosos le dijeron a un niño pequeño,
+[3065.74s -> 3068.48s] oye, espérate que ahí te van a salir las tripas por ahí.
+[3069.44s -> 3071.24s] Y mi papá, él nos cuenta, ¿no?
+[3071.24s -> 3073.84s] que se quedó esperando que se le salieran las tripas, ¿no?
+[3074.46s -> 3077.38s] Y en ese momento se desmaya y fue algo caótico
+[3077.38s -> 3082.04s] y eso le dio un terror a la sangre y todo lo que tenga, todos sus derivados, ¿no?
+[3082.98s -> 3084.70s] Pero ¿qué tengo que ver yo con eso, ¿no?
+[3085.76s -> 3088.82s] ¿Por qué yo también le tengo miedo a las agujas, ¿no?
+[3089.54s -> 3091.94s] Y aquí surge la pregunta que hoy les traigo a ustedes.
+[3093.58s -> 3095.20s] ¿Cuánto de las cosas que vivimos,
+[3095.76s -> 3096.86s] hábitos que tenemos,
+[3097.70s -> 3102.78s] reacciones que tenemos vienen de algo mucho más atrás en la historia,
+[3103.78s -> 3104.76s] yo te
+[3104.76s -> 3107.12s] puse el ejemplo de las agujas en mi caso,
+[3107.78s -> 3109.56s] pero a veces puede ser que te encuentras
+[3109.56s -> 3114.64s] con características de tu carácter, de tus reacciones, de tus hábitos, tus
+[3114.64s -> 3120.72s] luchas más profundas, cuánto de eso viene de algo que pasó muchísimo más
+[3120.72s -> 3122.22s] atrás en la historia.
+[3123.74s -> 3126.04s] Escuché la historia de que había una vez dos amigos,
+[3126.92s -> 3127.64s] que estaban
+[3127.64s -> 3131.02s] en un café y hace tiempo estos amigos no se veían.
+[3132.10s -> 3135.10s] Y uno de ellos estaba estresado,
+[3135.22s -> 3136.38s] se le anotaban sus ojos,
+[3137.22s -> 3142.08s] estaba lleno de apuro, parecía que la decepción, el estar
+[3142.08s -> 3146.68s] desconectado del momento estaba muy evidente en él y a pesar de que se había juntado
+[3146.68s -> 3152.28s] con su amigo, no se despegaba de su celular, de los pendientes que él tenía y se notaba
+[3152.28s -> 3154.60s] en su voz que no estaba presente en el momento.
+[3155.96s -> 3164.92s] Entonces el amigo lo mira y ve que su amigo estaba envuelto en tantas cosas que evidentemente
+[3164.92s -> 3170.16s] se le notaban y le dice, no tienes por qué seguir viviendo así.
+[3171.40s -> 3175.36s] Y pareciera ser que esa frase no cobró ningún sentido en el momento y que ni siquiera
+[3175.36s -> 3180.18s] lo escuchó su amigo, porque seguía en el celular, seguía atendiendo asuntos, seguía desconectado
+[3180.18s -> 3185.24s] del momento y seguía cargando ese peso que llevaba y el amigo le comienza a repetir y
+[3185.24s -> 3187.44s] le dice no tienes por qué seguir viviendo así,
+[3188.26s -> 3191.22s] querido amigo, no tienes por qué seguir
+[3191.22s -> 3193.00s] viviendo así.
+[3194.42s -> 3200.00s] Hoy quiero hablarte de algo que creo yo y si tú también lo crees puede
+[3200.00s -> 3202.86s] cambiar completamente quizás tu día,
+[3204.02s -> 3206.38s] quizás tu semana y ¿por qué no?
+[3207.00s -> 3208.22s] Todos tus días de aquí
+[3208.22s -> 3211.94s] en adelante y no es que le tenga fe a lo que yo preparé.
+[3212.52s -> 3214.04s] Yo estoy seguro que este mensaje
+[3214.04s -> 3218.80s] de Dios lo puso en mi corazón y viene desde hace varias semanas dándome vueltas en la cabeza
+[3218.80s -> 3220.20s] y no es por casualidad.
+[3221.16s -> 3224.32s] Si tú hoy decides creer que en la agenda de Dios no existen las
+[3224.32s -> 3228.36s] casualidades, este mensaje puede ser que Dios lo haya puesto en mi corazón
+[3229.48s -> 3230.66s] exclusivamente para ti.
+[3231.90s -> 3234.20s] Y déjame hacerte una pregunta para comenzar.
+[3235.24s -> 3235.64s] ¿Qué es el
+[3235.64s -> 3236.02s] pecado?
+[3236.70s -> 3237.74s] ¿Qué es el pecado? ¿No?
+[3238.72s -> 3241.66s] Parece pregunta del curso fe de Jesús que
+[3241.66s -> 3245.70s] nuestra iglesia generalmente muchos de aquí han estudiado. ¿Qué es el pecado?
+[3246.50s -> 3249.76s] Y es muy fácil ir a la Biblia y buscar en las cartas de Pablo y decir
+[3249.76s -> 3255.62s] bueno romanos es la transgresión de la ley y una visión tenemos nosotros del
+[3255.62s -> 3260.74s] pecado y que es completamente correcta en la Biblia se nos presenta la imagen de
+[3260.74s -> 3266.40s] que el pecado es errar el blanco, de que el pecado es equivocarnos, de que el pecado
+[3266.40s -> 3272.40s] es que estábamos culpables ante la ley de Dios, es por eso que nuestra
+[3272.40s -> 3276.38s] incapacidad de cumplir esta ley nos hace hacer seres pecadores.
+[3277.82s -> 3278.52s] Nosotros
+[3278.52s -> 3282.12s] Tenemos una visión, que es correcta que está en la Biblia,
+[3282.60s -> 3284.34s] una visión judicial del pecado.
+[3284.46s -> 3287.32s] Somos culpables y Dios nos da el perdón.
+[3288.14s -> 3291.46s] Es una forma muy real, muy bíblica de definirlo,
+[3292.14s -> 3296.98s] pero podemos perder de vista algo muy importante y más abarcante,
+[3297.68s -> 3301.86s] que el pecado tiene dimensiones mucho más profundas
+[3301.86s -> 3305.86s] que simplemente equivocarte, que simplemente tus acciones,
+[3305.86s -> 3312.38s] que simplemente el error y la mentira que dijiste esta semana el pecado es algo mucho más profundo
+[3313.30s -> 3317.18s] hay un autor que se llama John Mark Comer en su libro Practicing the Way
+[3317.18s -> 3323.90s] nombra las tres dimensiones del pecado en la teología bíblica y me llama mucho la atención
+[3323.90s -> 3331.48s] primero él dice que hay tres aspectos que en la biblia se nos presentan como pecado dimensiones
+[3331.48s -> 3334.40s] El primero es el pecado que cometemos, ¿OK?
+[3335.10s -> 3339.96s] Y eso muy sencillo, eso es lo que nosotros generalmente creemos
+[3339.96s -> 3340.54s] de esto,
+[3341.24s -> 3344.24s] que es cuando hablamos de nuestra condición que nos
+[3344.24s -> 3346.44s] hace cerrar el blanco, tomamos otra dirección,
+[3346.74s -> 3347.76s] hablamos sin pensar,
+[3348.52s -> 3351.84s] herimos queriendo o sin querer o sin
+[3351.84s -> 3353.06s] querer queriendo, ¿no?
+[3353.68s -> 3355.38s] Como el querido chavo del ocho, ¿no?
+[3355.98s -> 3358.16s] Herimos, nos equivocamos, mentimos.
+[3358.72s -> 3360.18s] Es el pecado que cometemos.
+[3360.18s -> 3365.74s] Pero hay una segunda dimensión del pecado, y que me pareció muy interesante en este libro que menciona,
+[3366.46s -> 3370.08s] que es el pecado que cometieron en contra nuestra,
+[3372.53s -> 3373.61s] que nos pesa también.
+[3374.55s -> 3378.65s] En este punto muchas veces olvidamos que somos consecuencia también deridas,
+[3379.19s -> 3379.87s] mentiras,
+[3380.75s -> 3385.77s] traiciones cometidas en contra nuestra y que hoy se sienten como una carga pesada.
+[3385.77s -> 3390.63s] Todos, si somos honestos, fuimos heridos, lastimados,
+[3391.19s -> 3395.27s] despreciados, traicionados, abandonados, tratados
+[3395.27s -> 3401.97s] con injusticia, acusados falsamente, en mayor o menor grado, en alguno de estos aspectos,
+[3402.09s -> 3404.43s] tú puedes estar identificado con esta declaración.
+[3405.47s -> 3408.51s] Somos tanto perpetradores como víctimas,
+[3409.33s -> 3412.49s] somos culpables, pero también somos heridos.
+[3412.49s -> 3420.25s] Y tú sabes que esa frase tan conocida de las personas heridas y eren, y yo incluso me gusta
+[3420.25s -> 3424.31s] pensar en esta alegoría, que vaso roto corta.
+[3425.95s -> 3429.39s] Esta semana justo se nos rompió la juguera y
+[3429.39s -> 3435.23s] tan peligroso porque si te rompe algo tienes que limpiar cada pequeñito vidrio que cae en el
+[3435.23s -> 3440.27s] suelo especialmente cuando tienes hijos porque a pesar de que sea muy pequeñito ese vestigio
+[3440.27s -> 3444.33s] que quedó ahí de esa ruptura te va a herir y yo no sé si a usted han pisado
+[3444.33s -> 3455.11s] vidrio no es complicado y en realidad vaso roto es peligroso y ere personas
+[3455.11s -> 3462.27s] heridas y Eren y eso tiene que ver con el pecado que ha sido cometido en
+[3462.27s -> 3466.17s] contra nuestra de las heridas que cargamos que ni siquiera tú y yo somos
+[3466.17s -> 3471.07s] responsables, pero pasaron, ocurrieron, están en nuestra historia.
+[3472.31s -> 3473.15s] Y la tercera
+[3473.15s -> 3477.19s] dimensión del pecado es el pecado que se comete alrededor.
+[3478.37s -> 3480.03s] Nuestro entorno nos
+[3480.03s -> 3480.89s] ha contagiado,
+[3481.71s -> 3485.33s] los psicólogos le pueden llamar traumas secundarios, Jesús le
+[3485.33s -> 3486.45s] llamaba el mundo.
+[3487.59s -> 3491.13s] Vivimos en un mundo donde lamentablemente es difícil
+[3491.13s -> 3491.93s] hacer lo bueno.
+[3493.13s -> 3496.79s] Y pareciera ser que eso está hondo en nosotros.
+[3497.47s -> 3500.05s] Es más fácil desordenar la casa que
+[3500.05s -> 3503.93s] ordenarla, literalmente y también alegóricamente.
+[3504.75s -> 3507.37s] Yo que soy padre y con mi hijita, bueno, todas las
+[3507.37s -> 3511.81s] noches estoy ahí, vamos a ordenar los juguetes, todo queda linda la casa para que el otro día,
+[3512.77s -> 3516.11s] en un segundo todo vuelva a estar desordenado.
+[3516.97s -> 3519.35s] Pareciera ser que como seres humanos nos
+[3519.35s -> 3524.07s] es más difícil poner las cosas en orden que desordenarlas, ¿no?
+[3524.87s -> 3529.15s] Hay una frase de Calistos Ware en su libro de Orthodox White que dice,
+[3529.81s -> 3533.95s] nacimos en un ambiente en donde es fácil hacerlo malo y difícil hacerlo bueno.
+[3534.45s -> 3537.81s] Es fácil lastimar a otros y difícil curar sus heridas.
+[3538.67s -> 3543.37s] Es fácil levantar sospechas contra el hombre y difícil ganarse su confianza.
+[3544.09s -> 3555.93s] Significa que cada uno de nosotros está condicionado por la solidaridad de la raza humana en su acumulación de malas acciones y malos pensamientos, y por lo tanto, de mal ser.
+[3556.87s -> 3567.01s] Y a esta acumulación de maldad hemos agregado nuestros propios actos deliberados de pecado, y así el abismo se hace cada vez más amplio.
+[3568.15s -> 3573.71s] Hoy me quiero centrar porque esta es una realidad compleja y yo creo que se requiere semanas
+[3573.71s -> 3576.71s] y semanas para hablar de nuestra condición en este sentido,
+[3577.37s -> 3578.83s] pero hoy me centraré exclusivamente
+[3578.83s -> 3584.09s] en la dimensión número dos, que es el pecado cometido en contra de nosotros.
+[3584.77s -> 3586.61s] Y aquí es donde te hago la pregunta nuevamente.
+[3587.35s -> 3589.19s] ¿Te has preguntado de dónde viene eso?
+[3590.29s -> 3594.15s] ¿De dónde viene ese aspecto en tu carácter que te cuesta tanto dejar atrás,
+[3596.79s -> 3596.99s] que
+[3596.99s -> 3600.71s] esa lucha, eso que tanto tiempo has querido cambiar, pero no puedes.
+[3602.13s -> 3605.81s] Aquí hay dos tipos de reacciones y puedo estar hablando de dos tipos de personas.
+[3607.19s -> 3613.21s] Unas personas que están desesperadas buscando cambiar y no pueden y no se dan cuenta que lo que acarrean
+[3613.21s -> 3620.15s] son años y años de quizás malas decisiones que han puesto que hoy la historia ha cargado sobre ti,
+[3620.69s -> 3624.17s] pero también puede ser que hay otras personas que quizás reaccionan así.
+[3624.17s -> 3626.87s] Ah, yo soy así porque mi papá era así, ¿no?
+[3627.65s -> 3629.07s] Oh, yo tengo el carácter fuerte.
+[3629.87s -> 3631.79s] Porque mi papá tenía el carácter fuerte.
+[3631.99s -> 3634.31s] Yo siempre digo, y lo dije en el podcast que tenemos ahí,
+[3634.43s -> 3636.85s] que aprovecho de invitarlos a escucharlo con los pastores,
+[3637.75s -> 3640.39s] de que no sé por qué tenemos en español
+[3640.39s -> 3643.31s] este dicho de que carácter fuerte es alguien agresivo,
+[3643.45s -> 3644.51s] alguien complicado,
+[3645.07s -> 3647.19s] cuando en realidad yo creo que un carácter fuerte
+[3647.19s -> 3649.59s] es alguien que realmente tiene dominio propio,
+[3650.07s -> 3651.07s] tiene humildad,
+[3651.51s -> 3653.19s] tiene las características de servicio.
+[3653.19s -> 3655.07s] ese es un carácter fuerte, ¿no?
+[3655.97s -> 3656.37s] Ahora,
+[3657.15s -> 3658.83s] uno puede tomarse como excusa y decir,
+[3659.03s -> 3660.67s] bueno, yo soy así porque mi papá era así,
+[3660.87s -> 3663.87s] o yo reacciono así porque mira lo que me hicieron en el pasado
+[3663.87s -> 3665.33s] y lo tomas como una justificación.
+[3666.01s -> 3668.37s] Ah, yo no confío porque me traicionaron.
+[3669.15s -> 3671.61s] Y aquí es donde viene una pregunta honesta
+[3671.61s -> 3675.99s] que todos necesitamos hacernos y también ustedes en sus casas,
+[3676.03s -> 3676.95s] los que ven esto online.
+[3677.83s -> 3681.11s] ¿En qué momento el dolor que te hicieron a ti
+[3681.11s -> 3684.33s] se convirtió en el dolor que tú haces,
+[3687.09s -> 3690.55s] la repito en qué momento el dolor que te hicieron a ti
+[3690.55s -> 3694.79s] se convirtió en el dolor que tú haces a los demás.
+[3695.97s -> 3699.19s] Sabes hay un versículo en exodo 25 si
+[3699.19s -> 3702.97s] tú tienes tu biblio hoy vamos no voy a proyectar los versículos aquí yo quiero que usen sus
+[3702.97s -> 3707.77s] biblias si tienes ahí eres de la generación más electrónica puedes sacar ahí tu celular
+[3707.77s -> 3710.15s] también para ver la Biblia ¿no?
+[3710.93s -> 3714.37s] Y vamos a Éxodo capítulo 25 que tiene que ver con los días
+[3714.37s -> 3721.05s] mandamientos y hay una parte de este versículo de este mandamiento que está siendo expuesto que
+[3721.05s -> 3727.09s] siempre me pareció un poco extraño cuando Dios mismo a través de Moisés dice que visito la
+[3727.09s -> 3732.75s] maldad de los padres sobre los hijos hasta la tercera y cuarta generación de los que me
+[3732.75s -> 3733.27s] aborrecen.
+[3734.67s -> 3738.31s] ¿Qué está describiendo este versículo? Al final del versículo 5.
+[3739.53s -> 3743.01s] Queridos, hay algo que es muy importante y que quiero dejar en claro.
+[3744.21s -> 3744.73s] Esto que está
+[3744.73s -> 3749.43s] describiendo el versículo no es magia espiritual, sino que está describiendo un
+[3749.43s -> 3752.91s] principio humano y a la vez un principio espiritual.
+[3753.99s -> 3755.57s] El pecado no se queda
+[3755.57s -> 3757.31s] solamente en quien lo comete.
+[3758.23s -> 3761.07s] Las consecuencias del pecado no solamente
+[3761.07s -> 3762.17s] terminan en ti.
+[3763.15s -> 3766.07s] Y eso es algo grave y serio.
+[3767.11s -> 3768.33s] Dios no está diciendo en este
+[3768.33s -> 3773.57s] versículo que castiga a hijos inocentes, sino que está describiendo una realidad.
+[3774.15s -> 3777.75s] Las decisiones tienen ondas expansivas.
+[3778.83s -> 3779.51s] Por ejemplo,
+[3780.51s -> 3783.31s] un padre ausente afecta la
+[3783.31s -> 3785.75s] manera en que su hijo aprende a amar, o no es así.
+[3787.05s -> 3790.47s] Ese hijo va a tener un tema
+[3790.47s -> 3793.27s] de cómo amar si nunca vio a su padre presente.
+[3794.15s -> 3797.71s] Una madre herida puede criar desde el miedo,
+[3798.53s -> 3802.41s] porque tú heridas y ahora piensa que también va a ser herida
+[3802.41s -> 3804.45s] y está criando desde el miedo.
+[3805.21s -> 3807.91s] O una familia que nunca resolvió conflictos
+[3807.91s -> 3811.47s] enseña a evitar conversaciones difíciles.
+[3812.23s -> 3817.11s] Y nace el hijo y huye de los conflictos en vez de enfrentarlos.
+[3817.85s -> 3819.55s] Esto no es una maldición mágica,
+[3819.55s -> 3822.61s] que a lo vuelvo a decir, es transmisión relacional.
+[3822.89s -> 3825.17s] Y mira, aquí hay algunos psicólogos con pruebas en esto.
+[3825.97s -> 3828.65s] Marían Rojas, esta pequeña psiquiatra que escuchamos con mi
+[3828.65s -> 3831.55s] esposa, y a la encanto de hecho mi esposa estudió psicología
+[3831.55s -> 3833.81s] por un tiempo y está pendiente todavía a continuar.
+[3834.13s -> 3836.51s] Y a la encanto, y me gusta hablar de estos temas con ella,
+[3836.83s -> 3838.35s] que ella me lleva más profundo todavía.
+[3838.53s -> 3840.15s] Y me dijo, escuchas pocas, ¿no?
+[3840.93s -> 3842.57s] Y esta psiquiatra, española,
+[3843.39s -> 3844.67s] habla sobre algo que yo he
+[3844.67s -> 3846.99s] pensado en esta semana y lo puso en palabras técnicas
+[3846.99s -> 3851.13s] que dice la transmisión intergeneracional del trauma.
+[3851.49s -> 3852.51s] Es interesante eso.
+[3853.25s -> 3858.01s] Y de hecho, yo esta semana incluso le pregunté a nuestro querido Chong, Alfonso,
+[3858.19s -> 3861.99s] y gracias, me mandó un artículo muy interesante de Tim Jennings,
+[3862.17s -> 3865.13s] también un profesional allí de la salud, también cristiano.
+[3865.99s -> 3866.89s] Y él dice lo siguiente,
+[3867.51s -> 3869.79s] fuimos diseñados por Dios para adaptarnos.
+[3870.39s -> 3874.01s] Esto significa que fuimos diseñados para cambiar según nuestras experiencias.
+[3874.01s -> 3878.89s] Y este cambio no es simplemente un cambio de creencias, sino un cambio físico real,
+[3879.13s -> 3884.05s] esto es interesante, que incluye modificaciones en las conexiones neuronales
+[3884.05s -> 3886.35s] y en la expresión genética.
+[3887.25s -> 3891.57s] O sea, las decisiones que tú toman incluso en tu composición
+[3891.57s -> 3895.95s] pueden de alguna u otra manera cambiar el destino de tus descendientes.
+[3896.75s -> 3901.43s] Hay errores en cadena, hay patrones que llevan siglos, generaciones enteras
+[3901.43s -> 3903.49s] donde tú y yo existimos.
+[3904.47s -> 3905.75s] Por eso que hoy quiero decirte,
+[3905.85s -> 3909.19s] le damos más cosas de las que nos imaginamos de nuestros padres,
+[3909.71s -> 3913.67s] de nuestros abuelos, de nuestros tátar abuelos e incluso más atrás.
+[3915.19s -> 3917.99s] Podemos percibir que hay cosas que construyen quienes somos
+[3917.99s -> 3921.29s] y aquí no quiero irme solo a lo negativo, sean buenas o malas.
+[3921.91s -> 3924.57s] Hay decisiones muy buenas que tomaron tus tátar abuelos,
+[3924.61s -> 3927.73s] por ejemplo, de abrazar la fe y eso se transmitió
+[3927.73s -> 3929.67s] y tú quizás hoy estás aquí
+[3929.67s -> 3934.41s] porque alguien en tu pasado tomó la decisión de seguir a Cristo y eso hasta el día de hoy
+[3934.41s -> 3936.29s] conforma tu identidad, ¿no?
+[3936.99s -> 3942.79s] Dios nos creó así, lo que vivimos nos cambia y lo que no resolvemos
+[3942.79s -> 3945.65s] o lo que resolvemos se transmite.
+[3946.53s -> 3948.93s] Quiero pasar ahora a la historia central bíblica porque
+[3948.93s -> 3953.83s] esta historia afirmate que se viene algo pero yo quizás tú lo sabías, quizás una historia
+[3953.83s -> 3960.73s] que ha escuchado, pero esta perspectiva que te voy a dar es algo que a mí de verdad que me emociona.
+[3961.95s -> 3968.35s] Hay dos maneras de leer la Biblia que yo he practicado últimamente y cuando yo descubrí esto he
+[3968.35s -> 3969.61s] podido ir más profundo, ¿no?
+[3970.45s -> 3975.19s] Una perspectiva es volar bajo, es simplemente centrarte en una
+[3975.19s -> 3980.21s] palabra, en un versículo y ir profundo y profundo y te vas a encontrar con que un pequeño
+[3980.21s -> 3984.13s] en un pequeño versículo, te abre una dimensión extraordinaria.
+[3984.19s -> 3987.13s] Eso es cuando te centras en un pequeño detalle de la Biblia
+[3987.13s -> 3988.47s] y puedes ir más profundo.
+[3988.77s -> 3990.95s] Te recomiendo estudiar la Biblia, sí, es buenísimo.
+[3991.67s -> 3994.65s] Pero hay una segunda forma de estudiar la Biblia,
+[3995.07s -> 3996.53s] que es volar un poquito más alto.
+[3997.31s -> 3999.67s] Yo creo que todos aquí en algún momento hemos tomado un avión.
+[4000.03s -> 4002.41s] Yo sé que algunos van a tomar la hora que van a ir a Costa Rica pronto,
+[4002.83s -> 4003.85s] que se van de misión también.
+[4004.49s -> 4006.81s] Y cuando tú vuelas alto, todo se ve más pequeño
+[4006.81s -> 4010.03s] y tú logras ver más cosas de las que tú veías
+[4010.03s -> 4011.27s] quizás andando solo en tu carro.
+[4012.21s -> 4017.11s] Cuando tú miras la Biblia así como una historia narrativa grande
+[4017.11s -> 4020.27s] que incluyó años y años, te vas a dar cuenta también de detalles,
+[4020.37s -> 4024.51s] de conexiones que volando bajo, no te ibas a dar cuenta.
+[4025.25s -> 4028.21s] Por eso en esta historia yo quiero invitar a volar un poquito más alto.
+[4028.81s -> 4031.21s] Qué es la historia de Abraham y Lotz, ok?
+[4031.21s -> 4036.79s] y el contexto, si tú abres tu biblia y hay en Génesis 12 y 19,
+[4037.51s -> 4039.77s] estos capítulos nos traen el
+[4039.77s -> 4045.05s] contexto de esta historia, Abram y Lot. ¿Quiénes eran Abram y Lot? Eran familiares, no,
+[4045.69s -> 4047.53s] eran Abram
+[4047.53s -> 4048.89s] era el tío de Lot, no,
+[4049.65s -> 4054.27s] y hubo en un momento porque los dos estaban creciendo, cumpliendo
+[4054.27s -> 4058.97s] este llamado, trabajando juntos por el propósito que Dios había puesto en el corazón de Abram,
+[4058.97s -> 4062.03s] pero llega al conflicto, ok, llega el problema.
+[4062.71s -> 4066.25s] Y este conflicto se nos presenta en Génesis 13 del 5 al 7,
+[4066.63s -> 4069.55s] donde tú puedes entender, si lo lees, lo voy a dejar también de tarea,
+[4070.19s -> 4071.45s] que Loth tenía muchas posesiones,
+[4072.07s -> 4076.25s] y sus pastores comienzan a pelear con los de Abraham, ok, conflicto,
+[4076.45s -> 4079.33s] y dice Génesis 13-7, que hubo con tienda
+[4079.33s -> 4081.39s] entre los pastores del ganado de Abraham
+[4081.39s -> 4085.19s] y los pastores del ganado de Loth y comienza la tensión.
+[4086.13s -> 4089.81s] Y Abraham surge con una solución, dice,
+[4090.59s -> 4092.19s] mira, voy a proponerte la paz,
+[4092.83s -> 4094.65s] en Génesis 13 del 8 al 9,
+[4095.63s -> 4100.35s] y en esos versículos tú vas a darte cuenta que Abraham le propone, dice, mira, no haya altercado
+[4100.35s -> 4105.35s] entre nosotros dos, porque somos hermanos, somos familiares. Dicen, no está toda la tierra
+[4105.35s -> 4106.13s] delante de ti,
+[4106.77s -> 4109.65s] yo te ruego, le dice que te apartes de mí,
+[4110.61s -> 4113.37s] donde yo vaya tú anda en la otra
+[4113.37s -> 4114.15s] dirección.
+[4114.75s -> 4120.99s] Parece un conflicto que fue saludable, porque fue una decisión aparentemente positiva
+[4120.99s -> 4121.63s] en aquel momento,
+[4122.33s -> 4125.87s] Abraham sede, él no pelea por control, sino que le dice a Lot, elige.
+[4126.79s -> 4127.63s] Y aquí
+[4127.63s -> 4129.71s] entra algo, porque miren, queridos,
+[4130.35s -> 4134.75s] tus elecciones por más pequeñas que parezcan tienen implicaciones,
+[4134.85s -> 4136.67s] implicancias profundas.
+[4137.53s -> 4141.59s] No son cualquier decisión, porque tú puedes decir, no, yo he tomado
+[4141.59s -> 4146.45s] una dirección un poquito complicada, estoy trabajando en esto,
+[4146.61s -> 4149.93s] pero es un pecado que yo tengo, pero lo estoy trabajando, ¿no?
+[4151.15s -> 4155.57s] Pero algo pequeño a la larga puede ser algo completamente destructivo.
+[4155.97s -> 4156.73s] Y eso le pasó a Lot.
+[4157.85s -> 4161.31s] Lot elige por vista en Génesis 13 del 10 al 11.
+[4161.85s -> 4164.85s] Es clave este detalle. Dice que Lot alzó sus ojos
+[4164.85s -> 4169.17s] y vio toda la llanuda del Jordán, que toda ella era de riego.
+[4169.17s -> 4172.95s] vio tierras que dicen, esta tierra, si me das a elegir a Bram, voy a irme para allá, ¿no?
+[4173.81s -> 4180.73s] Alzó sus ojos, eligió por apariencia, por prosperidad, dada, por conveniencia.
+[4181.47s -> 4185.91s] Y luego el texto comienza a decir algo inquietante y tú puedes olfatear aquí el conflicto.
+[4185.99s -> 4186.77s] Génesis 13, 12.
+[4187.89s -> 4192.89s] Dice, Lod fue proponiendo sus tierras hasta dónde? Hasta Sodoma.
+[4192.89s -> 4193.87s] Y
+[4195.25s -> 4197.39s] tú sabes, Sodoma y Gomorra, ¿no?
+[4198.69s -> 4203.01s] Estas ciudades donde abundaban los errores, el pecado.
+[4203.71s -> 4209.93s] No entró de golpe a Sodoma, pero se fue acercando poco a poco.
+[4211.57s -> 4213.03s] Así sucede también en nuestra vida.
+[4214.13s -> 4216.93s] Algo que parece inofensivo, a primera vista,
+[4217.61s -> 4218.87s] puede ser destructivo.
+[4219.29s -> 4223.51s] Y el pecado no sucede de la noche a la mañana, sucede poco a poco.
+[4223.51s -> 4226.99s] En Génesis 1313 dice lo siguiente,
+[4227.33s -> 4231.95s] más los hombres de Sodoma eran malos y pecadores contra Jehová en gran manera.
+[4232.31s -> 4234.83s] Así que ya sabes que esta decisión va a tener consecuencias.
+[4235.91s -> 4239.55s] Ya sabes que esta decisión tú hueles aquí el peligro, ¿no?
+[4241.01s -> 4244.97s] Y tú ves en Génesis 14 ya que no está cerca de Sodoma,
+[4245.09s -> 4247.43s] sino que ahora vivía dentro de Sodoma.
+[4248.91s -> 4250.39s] Queridos, el pecado es así.
+[4251.53s -> 4256.81s] pueden parecer pequeñas decisiones, te estás acercando a algo que parece inofensivo y riesgoso,
+[4257.31s -> 4258.45s] pero sin darte cuenta,
+[4259.03s -> 4262.95s] tú estás viviendo ahora dentro, ya no solo cerca estás viviendo dentro,
+[4263.13s -> 4264.47s] ya te es difícil salir de ahí.
+[4265.67s -> 4268.13s] Por eso que entra el conflicto, tú sabes que Sodomé y Gomorra
+[4268.13s -> 4271.01s] fue destruida, Génesis 19 del 30 al 36,
+[4272.69s -> 4275.67s] ahí Abraham tiene que desrescatarlos, hay destrucción,
+[4275.67s -> 4279.29s] hay conflicto y aquí entra lo más triste,
+[4280.09s -> 4282.01s] sucedió algo terrible,
+[4282.83s -> 4285.19s] dice que las hijas de Lod se pusieron
+[4285.19s -> 4293.43s] con mucho miedo de que no iban a tener descendencia y hicieron un plan para embriagar al papá y dice
+[4293.43s -> 4301.09s] Génesis 1937 y la mayor dio a luz a un hijo dice y llamó su nombre Moab el cual es padre de los
+[4301.09s -> 4303.01s] moavitas hasta hoy.
+[4303.73s -> 4309.17s] Se fue disvirtuando tanto estas decisiones que ahora tienes un descendiente
+[4309.17s -> 4315.65s] moav y ahora no solamente tienes un hijo nacido por algo terrible que sucedió, sino que siglos
+[4315.65s -> 4321.65s] después tienes a los moavitas y quienes fueron los moavitas fueron enemigos constantes del pueblo
+[4321.65s -> 4327.51s] de Israel. Lo encuentras en número 22 en jueces 3 y hay un punto tremendo aquí queridos.
+[4328.47s -> 4329.19s] Una
+[4329.19s -> 4329.77s] una decisión,
+[4330.91s -> 4331.63s] una separación,
+[4332.51s -> 4334.37s] una serie de pequeñas decisiones,
+[4334.61s -> 4336.31s] un conflicto algo terrible,
+[4336.97s -> 4338.99s] después desencadenó en algo
+[4338.99s -> 4343.29s] y tuvo consecuencias generacionales.
+[4343.29s -> 4346.47s] Y que no solamente afectó a Lot y a su familia,
+[4346.59s -> 4348.95s] sino que afectó al mismo pueblo de Israel.
+[4349.19s -> 4351.17s] Los Moabitas fueron enemigos de Israel.
+[4352.15s -> 4353.51s] Y aquí yo quiero hablarte, queridos.
+[4353.63s -> 4357.71s] Una decisión basada en conveniencia terminó generando
+[4357.71s -> 4359.77s] de una nación enemiga del pueblo de Dios.
+[4360.67s -> 4362.75s] No fue sólo una mala elección personal,
+[4363.15s -> 4365.89s] fue una historia que afectó a generaciones.
+[4366.47s -> 4367.67s] Y aquí yo quiero decirte, queridos,
+[4368.95s -> 4371.23s] vamos a admitir algo que puede ser doloroso.
+[4373.66s -> 4375.80s] Tú y yo fuimos criados imperfectamente.
+[4377.26s -> 4379.56s] Tú puedes decir, no, yo le agradezco a mi familia
+[4379.56s -> 4380.98s] por todo lo que me dieron y es cierto.
+[4382.12s -> 4384.26s] Yo soy de los primeros en honrar a mis padres,
+[4384.38s -> 4386.84s] en honrar a mi familia por todo lo que pusieron en mi
+[4386.84s -> 4387.28s] corazón,
+[4388.32s -> 4392.08s] pero mis padres no eran perfectos. Tú lo vas descubriendo después que vas creciendo,
+[4392.24s -> 4397.16s] ¿no? Cuando eres niño tus padres son superhéroes, pero a medida que crees te das cuenta que no
+[4397.16s -> 4398.02s] son perfectos.
+[4398.68s -> 4403.40s] Y como mis padres no eran perfectos, ¿qué generaron hijos no perfectos? Y hay que
+[4403.40s -> 4406.28s] admitir que tú y yo somos consecuencia de eso.
+[4407.46s -> 4410.70s] Todos fuimos criados imperfectamente y
+[4410.70s -> 4415.36s] y todos los que tenemos hijos, estamos criando imperfectamente, queridos.
+[4416.64s -> 4417.92s] Y eso me cuesta admitirlo a mí,
+[4418.60s -> 4423.36s] porque por más que yo quiera criar a mi hija de manera lo mejor que pueda,
+[4424.46s -> 4426.88s] hay cosas que ella va a tener que trabajar después,
+[4427.44s -> 4428.98s] porque cometemos errores.
+[4431.74s -> 4434.06s] Conocí a alguien que me contaba cómo sus padres,
+[4434.84s -> 4436.56s] que hicieron lo mejor posible,
+[4437.58s -> 4439.74s] su hogar aún así tenía mucho conflicto.
+[4439.74s -> 4446.64s] ella creció viendo a sus papás pelear y esos conflictos hasta el día de hoy son
+[4446.64s -> 4453.18s] pesos sobre sus hombros y esta persona me decía que como constantemente había
+[4453.18s -> 4458.86s] conflictos en su casa hoy no puede estar en un momento tranquilo en paz porque
+[4458.86s -> 4463.76s] esa paz aparente que siente piensa que la vuelta de la esquila va a haber un
+[4463.76s -> 4469.44s] conflicto aunque no lo va a ver aunque no lo hay llega a paz y como de
+[4469.44s -> 4470.94s] niña aprendió a anticipar esto,
+[4471.52s -> 4476.22s] ahora también le generó ese conflicto en su casa, esto tiene que
+[4476.22s -> 4476.98s] trabajarlo, ¿no?
+[4478.42s -> 4481.10s] Queridos, esos son pesos que cargamos.
+[4481.86s -> 4483.80s] Puede ser que tu hogar no fue conflictivo,
+[4483.88s -> 4484.92s] ok, ok lindo,
+[4485.64s -> 4487.58s] pero te dieron una atención excesiva, ¿no?
+[4488.18s -> 4490.42s] Que te hizo buscar incansablemente la
+[4490.42s -> 4492.88s] aprobación de los demás en un mundo que no funciona así.
+[4493.90s -> 4495.38s] Quizás te aplaudieron todo en
+[4495.38s -> 4500.70s] tu casa y después tú sales al mundo y te das cuenta que no vas a tener siempre la atención de todos que
+[4500.70s -> 4506.14s] no vas a ser siempre aplaudido que no siempre vas a ganar queridos y te das cuenta y te chocas
+[4506.14s -> 4514.02s] con la sociedad sabes esta persona que te estoy hablando un día me contó que ella estaba en pleno
+[4514.02s -> 4521.22s] conflicto de su casa y dice que su hermano se le acerca estaba a los padres discutiendo fuerte
+[4521.22s -> 4527.18s] su hermano mayor se le acerca y le dice mira recordemos esto porque esto es lo que
+[4527.18s -> 4531.60s] tenemos que evitar en el futuro a toda costa no tenemos que repetir esto
+[4532.72s -> 4539.90s] imagínate queridos tus decisiones marcan la vida de las personas pero ahora
+[4539.90s -> 4545.42s] cuál es la diferencia de una persona que logra encontrar felicidad aún con todo
+[4545.42s -> 4552.90s] el peso que carga sobre sus espaldas y alguien que quizás llegue hasta altas, hasta tarde
+[4552.90s -> 4553.34s] en la vida,
+[4553.90s -> 4557.08s] hasta la vejez y no ha podido lidiar con esto, es simplemente una palabra
+[4557.08s -> 4559.92s] brita, la responsabilidad que tomamos.
+[4561.44s -> 4563.96s] ¿Sabes? Somos personas llenas de cosas por resolver.
+[4564.24s -> 4568.34s] Yo estaba tratando de poner en frase lo que tenía en mi mente. Somos personas llenas
+[4568.34s -> 4573.70s] de cosas por resolver y aún así estamos formando la vida de otros, tratando de
+[4573.70s -> 4576.18s] que carguen menos peso del que nosotros cargamos.
+[4577.14s -> 4577.66s] Eso es.
+[4578.22s -> 4579.00s] Esa es la crianza.
+[4579.74s -> 4582.48s] Yo creo que mi hija tenga las menos cosas que resolver de las
+[4582.48s -> 4583.92s] que yo tuve que resolver.
+[4585.54s -> 4588.28s] Pero admitir que no somos perfectos.
+[4588.94s -> 4590.32s] Queridos, la historia.
+[4591.10s -> 4593.14s] Y yo no quiero dejarte aquí con malas noticias,
+[4593.20s -> 4596.34s] con un peso en tu casa, porque yo te quiero predicar del
+[4596.34s -> 4597.14s] evangelio.
+[4597.92s -> 4600.38s] Y ahora, afírmate porque se viene la buena noticia,
+[4600.48s -> 4600.76s] queridos.
+[4601.40s -> 4604.82s] la historia de Lot y Abraham no termina ahí.
+[4606.04s -> 4608.96s] Si tú miras la Biblia y la narrativa biblia que te vas
+[4608.96s -> 4614.92s] a dar cuenta de una historia que tiene características muy similares, que es la historia de Ruth y
+[4614.92s -> 4615.42s] Noemí.
+[4616.18s -> 4621.12s] ¿Y qué tendrá de conexión a esta historia? Déjame que te lo explique. Contexto.
+[4621.62s -> 4622.48s] Ruth quién era?
+[4623.56s -> 4631.58s] Ruth era la no era de Noemí en Ruth 1.1 y se aconteció en
+[4631.58s -> 4635.24s] los días que gobernaban los jueces, un poco de contexto, era una época caótica
+[4635.24s -> 4636.70s] para Israel, una época difícil.
+[4638.04s -> 4641.04s] Ahora Noemí pierde a su esposo y sus
+[4641.04s -> 4646.24s] dos hijos, eso está en Ruth 1.20 al 21 y Noemí comienza a vivir la
+[4646.24s -> 4650.00s] consecuencia de esta pérdida, incluso dice en uno de los versículos el 21
+[4650.00s -> 4655.40s] uno, no me llaméis 9mí, sino llamadme Mara, porque en grande amargura me apuesto el todo
+[4655.40s -> 4658.18s] poderoso, o sea 9mí estaba viviendo algo terrible,
+[4658.92s -> 4660.42s] estaba viviendo la pérdida que en
+[4660.42s -> 4661.90s] esos tiempos, hoy es terrible,
+[4662.50s -> 4664.20s] pero en esos tiempos el doble, el triple,
+[4665.06s -> 4665.50s] porque si tú
+[4665.50s -> 4669.10s] perdidas a tu esposo y aún tus hijos no eras nadie en esa sociedad,
+[4669.66s -> 4670.60s] estabas completamente
+[4670.60s -> 4676.16s] desprotegido, no solamente por la pérdida que esto significaba de dolor, sino también
+[4676.16s -> 4680.94s] que viene económicamente, socialmente, por eso no de mí, ya en su vejez,
+[4680.96s -> 4681.44s] ella dice,
+[4682.22s -> 4684.90s] llámame amarga, ya no soy dulce, llámame amarga.
+[4685.66s -> 4687.78s] Queridos, aquí hay trauma generacional,
+[4688.66s -> 4691.56s] hay pérdida, hay amargura y hay vejez triste,
+[4691.80s -> 4696.66s] y déjenme dedicarle unas pequeñas palabras y tranquilos que ya estamos llegando a la parte final.
+[4697.30s -> 4701.74s] Siempre escuchamos aquí que se le dedican mensajes a los jóvenes, este mensaje es para los jóvenes.
+[4702.36s -> 4708.12s] Pero yo quisiera dedicar esta parte del mensaje a nuestros queridos adultos y adultos mayores.
+[4709.02s -> 4710.72s] Y aquí hay varios en la iglesia.
+[4711.96s -> 4715.38s] Sabes que esta semana yo como que empecé a pensar en la vejez.
+[4715.68s -> 4716.96s] Yo soy joven, ¿no?
+[4717.56s -> 4717.72s] Bueno,
+[4718.30s -> 4721.46s] quizás los adolescentes ahí, los nacidos después del 2000 van a decir
+[4721.46s -> 4722.58s] ¡Oh, naciste en el 1994!
+[4723.64s -> 4724.66s] Soy viejo para ellos, ¿no?
+[4725.46s -> 4726.38s] Es el siglo pasado.
+[4727.20s -> 4730.02s] Pero yo me considero todavía joven, 31 años.
+[4730.68s -> 4731.26s] Ahora,
+[4732.08s -> 4734.68s] yo hasta hace poquitas semanas,
+[4735.50s -> 4738.54s] nunca pensé o me imaginé yo cuando viejito,
+[4739.52s -> 4744.08s] porque decía no, Cristo va a venir antes, no me puedo imaginar siendo viejito,
+[4744.54s -> 4749.02s] pero pasaron una serie de cosas en esta semana en donde comencé a pensar,
+[4749.74s -> 4751.38s] la vejez puede ser triste, ¿no?
+[4752.44s -> 4756.72s] Puede estar llena de soledad, puede estar llena de enfermedades.
+[4758.32s -> 4763.98s] Yo incluso me acuerdo que estuvimos repartiendo y haciendo algunas visitas no la semana antes
+[4763.98s -> 4774.20s] pasada y yo llegaba a casas en esta misma iglesia donde personas viven solos la soledad la vejez
+[4774.20s -> 4779.76s] yo pienso será que cuando sea viejito mi hija se va a acordar de mí va a venir a verme me va a
+[4779.76s -> 4785.10s] llamar no puede sonar tonto lo que estoy diciendo y puede pasar mucho tiempo eso es a futuro pero
+[4785.66s -> 4792.20s] Dígame ustedes los que son ya más adultos o jóvenes adultos, no me gusta llamarle ancianos
+[4792.20s -> 4792.76s] ni nada, ok?
+[4793.46s -> 4795.44s] Pero dígame, ¿la vida pasa rápido o no?
+[4797.96s -> 4802.78s] Yo hoy quiero decirte queridos, que aunque te sientas mara, que aunque te sientas que
+[4802.78s -> 4807.40s] tu vida en esta etapa de tu vida está amarga, miren, yo dedico estas palabras para ustedes,
+[4807.88s -> 4809.36s] Dios no ha terminado contigo,
+[4810.04s -> 4814.54s] Dios está contigo, Dios te acompaña, Dios te abraza,
+[4814.54s -> 4816.48s] todavía hay mucho que hacer en el mundo.
+[4816.52s -> 4819.04s] Si tienes vida, si estás respirando,
+[4819.64s -> 4821.44s] es porque Dios tiene un plan para ti.
+[4822.24s -> 4823.50s] Tú eres nuestra sabiduría.
+[4824.44s -> 4826.50s] Nosotros como jóvenes te necesitamos.
+[4827.30s -> 4828.36s] Y si nos unimos,
+[4828.62s -> 4830.86s] si mezclamos tu sabiduría con nuestra fuerza
+[4830.86s -> 4831.88s] y ganas de hacer cosas,
+[4832.38s -> 4835.08s] la iglesia puede levantarse, quizás como nunca antes.
+[4835.84s -> 4837.36s] Creo que es momento de dejar de pelear
+[4837.36s -> 4839.14s] entre ancianos y jóvenes
+[4839.14s -> 4840.62s] y no empezar a vernos como familia,
+[4840.72s -> 4841.40s] trabajar juntos.
+[4841.40s -> 4847.36s] Y yo decía, ah, todavía esto está en pañales, pero decía que lindo sería que como jóvenes
+[4848.20s -> 4853.62s] armemos un ministerio en la iglesia donde acompañemos a nuestros queridos adultos mayores, donde
+[4853.62s -> 4856.10s] un día podamos ir a la semana, vamos a visitar,
+[4856.80s -> 4858.68s] vamos a visitar, vamos a aprender, vamos a
+[4858.68s -> 4861.62s] escuchar las historias que estas personas nos tienen que contar.
+[4862.48s -> 4866.58s] Queridos, quiero dedicarte estas palabras porque noemi quería incluso cambiar su
+[4866.58s -> 4871.16s] identidad pensaba que todo había terminado para su vida pero aquí entra la
+[4871.16s -> 4872.02s] decisión de Ruth,
+[4872.74s -> 4875.50s] Ruth que era, ustedes me dijeron aquí adelante ya y se me
+[4875.50s -> 4878.14s] adelantaron, era Moabita,
+[4879.00s -> 4882.46s] o sea era descendiente de esta serie de rodes que
+[4882.46s -> 4884.34s] comenzó con Lot y sus hijas,
+[4885.08s -> 4888.78s] era parte de esta historia rota pero ella toma
+[4888.78s -> 4894.78s] una decisión radical queridos y esto está en Ruth 1 16 al 17 queridos y
+[4894.78s -> 4895.38s] es tremendo,
+[4896.26s -> 4904.32s] ve a Noemi su suegra sola y le dice no me ruees que te deje, miren lo
+[4904.32s -> 4908.54s] contrario a la decisión que tomó Lot y Abram, le dice no me ruees que te deje,
+[4909.94s -> 4915.16s] porque a donde quiera que tú fueres iré yo y a donde quiera que vivieres viviré,
+[4915.92s -> 4922.06s] tu pueblo será mi pueblo y tu dios será mi dios, ¿por qué me emociona esta
+[4922.06s -> 4928.26s] parte de la historia, queridos, porque esto es impresionante, queridos. Ella rompe con su
+[4928.26s -> 4928.62s] tierra,
+[4929.38s -> 4930.08s] su cultura,
+[4930.72s -> 4933.56s] su pasado espiritual, su identidad ancestral.
+[4934.24s -> 4934.34s] Mira,
+[4935.00s -> 4936.10s] Ruth no eligió
+[4936.10s -> 4938.90s] su origen, pero sí eligió su destino.
+[4939.50s -> 4941.36s] Y eso lo cambia todo.
+[4942.54s -> 4948.18s] Queridos, tú no has elegido tu origen, no elegiste lo que te pesa en tus hombros,
+[4948.18s -> 4953.02s] no elegiste las cosas que hicieron contigo, no tuviste lección allí,
+[4953.86s -> 4954.74s] pero así como Ruth,
+[4955.52s -> 4957.06s] tú puedes cambiar tu destino,
+[4957.90s -> 4963.08s] tú puedes cambiar el futuro de tu vida, no estar de si estás vivo,
+[4963.44s -> 4969.52s] todavía puedes tomar decisiones que cambien la dirección, no solamente de tu vida futura,
+[4969.68s -> 4972.40s] sino de lo que va a venir en el futuro después de ti,
+[4973.36s -> 4975.54s] porque así también si las decisiones
+[4975.54s -> 4980.44s] negativas tienen consecuencias hasta la tercera y cuarta generación como dice
+[4980.44s -> 4986.88s] Éxodo después Dios dice pero yo hago misericordia a millares su misericordia
+[4986.88s -> 4993.14s] sobrepasa nuestro pecado donde abundó el pecado sobre abundó la gracia de Dios
+[4994.80s -> 5001.62s] queridos la rende la redención que Ruth vivió no terminó solamente en esa
+[5001.62s -> 5002.16s] decisión.
+[5003.04s -> 5005.94s] Tú sabes que Ruth después conoce a Voss, ¿no?
+[5006.92s -> 5008.86s] Y que es interesante que Voss aparece
+[5008.86s -> 5012.68s] aquí con palabras que nos asemejan a Redentor, Joel.
+[5013.50s -> 5015.50s] Voss, pues, tomó a Ruth y ella fue
+[5015.50s -> 5020.92s] su mujer, dice Ruth 413. Y aquí entra un giro tremendo, queridos, en la Biblia.
+[5021.68s -> 5021.98s] Ruth
+[5021.98s -> 5029.26s] 417 dice que le dieron nombre a los descendentes de Ruth y dice que un hijo lo llamaron
+[5029.26s -> 5029.74s] Obed.
+[5030.30s -> 5035.30s] Y Obed es padre de Isaí y Isaí es padre de David.
+[5035.96s -> 5037.14s] ¿Y por qué te digo esto?
+[5037.84s -> 5040.46s] Porque cuando tú entras a la genealogía de Jesús,
+[5040.60s -> 5042.14s] que antes me parecía muy aburría y decía,
+[5042.14s -> 5043.44s] ¿por qué está aquí en la Biblia?
+[5044.06s -> 5047.68s] En Mateo, capítulo 1, aparece quién en la genealogía de Jesús.
+[5048.70s -> 5049.76s] Aparece Ruth.
+[5051.58s -> 5055.02s] Mira la misericordia de Dios en la historia.
+[5056.00s -> 5063.56s] una decisión. Trajo años de consecuencias terribles, pero una pequeña decisión de una mujer que estuvo
+[5063.56s -> 5066.18s] dispuesta a dejarlo todo para ser fiel a Dios,
+[5066.74s -> 5069.68s] Ruth, que no importó su pasado, de dónde venía,
+[5069.84s -> 5075.06s] cómo era su historia, hizo que no solamente cambiara el futuro de su vida y de sus familias,
+[5075.06s -> 5080.48s] sino que ella por esa decisión y ese linaje vino el Mesías, vino Cristo queridos.
+[5081.28s -> 5081.72s] En la
+[5081.72s -> 5085.80s] la genealogía de Jesucristo existe ruptura,
+[5086.50s -> 5088.86s] existe y existe redención.
+[5089.92s -> 5090.76s] Queridos,
+[5092.02s -> 5095.18s] la descendiente de una relación nacida en una cueva de vergüenza
+[5095.70s -> 5098.80s] terminó siendo parte de la genealogía del Mesías.
+[5099.60s -> 5104.14s] Eso es redención generacional, eso es romper el ciclo.
+[5105.30s -> 5108.26s] Génesis 13.9, cuando tú entras a la historia de Lot,
+[5108.82s -> 5109.22s] Dices,
+[5109.84s -> 5114.24s] Lodi Abram. Abram le dice, ¿no? Si fueras a la mano izquierda, yo irá a la derecha.
+[5114.54s -> 5119.94s] Y si tú a la derecha, yo iré a la izquierda. Y contrastalo con Ruth. No me robes que te dejes,
+[5120.08s -> 5124.38s] porque donde quiera que tú fueras, iré yo. Donde quiera que vivieras, viviré. Tu pueblo será
+[5124.38s -> 5127.04s] mi pueblo y tu Dios, mi Dios, separación,
+[5127.86s -> 5128.16s] unión.
+[5129.42s -> 5131.26s] Lot eligió por vista,
+[5132.10s -> 5132.84s] vio esas tierras.
+[5132.84s -> 5135.10s] Ruth eligió por fe.
+[5135.96s -> 5141.80s] Loth se acercó a Sodoma. Ruth se acercó al Dios de Israel.
+[5142.82s -> 5150.46s] De Loth nació Moab y por descendencia los Moabitas y de Ruth nació el linaje del Rey, del Mesías.
+[5151.10s -> 5159.10s] Uno dejó que la historia lo arrastrara y la otra Ruth decidió escribir una nueva.
+[5160.34s -> 5165.68s] Queridos, nosotros podemos romper estos ciclos generacionales y te vuelvo a decir lo que este
+[5165.68s -> 5168.84s] amigo le dijo a su amigo que estaba cargando con tantas cosas,
+[5169.42s -> 5171.56s] no tiene por qué ser igual,
+[5172.00s -> 5178.36s] no tienes por qué seguir viviendo así, no tienes por qué seguir viviendo así, no tienes
+[5178.36s -> 5183.08s] por qué seguir viviendo así, porque hay redención,
+[5183.90s -> 5186.30s] porque hay perdón, porque una decisión
+[5186.30s -> 5192.52s] lo puede cambiar todo y yo quiero terminar con esto queridos y me gustaría que el
+[5192.52s -> 5196.16s] worksheet puede ir pasando porque vamos a terminar cantando maravillosa gracia si
+[5196.16s -> 5200.64s] se puede si no están todos bueno ahí dan y si no si nos
+[5200.64s -> 5205.52s] acompañan ahí con el piano puede ser solo ahí con con piano queridos
+[5206.68s -> 5209.92s] disculpen que no les avise los tomé sorpresa pero aquí así es mi equipo
+[5209.92s -> 5210.74s] es bueno, es bueno.
+[5212.08s -> 5212.70s] Miren,
+[5213.84s -> 5216.56s] salvación, lo que les dije al principio,
+[5217.36s -> 5218.24s] también tiene que ver
+[5218.24s -> 5219.00s] con sanidad.
+[5220.12s -> 5222.74s] De hecho, en griego son la misma palabra.
+[5223.96s -> 5226.40s] Salvación no es solamente suplicar
+[5226.40s -> 5233.56s] misericordia ante un juez, la visión de leyes y de jueces, sino abrir tu alma ante el doctor.
+[5235.04s -> 5243.12s] sabías que los cristianos primitimos llamaban a Jesús el médico del alma y me gusta esta expresión
+[5243.12s -> 5244.00s] un
+[5245.47s -> 5249.91s] padre de la iglesia llamado Ignacio de Antioquía que fue guiado por el mismo apóstol Juan
+[5249.91s -> 5258.03s] él describe algo en Jesús que me encanta porque generalmente vemos a Jesús en términos merecíamos
+[5258.03s -> 5264.61s] el castigo merecíamos la muerte el vino nos rescató y gracias a él tenemos acceso al cielo que es
+[5264.61s -> 5267.27s] Hermoso, pero no termina allí queridos.
+[5267.99s -> 5269.93s] Los primeros cristianos veían a Jesús.
+[5270.39s -> 5272.71s] Yo sé que esta iglesia tenemos muchos profesionales de la
+[5272.71s -> 5273.01s] salud.
+[5273.47s -> 5275.43s] Jesús era el médico por excelencia.
+[5275.97s -> 5278.31s] Porque no solamente vino a salvarnos,
+[5278.63s -> 5280.49s] sino que vino a sanarnos.
+[5281.97s -> 5283.87s] Mira esta frase de Ignacio de Antioquía dice,
+[5284.03s -> 5286.83s] pero nuestro médico es el único Dios verdadero,
+[5287.33s -> 5288.49s] Jesús el Cristo.
+[5289.25s -> 5292.33s] Él se sujetó a corrupción para poder liberar nuestras
+[5292.33s -> 5297.93s] nuestras almas de la muerte y la corrupción y sanarlas y poder restaurarlas a su salud
+[5298.25s -> 5301.21s] cuando estaban muertas en impiedad y malos deseos.
+[5301.73s -> 5302.41s] Queridos,
+[5303.19s -> 5306.77s] no todo lo que enfrentamos puede cambiar,
+[5307.37s -> 5309.65s] pero nada puede cambiar hasta que
+[5309.65s -> 5310.45s] lo enfrentamos.
+[5311.59s -> 5314.01s] Esa es una frase que dijo James Bowie.
+[5314.93s -> 5319.65s] ¿Por qué no hoy decides enfrentar aquello que sabes que tienes que enfrentar?
+[5320.31s -> 5325.23s] ¿Por qué no hoy decides encontrarte con la maravillosa gracia de Jesús?
+[5326.33s -> 5328.07s] Que aunque tu origen sea difícil,
+[5328.73s -> 5330.75s] que aunque lo que cargas sea difícil,
+[5331.73s -> 5332.69s] está en tus manos,
+[5333.51s -> 5336.63s] abrirte para que el médico del alma desane
+[5337.51s -> 5339.85s] y que él pueda producir un milagro en tu vida.
+[5340.83s -> 5344.27s] Te quiero dejar con cinco puntos y vamos a terminar cantando.
+[5345.01s -> 5346.25s] ¿Qué puedo hacer el día de mañana?
+[5346.25s -> 5350.57s] Habiendo escuchado este mensaje que resonó conmigo, pero cómo lo puedo aplicar?
+[5350.67s -> 5350.97s] Primero,
+[5351.63s -> 5352.79s] toma responsabilidad.
+[5353.85s -> 5357.51s] No le pongas la culpa a las personas, a las instituciones, a la iglesia.
+[5358.45s -> 5361.21s] Toma responsabilidad a lo que has hecho bien y lo que has hecho mal.
+[5362.77s -> 5368.51s] Comienza a tomar responsabilidad de anombrar las cosas por las cuales estás luchando.
+[5369.35s -> 5370.73s] Toma responsabilidad. Segundo,
+[5371.33s -> 5373.93s] no le temas a las conversaciones incómodas.
+[5373.93s -> 5378.53s] puede ser que esta semana Dios te esté llamando a hacer ese llamado incómodo,
+[5378.53s -> 5383.91s] pero una conversación incómoda puede sanar toda una generación.
+[5384.59s -> 5386.19s] ¿Por qué no hayas ese llamado?
+[5387.13s -> 5389.11s] ¿Por qué no esta semana le dices,
+[5389.17s -> 5389.97s] mira, tenemos que hablar,
+[5390.53s -> 5392.25s] tenemos que tocar este tema incómodo,
+[5392.31s -> 5393.41s] porque tenemos que sanar.
+[5395.05s -> 5398.75s] Tercero, identifica qué comportamientos vienen de algo en tu pasado
+[5398.75s -> 5400.33s] que hay que resolver,
+[5401.11s -> 5402.21s] aprenda a nombrarlo.
+[5403.01s -> 5408.13s] Por eso cuando Jesús iba con las personas y muchos milagros le decía, ¿qué quieres que te haga?
+[5409.19s -> 5412.23s] Jesús sabía lo que ellos necesitaban, pero ¿por qué pregunta?
+[5413.01s -> 5415.45s] Porque quiere que tú también nombres lo que tú necesitas.
+[5416.19s -> 5422.05s] Cuando le das nombre y cuando lo nombras, comienzas el primer paso para trabajar con aquello que te duele.
+[5422.49s -> 5425.17s] Y queridos, decirte, esto va a doler, esto duele.
+[5426.87s -> 5429.19s] Romper ciclos generacionales duele.
+[5429.19s -> 5435.35s] y una frase que me mandó esta semana mi esposa querida y que me la mandó así
+[5435.35s -> 5440.09s] como dedicado a mí como como esposo dice tú y tu esposa están quebrando ciclos de
+[5440.09s -> 5445.13s] varias generaciones por eso las cosas no son fáciles ustedes son los que un
+[5445.13s -> 5449.11s] linaje entero estaba esperando no pare un
+[5450.81s -> 5452.75s] brasileño profesional marcus
+[5452.75s -> 5460.87s] araúllo escribió esta frase y por eso quiero ir al último consejo no le
+[5460.87s -> 5465.97s] Jesús te sana con milagros pero también con el milagro de profesionales que te
+[5465.97s -> 5467.83s] pueden ayudar con terapia profesional.
+[5468.83s -> 5470.45s] Muchas veces se ha mirado esto como un
+[5470.45s -> 5474.31s] tabú en la iglesia pero hay cosas que necesitas, tú necesitas nombrar, necesitas
+[5475.13s -> 5480.15s] herramientas para poder lidiar con cosas que tú solo no puedes por eso no le
+[5480.15s -> 5482.69s] temas de buscar ayuda profesional.
+[5484.31s -> 5486.19s] Termino con esto y vamos a cantar
+[5486.19s -> 5492.35s] maravillosa gracia Juan día 10 dice el ladrón no viene más que robar matar y
+[5492.35s -> 5495.91s] destruir eso es lo que quiere el enemigo
+[5497.11s -> 5504.25s] esa es la voz de tus errores destruirte pero a qué vino Jesús dice yo he
+[5504.25s -> 5508.49s] venido para que tengan vida y la tengan en abundancia
+[5509.19s -> 5513.83s] Jesús vino para darte vida y para que la tengas en abundancia
+[5514.73s -> 5515.89s] No seas como Lot,
+[5516.83s -> 5522.49s] sé como Ruth, y rompe ese ciclo generacional que te está pesando
+[5522.49s -> 5528.91s] y cambia la vida de tu vida, de tu familia y de las generaciones que vienen al futuro.
+[5529.55s -> 5536.61s] Vamos a cantar, vamos a ponernos de pie si hoy quieres responder a nuestro Dios con esta invitación
+[5536.61s -> 5541.67s] vamos a cantar de esta maravillosa gracia, está al avanza, la hizo una amiga en Chile
+[5541.67s -> 5550.25s] y siempre me emociona y es una alabanza que hoy quiero que sea tu oración así que quiero que nos
+[5550.25s -> 5553.19s] acompañes y vamos a cantar juntos, maravillosa gracia.
+[5687.29s -> 5692.17s] ¿Será que hay alguien que hoy especialmente quiere aceptar el llamado de Dios de hacer las
+[5692.17s -> 5693.95s] cosas diferentes, de romper ciclos?
+[5695.13s -> 5697.81s] ¿Gutaría invitarte a pasar aquí al frente para hacer
+[5697.81s -> 5702.53s] esta oración final. ¿Será que hay algún valiente que decía, que decida hoy? Yo quiero
+[5702.53s -> 5703.69s] decidir diferente.
+[5704.55s -> 5708.75s] Yo quiero avanzar en otra dirección. Yo quiero realmente cambiar.
+[5709.55s -> 5709.77s] ¿Será
+[5709.77s -> 5714.37s] que hay alguien? Los invito a pasar aquí adelante y vamos a hacer esta oración final.
+[5715.05s -> 5717.19s] Qué lindos cuando la iglesia se rinde.
+[5718.21s -> 5722.37s] ¿Sabes que el secreto de la vida cristiana no se
+[5722.37s -> 5725.97s] trata de ganar, sino que se trata de rendirse.
+[5727.57s -> 5730.45s] Me encantó pensar en esta semana,
+[5731.53s -> 5734.49s] cuando nosotros decimos que era una doble porción del Espíritu Santo.
+[5735.45s -> 5739.65s] Si bien es cierto, esa expresión está en un pasaje ahí del antiguo testamento,
+[5739.91s -> 5743.01s] cuando tú lees el nuevo testamento, no existe esa expresión,
+[5743.75s -> 5747.37s] sino que la expresión es estar llenos del Espíritu Santo.
+[5748.35s -> 5755.53s] Y yo mi oración es que tú puedas estar lleno del Espíritu Santo porque no es que vas a tener un
+[5755.53s -> 5760.47s] porcentaje hoy en tu casa bueno yo hoy recibo un poquito más del Espíritu Santo o él quiere
+[5760.47s -> 5766.33s] estar en tu vida o no estarlo pero cuál es la diferencia la diferencia está en cuánto de ti
+[5766.33s -> 5772.57s] tiene él cuánto de tus decisiones son controladas por él y yo quiero invitarte porque no te
+[5772.57s -> 5773.25s] Rindes a Él,
+[5773.93s -> 5780.15s] que Él pueda realmente abrazarte y tomarte completamente y que puedas de una
+[5780.15s -> 5784.47s] vez por todas romper estos ciclos generacionales. Vamos a orar.
+[5785.15s -> 5786.11s] Amado Padre, Señor,
+[5786.67s -> 5786.91s] en estos
+[5786.91s -> 5790.41s] momentos queremos orar ante Ti, Señor.
+[5791.77s -> 5796.45s] Gracias por ser ese Dios que renova Su misericordia
+[5796.45s -> 5797.03s] todos los días.
+[5799.82s -> 5804.14s] Que aunque a veces el peso del pecado es imposible de cargar,
+[5805.58s -> 5806.10s] eres un
+[5806.10s -> 5806.66s] Dios que vino,
+[5807.96s -> 5812.44s] puso nuestro dolor, nuestras culpas, nuestros pasados sobre sus hombros
+[5813.98s -> 5817.70s] y lo llevaste a esa cruz para ponerle un punto final.
+[5819.95s -> 5824.97s] Nuevamente hoy queremos saber de que somos guerreros que no luchan para obtener la
+[5824.97s -> 5830.81s] victoria, sino que luchamos desde la victoria, conseguida en la cruz de Cristo.
+[5832.90s -> 5833.32s] Señor, que
+[5833.32s -> 5836.84s] Cristo hoy pueda hacer ese médico del alma que necesitamos.
+[5838.08s -> 5839.30s] Quizá sabemos que estamos
+[5839.30s -> 5843.20s] salvados, que nos espera un cielo nuevo y una tierra nueva,
+[5844.06s -> 5845.50s] pero quizá hoy nos cuesta
+[5845.50s -> 5849.38s] encontrar la sanidad para nuestras más profundas heridas.
+[5850.78s -> 5851.76s] Señor sáannanos,
+[5852.96s -> 5854.38s] entra a los lugares
+[5854.38s -> 5862.38s] más oscuros de nuestro corazón, de nuestro interior, y sánanos de adentro que podamos
+[5862.38s -> 5868.38s] estar dispuestos a tomar las decisiones que puedan cambiar completamente la historia de
+[5868.38s -> 5868.92s] nuestra vida.
+[5869.50s -> 5874.40s] Y saber de que contigo nunca es tarde para volver a comenzar. Oramos en
+[5874.40s -> 5875.76s] el maravilloso nombre de Jesús.
+[5876.74s -> 5877.70s] Amén, señor, amén.
+[5878.42s -> 5880.16s] ¿Por qué no le das un abrazo al que está al lado?
+[5880.16s -> 5885.56s] que Dios te bendiga y nos vemos la tarde en sociedad de jóvenes que Dios te
+[5885.56s -> 5890.12s] bendiga que vayas con la paz de que has tenido un encuentro con él que Dios te
+[5890.12s -> 5891.14s] bendiga. Feliz a Dios.

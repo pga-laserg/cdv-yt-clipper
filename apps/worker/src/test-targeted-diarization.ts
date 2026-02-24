@@ -17,10 +17,15 @@ interface SpeakerTurn {
     end: number;
     speaker: string;
 }
+interface SpeakerTurnReview extends SpeakerTurn {
+    transcript_text: string;
+}
 
 interface GuessBounds {
     start: number;
     end: number;
+    startCandidates: number[];
+    endCandidates: number[];
 }
 
 function parseSrtTimestamp(ts: string): number {
@@ -83,16 +88,82 @@ function overlap(aStart: number, aEnd: number, bStart: number, bEnd: number): nu
     return Math.max(0, Math.min(aEnd, bEnd) - Math.max(aStart, bStart));
 }
 
+function isNonSpeech(text?: string): boolean {
+    const t = (text ?? '').toLowerCase().trim();
+    if (!t) return true;
+    if (t === 'music' || t === 'música' || t === 'piano' || t === 'silence' || t === 'silencio') return true;
+    if (/^\[.*\]$/.test(t) || /^\(.*\)$/.test(t)) return true;
+    if (/^(music|música|piano|instrumental|aplausos|applause|silence|silencio)\b/.test(t)) return true;
+    return false;
+}
+
+function hasOtherSpeakerAround(
+    turns: SpeakerTurn[],
+    speaker: string,
+    start: number,
+    end: number,
+    minOverlapSec = 0.35
+): boolean {
+    for (const t of turns) {
+        if (t.speaker === speaker) continue;
+        if (overlap(t.start, t.end, start, end) >= minOverlapSec) return true;
+    }
+    return false;
+}
+
 function parseGuess(boundaryJsonPath: string): GuessBounds {
     const raw = JSON.parse(fs.readFileSync(boundaryJsonPath, 'utf8')) as any;
+    const normalizeCandidates = (items: any[] | undefined, fallback: number): number[] => {
+        const values = Array.isArray(items)
+            ? items.map((x) => Number(x?.sec ?? x)).filter((v) => Number.isFinite(v))
+            : [];
+        values.unshift(fallback);
+        const out: number[] = [];
+        const seen = new Set<number>();
+        for (const v of values) {
+            const key = Math.round(v * 100) / 100;
+            if (seen.has(key)) continue;
+            seen.add(key);
+            out.push(v);
+        }
+        return out.slice(0, 3);
+    };
+
     if (raw?.raw?.speaker_start_sec != null && raw?.raw?.speaker_end_sec != null) {
-        return { start: Number(raw.raw.speaker_start_sec), end: Number(raw.raw.speaker_end_sec) };
+        const start = Number(raw.raw.speaker_start_sec);
+        const end = Number(raw.raw.speaker_end_sec);
+        return {
+            start,
+            end,
+            startCandidates: normalizeCandidates(raw.raw.start_candidates, start),
+            endCandidates: normalizeCandidates(raw.raw.end_candidates, end)
+        };
     }
     if (raw?.speaker_start_sec != null && raw?.speaker_end_sec != null) {
-        return { start: Number(raw.speaker_start_sec), end: Number(raw.speaker_end_sec) };
+        const start = Number(raw.speaker_start_sec);
+        const end = Number(raw.speaker_end_sec);
+        return {
+            start,
+            end,
+            startCandidates: normalizeCandidates(raw.start_candidates, start),
+            endCandidates: normalizeCandidates(raw.end_candidates, end)
+        };
     }
     if (raw?.start != null && raw?.end != null) {
-        return { start: Number(raw.start), end: Number(raw.end) };
+        const start = Number(raw.start);
+        const end = Number(raw.end);
+        const startCandidates = Array.isArray(raw.start_candidates)
+            ? raw.start_candidates.map((v: any) => Number(v)).filter((v: number) => Number.isFinite(v))
+            : [start];
+        const endCandidates = Array.isArray(raw.end_candidates)
+            ? raw.end_candidates.map((v: any) => Number(v)).filter((v: number) => Number.isFinite(v))
+            : [end];
+        return {
+            start,
+            end,
+            startCandidates: startCandidates.length > 0 ? startCandidates : [start],
+            endCandidates: endCandidates.length > 0 ? endCandidates : [end]
+        };
     }
     throw new Error(`Unsupported boundary JSON format: ${boundaryJsonPath}`);
 }
@@ -121,7 +192,11 @@ async function extractChunk(audioPath: string, outPath: string, startSec: number
 }
 
 async function runDiarize(chunkPath: string): Promise<SpeakerTurn[]> {
-    const pythonScript = path.resolve(__dirname, 'pipeline/python/diarize.py');
+    const pythonScriptCandidates = [
+        path.resolve(__dirname, 'pipeline/python/diarize.py'),
+        path.resolve(__dirname, '../src/pipeline/python/diarize.py')
+    ];
+    const pythonScript = pythonScriptCandidates.find((p) => fs.existsSync(p)) ?? pythonScriptCandidates[0];
     const venv311 = path.resolve(__dirname, '../venv311/bin/python3');
     const workerVenv = path.resolve(__dirname, '../venv/bin/python3');
     const pythonBin = process.env.DIARIZATION_PYTHON_BIN
@@ -138,8 +213,13 @@ async function runDiarize(chunkPath: string): Promise<SpeakerTurn[]> {
     return parsed;
 }
 
-function absoluteTurns(turns: SpeakerTurn[], offsetSec: number): SpeakerTurn[] {
-    return turns.map((t) => ({ ...t, start: t.start + offsetSec, end: t.end + offsetSec }));
+function absoluteTurns(turns: SpeakerTurn[], offsetSec: number, speakerPrefix?: string): SpeakerTurn[] {
+    return turns.map((t) => ({
+        ...t,
+        speaker: speakerPrefix ? `${speakerPrefix}:${t.speaker}` : t.speaker,
+        start: t.start + offsetSec,
+        end: t.end + offsetSec
+    }));
 }
 
 function pickAnchorSpeaker(turns: SpeakerTurn[], anchorStart: number, anchorEnd: number): string | null {
@@ -157,10 +237,11 @@ function refineStart(
     turns: SpeakerTurn[],
     speaker: string,
     guessStart: number,
-    gapJoinSec = 1.5
+    gapJoinSec = 1.5,
+    lookbackSec = 120
 ): number {
     const same = turns
-        .filter((t) => t.speaker === speaker && t.end >= guessStart - 20 && t.start <= guessStart + 20)
+        .filter((t) => t.speaker === speaker && t.end >= guessStart - lookbackSec && t.start <= guessStart + 25)
         .sort((a, b) => a.start - b.start);
     if (same.length === 0) return guessStart;
 
@@ -172,6 +253,9 @@ function refineStart(
     for (let i = idx - 1; i >= 0; i--) {
         const gap = same[i + 1].start - same[i].end;
         if (gap > gapJoinSec) break;
+        const bridgeStart = Math.min(same[i].end, same[i + 1].start) - 0.2;
+        const bridgeEnd = Math.max(same[i].end, same[i + 1].start) + 0.2;
+        if (hasOtherSpeakerAround(turns, speaker, bridgeStart, bridgeEnd)) break;
         start = same[i].start;
     }
     return start;
@@ -181,10 +265,11 @@ function refineEnd(
     turns: SpeakerTurn[],
     speaker: string,
     guessEnd: number,
-    gapJoinSec = 1.5
+    gapJoinSec = 1.5,
+    lookaheadSec = 120
 ): number {
     const same = turns
-        .filter((t) => t.speaker === speaker && t.end >= guessEnd - 20 && t.start <= guessEnd + 40)
+        .filter((t) => t.speaker === speaker && t.end >= guessEnd - 40 && t.start <= guessEnd + lookaheadSec)
         .sort((a, b) => a.start - b.start);
     if (same.length === 0) return guessEnd;
 
@@ -197,30 +282,124 @@ function refineEnd(
     for (let i = idx + 1; i < same.length; i++) {
         const gap = same[i].start - same[i - 1].end;
         if (gap > gapJoinSec) break;
+        const bridgeStart = Math.min(same[i - 1].end, same[i].start) - 0.2;
+        const bridgeEnd = Math.max(same[i - 1].end, same[i].start) + 0.2;
+        if (hasOtherSpeakerAround(turns, speaker, bridgeStart, bridgeEnd)) break;
         end = same[i].end;
     }
     return end;
 }
 
-function applyPadding(speakerStart: number, speakerEnd: number, segments: Segment[]) {
-    const prevSpeech = [...segments].reverse().find((s) => s.end <= speakerStart);
-    const nextSpeech = segments.find((s) => s.start >= speakerEnd);
+function applyPadding(
+    speakerStart: number,
+    speakerEnd: number,
+    segments: Segment[],
+    turns: SpeakerTurn[],
+    startSpeaker: string,
+    endSpeaker: string
+) {
+    const speechSegments = segments.filter((s) => !isNonSpeech(s.text));
+    const prevSpeech = [...speechSegments].reverse().find((s) => s.end <= speakerStart);
+    const nextSpeech = speechSegments.find((s) => s.start >= speakerEnd);
 
-    const gapBefore = Math.max(0, speakerStart - (prevSpeech?.end ?? 0));
+    const prevOtherTurn = [...turns]
+        .filter((t) => t.speaker !== startSpeaker && t.end <= speakerStart)
+        .sort((a, b) => b.end - a.end)[0];
+    const nextOtherTurn = turns
+        .filter((t) => t.speaker !== endSpeaker && t.start >= speakerEnd)
+        .sort((a, b) => a.start - b.start)[0];
+
+    const prevBoundary = Math.max(prevSpeech?.end ?? 0, prevOtherTurn?.end ?? 0);
+    const nextBoundary = Math.min(
+        nextSpeech?.start ?? Number.POSITIVE_INFINITY,
+        nextOtherTurn?.start ?? Number.POSITIVE_INFINITY
+    );
+
+    const gapBefore = Math.max(0, speakerStart - prevBoundary);
     const prePad = Math.min(10, gapBefore);
     const clipStart = Math.max(0, speakerStart - prePad);
 
-    const gapAfter = nextSpeech ? Math.max(0, nextSpeech.start - speakerEnd) : 10;
+    const gapAfter = Number.isFinite(nextBoundary) ? Math.max(0, nextBoundary - speakerEnd) : 10;
     const postPad = Math.min(10, gapAfter);
-    const clipEnd = nextSpeech ? Math.min(nextSpeech.start, speakerEnd + postPad) : speakerEnd + postPad;
+    const clipEnd = Number.isFinite(nextBoundary)
+        ? Math.min(nextBoundary, speakerEnd + postPad)
+        : speakerEnd + postPad;
 
     return {
         clip_start_sec: clipStart,
         clip_end_sec: clipEnd,
         applied_pre_pad_sec: prePad,
         applied_post_pad_sec: postPad,
-        next_speech_start_sec: nextSpeech?.start ?? null
+        next_speech_start_sec: Number.isFinite(nextBoundary) ? nextBoundary : null,
+        prev_other_speaker_end_sec: prevOtherTurn?.end ?? null,
+        next_other_speaker_start_sec: nextOtherTurn?.start ?? null
     };
+}
+
+function transcriptTextForTurn(turn: SpeakerTurn, segments: Segment[]): string {
+    const pieces: string[] = [];
+    for (const s of segments) {
+        const ol = overlap(turn.start, turn.end, s.start, s.end);
+        if (ol <= 0.2) continue;
+        const t = (s.text ?? '').trim();
+        if (!t) continue;
+        pieces.push(t);
+    }
+    return pieces.join(' ').replace(/\s+/g, ' ').trim();
+}
+
+function enrichTurnsWithTranscript(turns: SpeakerTurn[], segments: Segment[]): SpeakerTurnReview[] {
+    return turns.map((t) => ({
+        ...t,
+        transcript_text: transcriptTextForTurn(t, segments)
+    }));
+}
+
+function previousTurnBefore(turns: SpeakerTurn[], t: number): SpeakerTurn | null {
+    for (let i = turns.length - 1; i >= 0; i--) {
+        if (turns[i].end <= t + 0.001) return turns[i];
+    }
+    return null;
+}
+
+function nextTurnAfter(turns: SpeakerTurn[], t: number): SpeakerTurn | null {
+    for (let i = 0; i < turns.length; i++) {
+        if (turns[i].start >= t - 0.001) return turns[i];
+    }
+    return null;
+}
+
+function findLatestOtherToTargetStartTransition(
+    turns: SpeakerTurn[],
+    targetSpeaker: string,
+    upperBound: number
+): number | null {
+    let candidate: number | null = null;
+    for (let i = 1; i < turns.length; i++) {
+        const prev = turns[i - 1];
+        const cur = turns[i];
+        if (cur.start > upperBound + 15) break;
+        if (prev.speaker !== targetSpeaker && cur.speaker === targetSpeaker) {
+            candidate = cur.start;
+        }
+    }
+    return candidate;
+}
+
+function findEarliestTargetToOtherEndTransition(
+    turns: SpeakerTurn[],
+    targetSpeaker: string,
+    lowerBound: number
+): number | null {
+    for (let i = 1; i < turns.length; i++) {
+        const prev = turns[i - 1];
+        const cur = turns[i];
+        if (prev.end < lowerBound - 15) continue;
+        if (prev.speaker === targetSpeaker && cur.speaker !== targetSpeaker) {
+            return prev.end;
+        }
+    }
+    return null;
 }
 
 async function main() {
@@ -249,14 +428,22 @@ async function main() {
     const guess = parseGuess(boundaryPath);
 
     const audioEnd = segments.length > 0 ? segments[segments.length - 1].end : guess.end + 1;
-    const preScanSec = Number(process.env.TARGET_DIAR_PRE_SCAN_SEC ?? 8 * 60);
-    const postScanSec = Number(process.env.TARGET_DIAR_POST_SCAN_SEC ?? 8 * 60);
-    const anchorSec = Number(process.env.TARGET_DIAR_ANCHOR_SEC ?? 80);
+    const preScanSec = Number(process.env.TARGET_DIAR_PRE_SCAN_SEC ?? 120);
+    const postScanSec = Number(process.env.TARGET_DIAR_POST_SCAN_SEC ?? 120);
+    const anchorSec = Number(process.env.TARGET_DIAR_ANCHOR_SEC ?? 30);
+    const maxConfirmGapSec = Number(process.env.TARGET_DIAR_MAX_CONFIRM_GAP_SEC ?? 30);
 
-    const preWindowStart = Math.max(0, guess.start - preScanSec);
-    const preWindowEnd = Math.min(audioEnd, guess.start + anchorSec);
-    const postWindowStart = Math.max(0, guess.end - anchorSec);
-    const postWindowEnd = Math.min(audioEnd, guess.end + postScanSec);
+    const startCandidates = guess.startCandidates.length > 0 ? guess.startCandidates : [guess.start];
+    const endCandidates = guess.endCandidates.length > 0 ? guess.endCandidates : [guess.end];
+    const earliestStartSeed = Math.min(...startCandidates);
+    const latestStartSeed = Math.max(...startCandidates);
+    const earliestEndSeed = Math.min(...endCandidates);
+    const latestEndSeed = Math.max(...endCandidates);
+
+    const preWindowStart = Math.max(0, earliestStartSeed - preScanSec);
+    const preWindowEnd = Math.min(audioEnd, latestStartSeed + anchorSec);
+    const postWindowStart = Math.max(0, earliestEndSeed - anchorSec);
+    const postWindowEnd = Math.min(audioEnd, latestEndSeed + postScanSec);
 
     const tmpDir = path.join(workDir, 'processed');
     fs.mkdirSync(tmpDir, { recursive: true });
@@ -266,12 +453,12 @@ async function main() {
     console.log('Extracting pre window chunk...');
     await extractChunk(audioPath, preChunk, preWindowStart, preWindowEnd);
     console.log('Running diarization on pre window...');
-    const preTurnsAbs = absoluteTurns(await runDiarize(preChunk), preWindowStart);
+    const preTurnsAbs = absoluteTurns(await runDiarize(preChunk), preWindowStart, 'pre');
 
     console.log('Extracting post window chunk...');
     await extractChunk(audioPath, postChunk, postWindowStart, postWindowEnd);
     console.log('Running diarization on post window...');
-    const postTurnsAbs = absoluteTurns(await runDiarize(postChunk), postWindowStart);
+    const postTurnsAbs = absoluteTurns(await runDiarize(postChunk), postWindowStart, 'post');
 
     const preAnchorStart = Math.max(preWindowStart, guess.start + 10);
     const preAnchorEnd = Math.min(preWindowEnd, guess.start + 70);
@@ -282,18 +469,86 @@ async function main() {
     const postSpeaker = pickAnchorSpeaker(postTurnsAbs, postAnchorStart, postAnchorEnd) ?? preSpeaker;
     if (!preSpeaker || !postSpeaker) throw new Error('Failed to resolve anchor speaker from targeted windows.');
 
-    const refinedStart = refineStart(preTurnsAbs, preSpeaker, guess.start);
-    const refinedEnd = refineEnd(postTurnsAbs, postSpeaker, guess.end);
-    const padded = applyPadding(refinedStart, refinedEnd, segments);
+    const startSpeaker = preSpeaker;
+    const endSpeaker = postSpeaker;
+    const allTurns = [...preTurnsAbs, ...postTurnsAbs].sort((a, b) => a.start - b.start);
+    let refinedStart = refineStart(preTurnsAbs, startSpeaker, guess.start);
+    let refinedEnd = refineEnd(postTurnsAbs, endSpeaker, guess.end);
+    let startChosenBy = 'primary';
+    let endChosenBy = 'primary';
+
+    for (const c of startCandidates) {
+        const candidateStart = refineStart(preTurnsAbs, startSpeaker, c);
+        const prev = previousTurnBefore(preTurnsAbs, candidateStart);
+        if (prev && prev.speaker !== startSpeaker && candidateStart - prev.end <= maxConfirmGapSec) {
+            refinedStart = candidateStart;
+            startChosenBy = `candidate:${c}`;
+            break;
+        }
+    }
+
+    if (startChosenBy === 'primary') {
+        const fallbackStart = findLatestOtherToTargetStartTransition(preTurnsAbs, startSpeaker, refinedStart);
+        if (fallbackStart != null) {
+            refinedStart = refineStart(preTurnsAbs, startSpeaker, fallbackStart);
+            startChosenBy = 'sequential-fallback';
+        }
+    }
+
+    for (const c of endCandidates) {
+        const candidateEnd = refineEnd(postTurnsAbs, endSpeaker, c);
+        const next = nextTurnAfter(postTurnsAbs, candidateEnd);
+        if (next && next.speaker !== endSpeaker && next.start - candidateEnd <= maxConfirmGapSec) {
+            refinedEnd = candidateEnd;
+            endChosenBy = `candidate:${c}`;
+            break;
+        }
+    }
+
+    if (endChosenBy === 'primary') {
+        const fallbackEnd = findEarliestTargetToOtherEndTransition(postTurnsAbs, endSpeaker, refinedEnd);
+        if (fallbackEnd != null) {
+            refinedEnd = refineEnd(postTurnsAbs, endSpeaker, fallbackEnd);
+            endChosenBy = 'sequential-fallback';
+        }
+    }
+
+    const padded = applyPadding(refinedStart, refinedEnd, segments, allTurns, startSpeaker, endSpeaker);
+    const prevAtStart = previousTurnBefore(preTurnsAbs, refinedStart);
+    const nextAtEnd = nextTurnAfter(postTurnsAbs, refinedEnd);
 
     const output = {
         guess: {
             start_sec: guess.start,
-            end_sec: guess.end
+            end_sec: guess.end,
+            start_candidates_sec: startCandidates,
+            end_candidates_sec: endCandidates
+        },
+        selected_target_speaker: {
+            start: startSpeaker,
+            end: endSpeaker
+        },
+        boundary_confirmation: {
+            start_confirmed_change_of_speaker: Boolean(prevAtStart && prevAtStart.speaker !== startSpeaker),
+            end_confirmed_change_of_speaker: Boolean(nextAtEnd && nextAtEnd.speaker !== endSpeaker),
+            start_chosen_by: startChosenBy,
+            end_chosen_by: endChosenBy,
+            start_previous_turn: prevAtStart,
+            end_next_turn: nextAtEnd
         },
         targeted_windows: {
-            pre: { start_sec: preWindowStart, end_sec: preWindowEnd, anchor_speaker: preSpeaker, turns: preTurnsAbs },
-            post: { start_sec: postWindowStart, end_sec: postWindowEnd, anchor_speaker: postSpeaker, turns: postTurnsAbs }
+            pre: {
+                start_sec: preWindowStart,
+                end_sec: preWindowEnd,
+                anchor_speaker: preSpeaker,
+                turns: enrichTurnsWithTranscript(preTurnsAbs, segments)
+            },
+            post: {
+                start_sec: postWindowStart,
+                end_sec: postWindowEnd,
+                anchor_speaker: postSpeaker,
+                turns: enrichTurnsWithTranscript(postTurnsAbs, segments)
+            }
         },
         refined_speaker_bounds: {
             start_sec: refinedStart,
