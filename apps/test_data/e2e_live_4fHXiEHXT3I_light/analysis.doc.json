@@ -1,9 +1,9 @@
 {
   "version": "1.0.0",
-  "generated_at": "2026-02-24T18:25:09.488Z",
+  "generated_at": "2026-02-25T00:57:34.378Z",
   "boundaries": {
     "start": 3811.47,
-    "end": 5465.97
+    "end": 5901.14
   },
   "chapters": [
     {
@@ -33,7 +33,7 @@
     {
       "start": 1980,
       "end": 2879.37,
-      "title": "Congregational Worship and Prayer",
+      "title": "Worship and Prayer",
       "type": "congregational_music",
       "confidence": 0.45,
       "reason": "Worship songs, communal prayers and pastoral intercession leading into sermon;signal_mismatch_music;split_pre_sermon_intro"
@@ -57,7 +57,7 @@
     {
       "start": 5465.97,
       "end": 5670,
-      "title": "Altar Call and Response",
+      "title": "Invitation / Altar Call",
       "type": "offering",
       "confidence": 0.6,
       "reason": "Likely time for offering/response immediately after sermon"
@@ -1054,343 +1054,343 @@
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2027.44,
       "end": 2030.02,
       "text": "Dulce que tú se"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2032.2,
       "end": 2033.9,
       "text": "difuncés."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2063.47,
       "end": 2064.59,
       "text": "Siempre que"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2067.21,
       "end": 2070.71,
       "text": "en sus olas de amor se lee."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2076.89,
       "end": 2077.89,
       "text": "Este solo"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2085.92,
       "end": 2086.98,
       "text": "está"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2089.09,
       "end": 2090.39,
       "text": "tan seguro"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2095.67,
       "end": 2097.03,
       "text": "mientras mire."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2108.65,
       "end": 2109.75,
       "text": "Es aquella"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2124.4,
       "end": 2125.32,
       "text": "estrella."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2198.04,
       "end": 2201.26,
       "text": "Amén, qué maravillosa paz tenemos en Cristo."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2203.06,
       "end": 2216,
       "text": "Esa paz solo es posible por la gracia de Cristo, que vino y murió por nosotros, no hay otra forma de que tú y yo tengamos bendición y paz si no fuera por el sacrificio de Jesús."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2216.84,
       "end": 2222.38,
       "text": "Alabemos a Cristo, quien murió por nosotros, se entregó y está presente aquí."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2224.91,
       "end": 2233.41,
       "text": "Si tienes algún pedido especial, te invitamos también a medias que cantamos, ir pasando aquí al frente para entregar todo lo que somos a los pies de Cristo. Vamos a cantar."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2315.17,
       "end": 2318.27,
       "text": "Es tu eterno amor,"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2322.21,
       "end": 2325.45,
       "text": "tus manos midan"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2328.42,
       "end": 2335.54,
       "text": "Y las sepultaste en el fondo del mar Por"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2353.65,
       "end": 2357.33,
       "text": "eso estoy ante ti Yo"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2527.41,
       "end": 2534.57,
       "text": "me emociona muchísimo cantar esta lavanza Porque ¿qué seríamos nosotros sin la maravillosa gracia de nuestro Señor?"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2534.57,
       "end": 2542.57,
       "text": "Esa sublime gracia que impactó el mundo y que hoy gracias a esa gracia estamos aquí."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2543.63,
       "end": 2545.77,
       "text": "Hoy hay muchos motivos de oración."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2546.79,
       "end": 2550.89,
       "text": "Hay motivos que ya públicamente se conocen."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2550.97,
       "end": 2562.93,
       "text": "Hemos estado orando por diversas situaciones de salud, diversas situaciones que nuestro cuerpo, nuestros miembros del cuerpo están pasando y están sufriendo."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2562.93,
       "end": 2584.87,
       "text": "y sabemos que aunque nos duele a un dedo todo el cuerpo sufre y así es esta figura de la iglesia cuando un miembro de este cuerpo sufre a todos nos duele, es por eso que hoy nos unimos en oración y seguimos pidiendo por ese milagro que Dios está haciendo en la vida del pastor Stout y tantas personas que están también pasando por situaciones de salud complejas."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2586.11,
       "end": 2593.39,
       "text": "Permite que podamos juntos y especialmente lo que están aquí adelante tienen motivos y han expresado pasando aquí a este lugar."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2594.67,
       "end": 2597.77,
       "text": "Puede decirte, Dios está al control de tu vida."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2598.29,
       "end": 2604.09,
       "text": "Dios sabe que está en lo profundo de tu corazón y Él está trabajando a tu favor."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2604.97,
       "end": 2610.59,
       "text": "Es por eso que hoy en este acto de arrodillarnos y dorar simplemente hemos venido a rendirnos a Su voluntad."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2610.91,
       "end": 2619.89,
       "text": "Sabiendo que así podemos encontrar esa paz que Aaron también nos mencionaba, que no es por la situación, sino es por el Dios en el quien servimos."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2620.29,
       "end": 2624.71,
       "text": "Vamos a inclinarnos, vamos a rodillarnos y podes y vamos a hacer esta oración especial."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2633.39,
       "end": 2638.19,
       "text": "Amado Padre, que estás en los cielos y según tu promesa también estás aquí en medio de nosotros."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2640.6,
       "end": 2646.5,
       "text": "Hoy oramos con fe de que tú nos escuchas, a pesar de nuestros errores, a pesar de nuestro pasado,"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2648,
       "end": 2655.64,
       "text": "sabiendo que tú eres un Dios misericordioso, sabiendo que tú eres un Dios perdonador, sabiendo que tú eres un Dios real."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2656.8,
       "end": 2661.88,
       "text": "Hoy, Señor, queremos seguir pidiéndote por nuestro querido pastor Stout, por su salud."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2662.88,
       "end": 2667.62,
       "text": "Se ven mejoras considerables y eso solamente obra de tus manos."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2668.3,
       "end": 2683.26,
       "text": "Queremos seguir orando por él, por su vida, por nuestra hermana Inés, por fortaleza y también queremos orar por Ivana Morales, orar por la salud de la niña, de su niña, para que Dios pueda fortalecer allí."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2684.4,
       "end": 2698.62,
       "text": "También hablamos por nuestro querido Pastor Riso que está en este viaje emisionero a Cuba, permite que él con todos los que están yendo puedan ser una gran bendición en donde estén y puedan llevar ese evangelio que es buena noticia aún en esa situación tan compleja."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2699.68,
       "end": 2706.64,
       "text": "Seguir pidiéndote por estas situaciones migratorias, situaciones económicas que tus hijos están cargando hoy."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2707.52,
       "end": 2733.72,
       "text": "Tenemos un padre que conoce nuestras necesidades y que él lo prometió, tú lo prometiste, señor, si te buscamos primero todas estas cosas van a ser añadidas y es por eso que hoy postrados aquí hemos venido a decidir buscarte primero, ponerte primero, rendirnos a ti, sabiendo que tú estás y vas a seguir trabajando en las vidas aquí de tu pueblo."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2734.98,
       "end": 2755.24,
       "text": "Señor, queremos terminar esta oración agradeciéndote por esas maravillosas gracias y pidiéndote, señor, que este mensaje que vamos a escuchar y que todos vamos a abrazar el día de hoy, si sí lo queremos, señor, si sí lo disponemos, que sea un mensaje dirigido por ti y que pueda ser transformador para nuestras vidas."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2755.98,
       "end": 2757.9,
       "text": "Lo pedimos en el maravilloso nombre de Jesús."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2758.68,
       "end": 2759.36,
       "text": "Amén, señor."
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2770.7,
       "end": 2771.12,
       "text": "Así como"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2772.66,
       "end": 2778.58,
       "text": "Y incomparable estuete, no"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2781.59,
       "end": 2783.13,
       "text": "haste en tus"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2784.82,
       "end": 2800.88,
       "text": "mil niquidad Y las sepultaste en el fondo del mar Nunca podré, nunca podré"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2813.14,
       "end": 2813.58,
       "text": "ser"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2818.6,
       "end": 2819.86,
       "text": "ante te"
     },
     {
       "chapter_index": 3,
-      "chapter_title": "Congregational Worship and Prayer",
+      "chapter_title": "Worship and Prayer",
       "start": 2821.56,
       "end": 2822.32,
       "text": "en su..."
@@ -3308,21 +3308,21 @@
     },
     {
       "chapter_index": 6,
-      "chapter_title": "Altar Call and Response",
+      "chapter_title": "Invitation / Altar Call",
       "start": 5468.83,
       "end": 5482.69,
       "text": "Muchas veces se ha mirado esto como un tabú en la iglesia pero hay cosas que necesitas, tú necesitas nombrar, necesitas herramientas para poder lidiar con cosas que tú solo no puedes por eso no le temas de buscar ayuda profesional."
     },
     {
       "chapter_index": 6,
-      "chapter_title": "Altar Call and Response",
+      "chapter_title": "Invitation / Altar Call",
       "start": 5484.31,
       "end": 5528.91,
       "text": "Termino con esto y vamos a cantar maravillosa gracia Juan día 10 dice el ladrón no viene más que robar matar y destruir eso es lo que quiere el enemigo esa es la voz de tus errores destruirte pero a qué vino Jesús dice yo he venido para que tengan vida y la tengan en abundancia Jesús vino para darte vida y para que la tengas en abundancia No seas como Lot, sé como Ruth, y rompe ese ciclo generacional que te está pesando y cambia la vida de tu vida, de tu familia y de las generaciones que vienen al futuro."
     },
     {
       "chapter_index": 6,
-      "chapter_title": "Altar Call and Response",
+      "chapter_title": "Invitation / Altar Call",
       "start": 5529.55,
       "end": 5553.19,
       "text": "Vamos a cantar, vamos a ponernos de pie si hoy quieres responder a nuestro Dios con esta invitación vamos a cantar de esta maravillosa gracia, está al avanza, la hizo una amiga en Chile y siempre me emociona y es una alabanza que hoy quiero que sea tu oración así que quiero que nos acompañes y vamos a cantar juntos, maravillosa gracia."

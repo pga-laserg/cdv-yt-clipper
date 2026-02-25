@@ -1,7 +1,7 @@
 # Transcript Polished Review
 
-Generated: 2026-02-24T18:25:09.488Z
-Sermon bounds: 01:03:31 - 01:31:05
+Generated: 2026-02-25T00:57:34.378Z
+Sermon bounds: 01:03:31 - 01:38:21
 
 ## 1. Welcome & Opening Remarks
 - Type: welcome
@@ -280,7 +280,7 @@ Sermon bounds: 01:03:31 - 01:31:05
 
 [00:32:35 - 00:33:14] Y cuando pensamos para qué fue usado este versículo, estas palabras que él dedicó hacia ellos, podemos ver que este versículo es más profundo de lo que a primera vista o sea, lo hacemos, que sea, entonces, yo pienso que tenemos que celebrar esta paz que Dios nos da, aún en los momentos de angustia y en los momentos de dolor, entonces les invitamos a que canten con nosotros, esta canción Juan Dulce Paz.
 
-## 4. Congregational Worship and Prayer
+## 4. Worship and Prayer
 - Type: congregational_music
 - Range: 00:33:00 - 00:47:59
 - Confidence: 0.45
@@ -939,7 +939,7 @@ Sermon bounds: 01:03:31 - 01:31:05
 
 [01:30:50 - 01:31:07] brasileño profesional marcus araúllo escribió esta frase y por eso quiero ir al último consejo no le Jesús te sana con milagros pero también con el milagro de profesionales que te pueden ayudar con terapia profesional.
 
-## 7. Altar Call and Response
+## 7. Invitation / Altar Call
 - Type: offering
 - Range: 01:31:05 - 01:34:30
 - Confidence: 0.60

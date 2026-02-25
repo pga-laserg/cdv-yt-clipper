@@ -265,14 +265,14 @@
     "end_sec": 5464.96
   },
   "final_clip_bounds": {
-    "clip_start_sec": 2869.37,
+    "clip_start_sec": 3811.47,
     "clip_end_sec": 5901.14,
-    "applied_pre_pad_sec": 10,
+    "applied_pre_pad_sec": 0.7600000000002183,
     "applied_post_pad_sec": 10,
     "next_speech_start_sec": 5465.97,
     "prev_other_speaker_end_sec": null,
     "next_other_speaker_start_sec": null,
-    "padding_source": "manual_recompute_transcript_only"
+    "padding_source": "analyze.llm_single_adjudicator"
   },
   "llm_fallback": {
     "invoked": false,
@@ -283,10 +283,16 @@
     "reason": "disabled"
   },
   "llm_single_adjudicator": {
-    "start": 2879.37,
+    "start": 3812.23,
     "end": 5891.14,
-    "confidence": 0.88,
+    "confidence": 0.87,
     "decision": "adjust",
-    "reason": "Chapter + closing-arbiter adjudication applied."
+    "reason": "Use chapter-aligned sermon START; extend END to include contiguous altar call (them. tied) but exclude closing/farewell per policy.; closing_arbiter(benediction): Closing prayer concluded with Amen followed by pastoral benediction and final blessing, signaling transition out of sermon/altar-call response into post-service announcements/social time."
+  },
+  "llm_single_adjudicator_padded": {
+    "clip_start_sec": 3811.47,
+    "clip_end_sec": 5901.14,
+    "applied_pre_pad_sec": 0.7600000000002183,
+    "applied_post_pad_sec": 10
   }
 }

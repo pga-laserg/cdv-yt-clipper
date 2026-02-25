@@ -1,0 +1,2235 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-02-25T01:15:38.662Z",
+  "boundaries": {
+    "start": 1867.46,
+    "end": 5101.54
+  },
+  "chapters": [
+    {
+      "start": 0,
+      "end": 135,
+      "title": "Bienvenida y saludo inicial",
+      "type": "welcome",
+      "confidence": 0.9,
+      "reason": "saludos iniciales y exhorto de inicio"
+    },
+    {
+      "start": 135,
+      "end": 270,
+      "title": "Oración de apertura",
+      "type": "opening_prayer",
+      "confidence": 0.9,
+      "reason": "invitación a cerrar ojos y orar"
+    },
+    {
+      "start": 270,
+      "end": 585,
+      "title": "Presentación infantil / fábula y oración",
+      "type": "child_presentation",
+      "confidence": 0.92,
+      "reason": "fábula para niños y plegaria infantil"
+    },
+    {
+      "start": 585,
+      "end": 720,
+      "title": "Témpanos, ofrenda y anuncios cortos",
+      "type": "offering",
+      "confidence": 0.8,
+      "reason": "lectura de Malacías 3:10 y llamado a diezmos/ofrendas"
+    },
+    {
+      "start": 720,
+      "end": 1870.031,
+      "title": "Alabanza y Adoración",
+      "type": "congregational_music",
+      "confidence": 0.45,
+      "reason": "anuncio de alabanza y varios minutos de música/interludio;signal_mismatch_music"
+    },
+    {
+      "start": 1870.031,
+      "end": 4929.79,
+      "title": "Sermón principal",
+      "type": "sermon",
+      "confidence": 0.95,
+      "reason": "coincide con límites locales de inicio y fin del sermón"
+    },
+    {
+      "start": 4929.79,
+      "end": 5103.98,
+      "title": "Cierre y bendición final",
+      "type": "post_sermon_response",
+      "confidence": 0.88,
+      "reason": "comentarios finales, amén y despedida"
+    }
+  ],
+  "chapter_signals": [
+    {
+      "speech_ratio": 1,
+      "music_ratio": 0,
+      "noenergy_ratio": 0,
+      "has_music": false,
+      "has_long_pause": false
+    },
+    {
+      "speech_ratio": 0.985,
+      "music_ratio": 0,
+      "noenergy_ratio": 0,
+      "has_music": false,
+      "has_long_pause": false
+    },
+    {
+      "speech_ratio": 0.981,
+      "music_ratio": 0,
+      "noenergy_ratio": 0.013,
+      "has_music": false,
+      "has_long_pause": false
+    },
+    {
+      "speech_ratio": 1,
+      "music_ratio": 0,
+      "noenergy_ratio": 0,
+      "has_music": false,
+      "has_long_pause": false
+    },
+    {
+      "speech_ratio": 1,
+      "music_ratio": 0,
+      "noenergy_ratio": 0,
+      "has_music": false,
+      "has_long_pause": false
+    },
+    {
+      "speech_ratio": 0.976,
+      "music_ratio": 0.001,
+      "noenergy_ratio": 0.012,
+      "has_music": false,
+      "has_long_pause": false
+    },
+    {
+      "speech_ratio": 1,
+      "music_ratio": 0,
+      "noenergy_ratio": 0,
+      "has_music": false,
+      "has_long_pause": false
+    }
+  ],
+  "cues": {
+    "music_sections": 1,
+    "noenergy_sections": 17,
+    "long_pause_sections": 3
+  },
+  "paragraphs": [
+    {
+      "chapter_index": 0,
+      "chapter_title": "Bienvenida y saludo inicial",
+      "start": 16.91,
+      "end": 18.07,
+      "text": "Buenos días, feliz sábado."
+    },
+    {
+      "chapter_index": 0,
+      "chapter_title": "Bienvenida y saludo inicial",
+      "start": 18.89,
+      "end": 20.83,
+      "text": "Dios les bendiga a cada uno de ustedes."
+    },
+    {
+      "chapter_index": 0,
+      "chapter_title": "Bienvenida y saludo inicial",
+      "start": 21.21,
+      "end": 25.71,
+      "text": "Sabes que de todos los días del año, el sábado siempre es el día más especial."
+    },
+    {
+      "chapter_index": 0,
+      "chapter_title": "Bienvenida y saludo inicial",
+      "start": 26.27,
+      "end": 30.49,
+      "text": "Es un día que Dios apartó para que podamos estar con Él, para que podamos adorarle."
+    },
+    {
+      "chapter_index": 0,
+      "chapter_title": "Bienvenida y saludo inicial",
+      "start": 30.97,
+      "end": 35.53,
+      "text": "Y no hay bendición más especial que estar acá hoy, el último sábado del año."
+    },
+    {
+      "chapter_index": 0,
+      "chapter_title": "Bienvenida y saludo inicial",
+      "start": 35.99,
+      "end": 41.51,
+      "text": "Mientras cerramos el 2025, podemos mirar hacia atrás y regolar todas las bendiciones que Dios nos ha dado."
+    },
+    {
+      "chapter_index": 0,
+      "chapter_title": "Bienvenida y saludo inicial",
+      "start": 42.03,
+      "end": 45.49,
+      "text": "Estamos acá hoy, es porque Dios nos hasta aquí nos ha acompañado."
+    },
+    {
+      "chapter_index": 0,
+      "chapter_title": "Bienvenida y saludo inicial",
+      "start": 46.37,
+      "end": 101.03,
+      "text": "esta vez ha sido un año desafiante, esta vez ha sido un año con con dificultades, esta vez que uno nos hemos enfermado, algunos hemos pasado alguna dificultad, pero de igual manera a Dios nos ha bendecido lo suficiente para estar aquí hoy, de igual manera a Dios nos ha acompañado para que cerremos juntos este año. Así que esta mañana de parte de nuestra iglesia, de parte del equipo pastoral le queremos dar a todos una cordiar bienvenida, decirles que se sientan a gusto en este lugar, darles un agradecimiento por estar acá hoy a escoger de todos los lugares donde puedes haber estado, escogiste estar hoy acá en la iglesia central del valle, una iglesia de brazos abiertos, así que de parte de nuestra iglesia, de parte del equipo pastoral, queremos darle un feliz sábado y un feliz año nuevo a cada uno de ustedes. Así que antes de comenzar les pido que cerremos nuestros ojos allí donde están y teniamos una oración para darle inicio al programa de esta mañana. ¿Oramos?"
+    },
+    {
+      "chapter_index": 0,
+      "chapter_title": "Bienvenida y saludo inicial",
+      "start": 104.41,
+      "end": 107.35,
+      "text": "Amados agradecidos por todo lo que tú has hecho por nosotros."
+    },
+    {
+      "chapter_index": 0,
+      "chapter_title": "Bienvenida y saludo inicial",
+      "start": 108.03,
+      "end": 114.13,
+      "text": "Señor, durante todo un año tú nos has cuidado, durante todo un año tú nos has bendecido de manera especial."
+    },
+    {
+      "chapter_index": 0,
+      "chapter_title": "Bienvenida y saludo inicial",
+      "start": 114.71,
+      "end": 147.41,
+      "text": "Y hoy, el último sábado de este año, te queremos alabar y queremos honrar tu hermoso y grandioso nombre. En esta mañana queremos sentir tu presencia acá con nosotros, que tú puedas tocar al predicador, que ha de presentar tu palabra esta mañana, que tú puedas tocar nuestros corazones y que Podemos salir de aquí, Dios, no solo agradecidos por un año que tú nos has dado, sino con renovadas fuerzas para que este próximo año 2026 podamos seguir sirviéndote, podamos seguir caminando hacia las mansiones celestiales. Te agradecemos esto, señores, en nombre de Jesús."
+    },
+    {
+      "chapter_index": 1,
+      "chapter_title": "Oración de apertura",
+      "start": 148.07,
+      "end": 150.49,
+      "text": "Amén. Dios le bendiga a Crilesia. Feliz Ago, nuevamente."
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 305.19,
+      "end": 307.91,
+      "text": "Les quiero platicar, les quiero contar una historia."
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 308.67,
+      "end": 311.09,
+      "text": "Una fábula. ¿Ustedes saben que es una fábula?"
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 311.91,
+      "end": 345.83,
+      "text": "¿No saben que es una fábula? Una fábula es cuando los personajes o son animales o son cosas y hablan entonces les voy a contar una fábula en el campo había un enorme roble grande muy impresionante pero ese roble saben que decía él decía pues yo no sé hacer nada estoy aquí no tengo flores no tengo fruto y estaba muy triste entonces el manzano ¿Qué es el manzano?"
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 347.95,
+      "end": 349.95,
+      "text": "Es el árbol que da las manzanas."
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 350.19,
+      "end": 351.91,
+      "text": "Le dijo, pues, esfuérzate."
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 352.31,
+      "end": 355.09,
+      "text": "Esfuérzate y puedes dar manzanas como yo."
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 355.35,
+      "end": 356.49,
+      "text": "Esfuérzate, esfuérzate."
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 357.09,
+      "end": 359.63,
+      "text": "Pero el roble no podía dar manzanas."
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 360.03,
+      "end": 361.13,
+      "text": "Y le dijo el rosal."
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 361.47,
+      "end": 362.25,
+      "text": "¿Saben qué es el rosal?"
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 364.46,
+      "end": 370.14,
+      "text": "La planta que da las rosas, le dijo, no, olvídate de las manzanas."
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 370.38,
+      "end": 372.96,
+      "text": "Mejor da flores, es más simple, más sencillo."
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 372.96,
+      "end": 391.5,
+      "text": "Pero tampoco podía hacer flores, ni de rosas, ni claveles, y no podía el roble, y cada vez se ponía más triste, pero ahí entre las ramas estaba un búho, ¿saben cuál es el búho?"
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 392.1,
+      "end": 397.6,
+      "text": "Sí, el árbol que tiene los ojos trandotes, le dijo, no le dijo, yo te puedo ayudar."
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 397.6,
+      "end": 495.82,
+      "text": "tu problema es el problema que muchos tienen, muchos serios tienen, lo que pasa es que te haces forzado por ser como los demás, tu no puedes dar flores porque no eres un rosal y no puedes dar manzanas porque no eres un manzano, tu eres un roble, mira que grande y espectacular eres, tus ramas son grandes, muchos pajaritos vienen a tus ramas y se y se hacen sus nidos aquí, también das mucha sombra y muchos se acercan a ti porque tienes muy buena sombra y tienes muchas cualidades, el campo se ve más hermoso porque tú estás aquí, eres verde y hermoso, sabe niños que nosotros a veces tenemos también el problema del roble, queremos ser como los demás y a veces pues no nos sale, queremos vestirlos como los demás y a veces no nos queda esa ropa, o no podemos tenerla, pero eso no es malo, nosotros tenemos muchas cualidades, si nosotros nos vemos a nosotros mismos no somos mejores que los demás, pero los demás no son mejores que nosotros, todos Jesús nos hizo únicos y muy especiales y con muchas cualidades, solamente que nosotros tenemos que ver qué es lo que tenemos especial, ese talento que Jesús puso a nosotros y saben para qué son los talentos que Dios nos dio?"
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 497.32,
+      "end": 566.46,
+      "text": "Pues nos dio cualidades y muchos talentos, primero para adorar a Dios y segundo para ayudar a los demás nadie nadie nadie por su estatura o por su color o por su sonrisa o su pelo nadie es mejor que los demás el pelo que Dios nos dio es especial y ese debemos llamar y cuidar en los ojos que tenemos son muy especiales y no los tenemos azules o verdes no no importa el color café es muy lindo y ustedes tienen que pensar que Jesús los hizo muy especiales, ok, vamos a hacer una oración y decirle gracias a Jesús por cómo nos hizo, ok, vamos a cerrar los ojitos, querido Jesús gracias te damos porque nos hiciste exactamente como nos hiciste, tal vez no seamos altos o no seamos rubios pero nuestro color y nuestra nuestra estatura y el lugar donde nosotros estamos y nos pusiste ahí debemos de ser felices ayúdanos a hacerlo señor. Gracias por todo lo que has hecho por nosotros."
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 567.08,
+      "end": 568.3,
+      "text": "En el nombre de Jesús."
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 580.23,
+      "end": 582.51,
+      "text": "Felizado familia, ¿Cómo están?"
+    },
+    {
+      "chapter_index": 2,
+      "chapter_title": "Presentación infantil / fábula y oración",
+      "start": 584.03,
+      "end": 600.67,
+      "text": "Les quería leer un versículo para los diezmos y las ofrendas. Se encuentra en Malacías capítulo 3 versículo 10 y dice así trae todos los diosmos al alfoli y hay alimento en mi casa, probadme ahora en esto, dice Jehová de los ejércitos, a ver si nos abró las puertas."
+    },
+    {
+      "chapter_index": 3,
+      "chapter_title": "Témpanos, ofrenda y anuncios cortos",
+      "start": 602.21,
+      "end": 607.45,
+      "text": "Familia, Dios nos pide que seamos fieles en los diosmos y las ofrendas porque todo lo que recibimos es gracias a Él."
+    },
+    {
+      "chapter_index": 3,
+      "chapter_title": "Témpanos, ofrenda y anuncios cortos",
+      "start": 608.15,
+      "end": 613.93,
+      "text": "Invito a los diáconos que se paren para la versión final, para los diosmos y las ofrendas."
+    },
+    {
+      "chapter_index": 3,
+      "chapter_title": "Témpanos, ofrenda y anuncios cortos",
+      "start": 615.41,
+      "end": 616.31,
+      "text": "Quienemos el rostro."
+    },
+    {
+      "chapter_index": 3,
+      "chapter_title": "Témpanos, ofrenda y anuncios cortos",
+      "start": 617.67,
+      "end": 626.85,
+      "text": "Para el Todo Poderoso, tengo gracias por este sábado y por los diosmos que nos desgraciado, te piensas bien días y vienes al destino donde vayan los días y las ofrendas."
+    },
+    {
+      "chapter_index": 3,
+      "chapter_title": "Témpanos, ofrenda y anuncios cortos",
+      "start": 627.15,
+      "end": 628.31,
+      "text": "El nombre de Jesús. Amen."
+    },
+    {
+      "chapter_index": 3,
+      "chapter_title": "Témpanos, ofrenda y anuncios cortos",
+      "start": 667.47,
+      "end": 668.61,
+      "text": "Feliz sábado familia."
+    },
+    {
+      "chapter_index": 3,
+      "chapter_title": "Témpanos, ofrenda y anuncios cortos",
+      "start": 670.23,
+      "end": 681.45,
+      "text": "Estamos celebrando ya nuestro último sábado del año y es una celebración porque el señor nos permite estar en su casa y porque su espíritu santo está con nosotros. Amen."
+    },
+    {
+      "chapter_index": 3,
+      "chapter_title": "Témpanos, ofrenda y anuncios cortos",
+      "start": 683.09,
+      "end": 687.75,
+      "text": "Vamos a comenzar nuestra alabanza con bienvenido a en la casa."
+    },
+    {
+      "chapter_index": 3,
+      "chapter_title": "Témpanos, ofrenda y anuncios cortos",
+      "start": 688.95,
+      "end": 698.15,
+      "text": "Es hermoso pensar que es un sábado para que se acabe el año, pero también es un año menos para que podamos disfrutar en la patria celestial."
+    },
+    {
+      "chapter_index": 3,
+      "chapter_title": "Témpanos, ofrenda y anuncios cortos",
+      "start": 698.79,
+      "end": 706.21,
+      "text": "No sé con qué canto vamos a iniciar allá, pero espero que el Señor Jesús con los brazos abiertos nos diga bienvenido a casa."
+    },
+    {
+      "chapter_index": 3,
+      "chapter_title": "Témpanos, ofrenda y anuncios cortos",
+      "start": 706.91,
+      "end": 725.41,
+      "text": "Así que mientras estamos cantando, los quieren invitar a ponernos de pie a saludar, a que podamos dar la bienvenida a lo mejor y esperemos en Dios que sea el último sábado de nuestras vidas aquí en la tierra y el próximo los celebremos en el cielo, cantemos y venido a casa, pudimos"
+    },
+    {
+      "chapter_index": 4,
+      "chapter_title": "Alabanza y Adoración",
+      "start": 987.17,
+      "end": 1029.38,
+      "text": "celebrar lo que fue el evento más grande de todos los tiempos que fue la avenida de nuestro Señor Jesús y si nos ponemos a pensar en la magnitud y la impresión de las personas que vivieron en ese momento creo que hasta nos daría envidia porque qué bonito poder presenciar el nacimiento del señor y a lo mejor no vivimos en esa época pero primeramente el señor lo veremos volver en gloria y majestad vamos a cantar ahora el mismo aleluya y cantamos con la misma emoción con el mismo ánimo con que se escuchó ese aleluya en Belén Estaba"
+    },
+    {
+      "chapter_index": 4,
+      "chapter_title": "Alabanza y Adoración",
+      "start": 1290.82,
+      "end": 1291.5,
+      "text": "lejos de nuestra"
+    },
+    {
+      "chapter_index": 4,
+      "chapter_title": "Alabanza y Adoración",
+      "start": 1294.03,
+      "end": 1296.39,
+      "text": "presencia, se hicieron presentos"
+    },
+    {
+      "chapter_index": 4,
+      "chapter_title": "Alabanza y Adoración",
+      "start": 1298.47,
+      "end": 1298.89,
+      "text": "bendiciones."
+    },
+    {
+      "chapter_index": 4,
+      "chapter_title": "Alabanza y Adoración",
+      "start": 1571.02,
+      "end": 1582.92,
+      "text": "Darlos a que el que quiera declarar a Cristo sobre su familia, sobre su hogar y sobre su vida, este 2026, pueda acompañarnos allí al frente."
+    },
+    {
+      "chapter_index": 4,
+      "chapter_title": "Alabanza y Adoración",
+      "start": 1583.78,
+      "end": 1584.88,
+      "text": "Queremos hablar por ustedes,"
+    },
+    {
+      "chapter_index": 4,
+      "chapter_title": "Alabanza y Adoración",
+      "start": 1589.96,
+      "end": 1591.36,
+      "text": "lo que pueda tener este año,"
+    },
+    {
+      "chapter_index": 4,
+      "chapter_title": "Alabanza y Adoración",
+      "start": 1596.22,
+      "end": 1599.58,
+      "text": "el Señor esté como centro de nuestras vidas."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 1877.46,
+      "end": 1880.52,
+      "text": "Este año ha sido de gran bendición para todos, no es así?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 1881.7,
+      "end": 1894.58,
+      "text": "el Espíritu Santo se ha guiado nuestras familias, Dios se ha manifestado, sin embargo el día de hoy sé que hay varios de nosotros que tenemos peticiones que necesitamos poner en las manos de nuestro Señor Jesucristo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 1895.36,
+      "end": 1917.96,
+      "text": "Algunas de las que tenemos en nuestra lista es Claudia que seguimos orando por su salud, ella tiene cáncer y necesita que la providencia divina que el toque sanador de Cristo Jesús pueda llegar a su vida, tenemos también a Nicolás, pide por su salud, Lucia maya también, sin duda alguna la enfermedad ha tocado a nuestras puertas pero también Cristo está dentro de nuestro hogar."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 1918.7,
+      "end": 1938.94,
+      "text": "Tenemos las situaciones migratorias alrededor de nuestra iglesia, esta semana incluso escuchaba a unos amigos de Houston que lamentablemente fueron deportados también, es algo que todos los días está con nosotros presentes, sin embargo, en frente del nombre de Cristo no hay nada que pueda mover nuestra trafe."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 1939.72,
+      "end": 1982.18,
+      "text": "Tenemos también algo más personal que quiero compartir con ustedes a mi sobrinito hace dos días, lo tuvieron Quinternaz, mi hermano viajó a Chiapas con su familia, con mi cuñada y lamentablemente le entró una crisis también astmática, una bronquitis astmática y estuvo hospitalizado por dos días. El día de hoy en la mañana me dijo mi hermano que bajó su oxigenación así que pido oración por mi sobrinito. Y si más entre nosotros que necesita oración, mientras oramos te voy a invitar a que levantes la mano y que en esa señal le digas a Cristo que tome tu mano, que tome tus palabras y pueda dar solución. Les invito a que nos coleguemos las rodillas para orar."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 1987.69,
+      "end": 2039.87,
+      "text": "Amante Padre que estás en el cielo Señor, gracias Padre porque en este sábado tenemos el privilegio Señor de poder hablarte, de poder platicar contigo como si estuvieras aquí al lado es más señor estás aquí al lado de nosotros hay muchas peticiones señores nuestros corazones en nuestra mente todas declaran la necesidad que tenemos de ti varios de nuestros hermanos señor claman por auxilio claman por ayuda señor incluso en casa tenemos a nuestro a mi sobrinito señor que necesita de ti sin embargo padre tal como lo dice este último canto declaramos tu nombre, Cristo, sobre nuestras familias, sobre nuestras vidas, Señor, sobre nuestra iglesia, no sólo en central del Valle sino alrededor del mundo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2040.95,
+      "end": 2100.47,
+      "text": "Hay mucha necesidad, Señor, pero no de salud, no sólo de dinero, no sólo de sanidad, Señor, sino de tu nombre padre así como hace dos mil años aproximadamente naciste en este hogar en este lugar señor queremos que nazca hace nuestros corazones otra vez es más padre ya queremos que vengas por segunda vez señor por más bonito que hayas hecho a la creación y que este mundo tenga tan bonitas cosas que provengan de ti no hay nada comparado como encontrarte cara a cara en el cielo así que padre que las profecías que se tengan que cumplir que pasen que prediquemos tu nombre señor para que pronto te veamos por segunda vez gracias señor porque declaramos que tú eres y das la solución para cada una de nuestras situaciones."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2101.23,
+      "end": 2108.33,
+      "text": "Pongo a tu iglesia en tus manos señor, en el nombre de tu hijo mado, Cristo Jesús."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2109.01,
+      "end": 2109.23,
+      "text": "Amén."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2115.61,
+      "end": 2120.33,
+      "text": "Reproclamamos, Jesús en lo alto estás,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2124.05,
+      "end": 2128.09,
+      "text": "sigo sobre toda unidad."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2131.06,
+      "end": 2134.66,
+      "text": "Mi familia, tu nombre"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2170.57,
+      "end": 2174.37,
+      "text": "feliz sábado familia cómo estamos el día de hoy hace"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2175.97,
+      "end": 2258.11,
+      "text": "ratito bendecidos hace el ratito la escuela sabatica lo saludaba y lo dejé a medias yo tengo un saludo muy típico que estoy compartiendo con ustedes cada vez que predico así que mano derecha arriba quien se siente bendecido el día de hoy déjenla arriba mano derecha arriba mano derecha arriba quien se siente bendecido el día de hoy y también mano izquierda quien se encuentra feliz en la casa del señor aprovechen estirarse porque esto se va a familia, tenemos no solo nuestros brazos para descansar sino para lavar el nombre de Cristo en esta mañana, ya casi tarde. Quiero agradecer especialmente a nuestros jóvenes de la iglesia el día de hoy aceptaron el reto el Jude Warship de CDB que estamos formando ya meses atrás con los muchachos que han estado cantando en diferentes eventos aquí del valle estuvieron cantando en los sábados joven de Jordán, en nuestros programas de Revive, en nuestros programas de sociedad de jóvenes en diferentes eventos han estado preparándose cantando así que chicos, Yolet, Gracie, Melanie, que también nos visita la familia de Israel, tenemos ahí en el chelo, tuvimos a Mayen, la guitarra, Israel, quienes más estuvieron Alexis y Charles con nosotros, Azael y Dani Romero, listo, ahora sí me los aprendí. Muchas gracias chicos, excelente trabajo que hicieron el día de hoy, si o no fuimos bendecidos con la música en esta mañana. Hay talento y sé que esta iglesia los apoyará."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2258.83,
+      "end": 2261.79,
+      "text": "Ha sido una semana muy especial, ¿no creen?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2263.45,
+      "end": 2265.35,
+      "text": "Ha sido una semana llena de bendiciones."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2266.63,
+      "end": 2288.27,
+      "text": "Sin embargo, nuestra iglesia se caracteriza también por tener la bendición de recibir a nuestros amigos y visitas con los brazos abiertos. Y sé que entre nosotros está el pastor Saúl. Saúl Flores, muchas gracias por estar con su familia también aquí. Son bienvenidos a la Casa de Dios, a nuestra iglesia central del valle. También que está por ahí, David Ortiz, se me perdió hace el ratito, por aquí está, ah, aquí están."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2289.07,
+      "end": 2298.21,
+      "text": "Muchas gracias por estar con nosotros, que Dios los bendiga, hermana, bendiciones también a toda su familia, esta es su hogar también, gracias por estar aquí."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2298.81,
+      "end": 2308.65,
+      "text": "¿Qué les parece, familia, que antes que abramos la Biblia, que entremos de lleno para llenarnos del poder del Espíritu, la palabra es Señor, inclinemos nuestro rostro y pidamos la dirección divina."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2308.65,
+      "end": 2358.87,
+      "text": "amante padre gracias señor porque esta mañana sabemos que estás con nosotros y nuestro cuerpo físico también señor está en tu presencia sin embargo señor quiero hacer esta oración específica porque probablemente señor nuestra mente no se encuentra en este lugar probablemente nuestro corazón no esté presente aquí señor de cualquier parte en este mundo que se pueda estar volando nuestra mente Señor trae la que a tu casa Señor trae el corazón que está perdido trae la mente que se ha quedado en la casa Señor trae la que a tu presencia Señor para que estemos listos para recibirte para tener un encuentro contigo padre en el nombre de tu hijo mado Cristo Jesús en quien hay salvación, sabiduría Señor."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2359.71,
+      "end": 2360.17,
+      "text": "Amén."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2361.85,
+      "end": 2383.65,
+      "text": "quiero preguntar algo familia y esta es la primera pregunta de esta mañana voy a hacer varias voy a ser bien preguntón quiero preguntarles algo por qué estamos agradecidos el día de hoy hoy 27 de diciembre del año 2025 por qué estamos agradecidos me gustaría escuchar 2 3 4 5 20 si se pueden personas que nos digan por qué estamos agradecidos"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2385.76,
+      "end": 2389.28,
+      "text": "amén gloria a dios hermanita por lo bueno que es hermana"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2391.46,
+      "end": 2398.7,
+      "text": "gloria a dios porque hasta vencer, porque hasta aquí nos ha ayudado. ¿Alguien más? ¿Por qué estamos agradecidos el día de hoy? ¡Rof!"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2405.37,
+      "end": 2409.43,
+      "text": "Amén gloria a Dios. Amén gracias Rod por declarar eso. Gracias."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2409.53,
+      "end": 2410.67,
+      "text": "Aquí dijeron los milagros, doctor."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2412.23,
+      "end": 2414.89,
+      "text": "Por la familia. Gloria a Dios. Por la familia hermanita."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2416.67,
+      "end": 2418.75,
+      "text": "Porque estamos adorando la libertad."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2423.27,
+      "end": 2433.23,
+      "text": "Porque el Espíritu Santo no se rinde y sigue trabajando en nosotros y para nosotros. Por este lado, alguien que quiera compartir un agradecimiento porque estamos agradecidos el día de hoy."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2434.23,
+      "end": 2442.59,
+      "text": "Alguien ahí, alguien ahí, si no los voy a comprometer por la familia, y sabe Divana que siempre la comprometo a ella, así que salven a Divana, es cierto, hermanita."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2446.17,
+      "end": 2466.79,
+      "text": "Amen, y siempre será siermana, gloria a Dios por eso. Bueno, voy a cambiarles la pregunta un poquito, porque ya les pregunté el día de hoy por qué estamos agradecidos, pero si estuviéramos un año adelante, 27, bueno, sería 28 porque se recorden los días. Si fuera 28 de diciembre del año 2026, ¿por qué te gustaría estar agradecido?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2467.55,
+      "end": 2468.59,
+      "text": "¿Por qué hago esta pregunta?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2469.29,
+      "end": 2477.47,
+      "text": "Porque a veces mis queridos hermanos nosotros vivimos también tanto en el pasado, en el presente que también se nos olvida proyectar nuestra vida en el futuro."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2478.31,
+      "end": 2491.39,
+      "text": "Por ejemplo a mí me gustaría decir el próximo año 28 de diciembre, 27 de diciembre del año 2026, a mí me encantaría agradecer al Señor Jesús porque esta y la iglesia va a estar llenas en espacios vacíos."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2492.71,
+      "end": 2499.71,
+      "text": "Porque eso significa que la iglesia se metió a la misión y completó el llenar esta iglesia, va a tener que construir otra o engrandecerla."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2500.79,
+      "end": 2510.37,
+      "text": "Te pregunto, por qué razón, si fuera el 2026, diciembre del 2026, qué razón te gustaría estar agradeciendo el próximo año?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2511.47,
+      "end": 2513.59,
+      "text": "Me gustaría escuchar dos o tres por ahí."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2514.41,
+      "end": 2516.51,
+      "text": "¿Por qué es razón? Ahí atrás, mi hermano."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2525.25,
+      "end": 2525.65,
+      "text": "Amen."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2527.23,
+      "end": 2529.67,
+      "text": "Por un año más de vida, ok."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2531.23,
+      "end": 2545.45,
+      "text": "Por su misericordia. Quiero compartirles algo que anote aquí, que hace una semana y media tuve la oportunidad de dar un taller, una capacitación a unos empresarios del noroeste del país de la zona de Nueva York."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2546.07,
+      "end": 2576.39,
+      "text": "Tengo unos amigos por ahí que tienen empresas y generalmente cada cada mes me buscan y me dicen pastor nos puede ayudar a dar un taller de cómo podemos integrar la fe, nuestros negocios, etcétera. Es un grupo muy bonito porque Dios me da la oportunidad de compartir su palabra a gente que literalmente habla su lenguaje ahora sí que de la vida son los negocios, son los números y podemos compartir la fe con ellos y me gustó lo que uno de ellos respondió. Cuando hice esta pregunta uno de ellos me respondió yo quiero agradecer porque estoy en el cielo"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2578.22,
+      "end": 2579.74,
+      "text": "imagínense"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2581.3,
+      "end": 2608.26,
+      "text": "si el si él dice esta pregunta del 2026 y me dijo si estuviera en el 2026 diciembre yo estaría agradeciendo porque estaría en el cielo y creo que esa es una visión que como cristianos a veces perdemos a veces nos confundimos a veces nos distraemos con tanta cosa que hay en el mundo con tantas cosas que se mueven alrededor de nosotros que perdemos de vista el objetivo de estar en este mundo. Estamos preparándonos para tener un encuentro personal con Dios."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2609.16,
+      "end": 2620.64,
+      "text": "Antes de entrar incluso más a fondo con las ideas de poder estar en el cielo, quiero compartir algo, también una idea que vamos a conectar, que se llama el FOMO."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2621.56,
+      "end": 2634.92,
+      "text": "Los chicos de generación alfa y generación zeta saben a lo que me estoy refiriendo. A algunos de los muchachos que no tenga FOMO y me puede explicar que es el FOMO? Si no lo voy a hacer yo, pero quiero ver si los muchachos algunos quieren ayudar."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2635.58,
+      "end": 2636.26,
+      "text": "¿Qué es FOMO?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2637.4,
+      "end": 2639.62,
+      "text": "Alguien que salve el pastor Ryan de no explicarlo mal."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2640.94,
+      "end": 2646.58,
+      "text": "Muchachos yo sé que hay por aquí. ¿Qué es FOMO? Veo que Mailin se está riendo. No sé si sabes Mailin que es o no."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2647.2,
+      "end": 2648.78,
+      "text": "Sabes que... a ver, explícanos Mailin."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2648.86,
+      "end": 2651.1,
+      "text": "¿Qué es FOMO? Ponte de pie y cuéntanos qué es FOMO."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2656.73,
+      "end": 2661.17,
+      "text": "Siempre me dice que la pongo en entredicho para participar. Pero dale, dale Mailin."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2661.17,
+      "end": 2665.05,
+      "text": "Fero missing out. Fero missing out. ¿Y qué significa eso?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2671.08,
+      "end": 2686.6,
+      "text": "Ok, muchas gracias, Melín. La traducción literal, bueno, en inglés es fero missing out, en español es miedo a perderse algo. Las implicaciones del fomo, que es algo de lo que se habla y que sienten nuestros muchachos hoy en día, vean, es el miedo a no vivir lo suficiente."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2687.66,
+      "end": 2718.42,
+      "text": "El miedo a quedarse fuera de las tendencias, que hay algo que se está hablando en TikTok, algo que se está hablando, bueno que se ve en Pinterest, algo que se comparte en Instagram, ven a sus amigos reunirse, irse a las fiestas, irse a comprar cierta cosa que les está gustando, estar haciendo órdenes a cada rato de compras, lo que sea, el salir al Starbucks con los amigos de la escuela o las fiestas de fin de año o la baile de primavera, entonces a los muchachos, a nuestros jóvenes, les da el perderceso."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2719.48,
+      "end": 2723.02,
+      "text": "¿Cuántos de los padres sabían ese término que ellos están utilizando?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2724.32,
+      "end": 2724.92,
+      "text": "¿Algunos sabían?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2725.66,
+      "end": 2726.5,
+      "text": "Muy pocos, ¿verdad?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2727.34,
+      "end": 2744.1,
+      "text": "Me gustó este término porque es algo que nosotros como cristianos deberíamos hacer una aplicación espiritual y a lo mejor los muchachos me van a odiar por hacer esta aplicación por quitarles una palabra que es muy de ellos, pero el fomo nos debería dar perdernos el cielo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2745.3,
+      "end": 2760.48,
+      "text": "No darnos miedo por no ser parte de las tendencias de este mundo, no tener miedo por no ser parte de las fiestas o las cosas que nos ofrecen aquí la tierra, sino por perdernos el cielo, sin embargo, lamentablemente el enemigo está ganando."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2761.42,
+      "end": 2778.36,
+      "text": "Las estadísticas no mienten cuando dicen que entre adolescentes jóvenes y adultos, incluye la estadística, entre adultos que usan redes sociales, cualquiera de las que he mencionado incluyendo Twitter, Facebook, que son los mayores de 30 años, 25 años que están usando Facebook, dice así,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2780.06,
+      "end": 2788.96,
+      "text": "poco más del 40 por ciento han experimentado fomo a perderse algo de tendencia que está pasando en el mundo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2790.1,
+      "end": 2796.6,
+      "text": "No es sólo cuestión de los jóvenes, el sentimiento del miedo a no pertenecer, incluy adultos."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2797.38,
+      "end": 2813.88,
+      "text": "Dice también que el mismo 40% se ha endeudado, ha agarrado deudas para mantenerse al día en redes sociales en las tendencias de los juegos, de los videojuegos o de las compras que comúnmente se hacen día a día."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2815.02,
+      "end": 2832.36,
+      "text": "En general, el 40%, si aquí si hubieran, ¿cuántas personas les gusta? 400 personas, 4x4 16 aproximadamente, 160 personas estarían teniendo ahorita ya deudas por estarse perdiendo las tendencias de este mundo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2834.5,
+      "end": 2873.2,
+      "text": "Vámonos más específico con esta misma encuesta entre adolescentes y jóvenes, el 69% de nuestros adolescentes y jóvenes, 69%. Si yo pasara 10 de nuestros muchachos, 7 estarían confesando que sienten miedo a no pertenecer a lo que el mundo está poniendo como tendencia y esto mis queridos hermanos mis queridos jóvenes no es algo por lo que hay que avergonzarse nuestras heridas nuestras batallas no es algo que nos debe dar pena compartir o expresar porque es una realidad entre nosotros."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2874.42,
+      "end": 2882.96,
+      "text": "Si nos da miedo compartirlo, seríamos parte del fomo. Si nos da pena el poder lo expresar y buscar ayuda, seríamos parte del fomo también."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2883.92,
+      "end": 2886.64,
+      "text": "Por lo tanto, es algo que necesitamos trabajar."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2887.36,
+      "end": 2937.32,
+      "text": "Es algo porque los efectos psicológicos que está provocando este sentimiento, este miedo, no sólo en los adolescentes y jóvenes, sino en todos los que estamos aquí, porque estamos expuestos a ello todos los días que estamos no solo en el celular en las redes sociales aguas no los estoy satanizando no lo estoy diciendo no lo haga no lo vean estoy pidiendo prudencia y sabiduría para ello o en la televisión en las series en las noticias el doctor tojera nos recomendaba estar al tanto lo que pasaba familia todo eso lo que estamos expuestos nos está ocasionando inseguridad la comparación de status sociales yo tengo dinero tú no yo me compré esto tú no yo hice este viaje tú no mis hijos tienen carro propio tú no yo estudié acá tú no mis hijos estudian acá tú no"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2939.21,
+      "end": 2942.93,
+      "text": "la necesidad de aprobación muchas"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 2944.88,
+      "end": 3000.72,
+      "text": "veces mis queridos hermanos nosotros estamos y aguas también lo voy a aclarar no estoy diciendo que no lo hagan pero a veces las llamadas que recibimos como pastores o los ancianos de iglesia de nuestros propios hermanos o de otros lugares es pastor fíjese que tengo esta decisión me han dicho que tengo que ir el sábado a trabajar que tengo que ir a presentar este examen que tengo un partido que tengo una reunión una fiesta será que puedo ir o debo ir tú y yo sabemos cuál es la respuesta sólo estamos buscando aprobación ya sabemos lo que tenemos que hacer nada más estamos buscando una aprobación para cometerlo y esas son las tendencias psicológicas a las que estamos expuestos en este mundo, a esa necesidad de aprobación y lamentablemente ni siquiera le preguntamos a Dios, a Dios le decimos a Dios y le anamos preguntando a cualquier persona."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3002,
+      "end": 3023.58,
+      "text": "Por eso mis queridos nosotros tenemos que caer en cuenta que esta situación del miedo a perdernos el mundo nos está quitando de la vista el perdernos el cielo y está sustituyendo nuestra verdadera necesidad que como humanos tenemos que es depositar nuestra creencia en Cristo Jesús."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3025.4,
+      "end": 3064.12,
+      "text": "Psicológicamente y antropológicamente el ser humano tiene dos necesidades principales para los que no lo saben la número uno es creer en algo y la necesidad social de compartir con alguien más con algo, con unas otras personas. Entonces, al nosotros confundir nuestra mente, priorizar diferentes cosas, obviamente tomamos malas decisiones y nos relacionamos con gente que no nos suma, que nos mal influye o nosotros somos los que mal influimos a otros y pues nuestras creencias la estamos poniendo en lo que simplemente llena nuestro vacío y no en lo que nos va a salvar, sabiendo que Cristo también puede llenar nuestro vacío."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3064.68,
+      "end": 3082.18,
+      "text": "Pero como estamos tan acostumbrados a la diversión o al entretenimiento rápido, al placer rápido, a estar viendo videos, los reels, uno tras otro, tras otro, tras otro, scroll down, scroll down, scroll down, estamos condicionando nuestra mente de esa manera a aplicarlo también en nuestra vida."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3082.78,
+      "end": 3093.88,
+      "text": "Y cuando venimos al Señor a pedirle un milagro, a pedirle una petición, a decirle algo, Señor, haz un milagro, haz esto a lo a otro. Queremos que nos responda así como si fuéramos el jefe y el nuestro sirviente,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3095.6,
+      "end": 3097.2,
+      "text": "pero no funciona así."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3098.14,
+      "end": 3099.8,
+      "text": "Recuerden que la vida es un proceso,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3101.28,
+      "end": 3115.96,
+      "text": "la vida es algo que va a durar, ahora sí que va a ir a la redundancia, perdón, el proceso de santificación va a durar toda la vida y Dios mis queridos hermanos no te va a responder como tú quieres, va a responder como tú necesitas para ser salvo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3117.94,
+      "end": 3128.06,
+      "text": "Por eso es importante, mis queridos, que nosotros estemos pendientes de la salud mental y emocional de nuestras vidas, de nuestras familias."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3129.32,
+      "end": 3143.36,
+      "text": "Por eso es importante estar conscientes del medio y el problema en el que nos estamos moviendo. En este mundo hay distracciones, hay problemas, hay cosas que nos están alejando de lo eterno, de lo que se importa."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3144.68,
+      "end": 3170.78,
+      "text": "Vamos un poquito la Biblia, mis queridos, mi querida familia, vamos a ir rápido a dos versículos número uno, Ecclesiastés 2.11, muy conocido, Ecclesiastés 2.11, literalmente nos aplica, nos explica, nos confirma y nos declara lo siguiente, 2.11, mire yo luego todas las obras que habían hecho las manos, el trabajo que tomé para hacerlas, y aquí todo era qué?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3172.08,
+      "end": 3172.62,
+      "text": "Todo era qué?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3173.44,
+      "end": 3175.9,
+      "text": "Y, y,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3177.89,
+      "end": 3186.79,
+      "text": "vamos otra vez, una, dos, tres, vi que todo era y, y sin provecho de qué?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3188.29,
+      "end": 3190.97,
+      "text": "Y si la Biblia lo dice, yo lo creo, pero no no lo vivimos."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3192.29,
+      "end": 3195.81,
+      "text": "¿Por qué seguimos acumulando riquezas en este mundo?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3196.67,
+      "end": 3199.83,
+      "text": "¿Por qué seguimos llenando las arcas de este mundo?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3201.27,
+      "end": 3201.91,
+      "text": "¿Por qué?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3203.23,
+      "end": 3229.95,
+      "text": "Si estamos perdiendo de vista lo que es importante y aquí podríamos desarrollar muchos temas diferentes, que pudieran ser controversiales, uno de ellos por ejemplo la educación. No, es que en esa universidad, en esa secundaria en esa high school tienen un mejor programa de capacitación y mi hijo va a poder ir a la mejor universidad para tener el mejor trabajo y así poder tener la mejor herencia y el mejor futuro asegurado para él."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3231.37,
+      "end": 3235.19,
+      "text": "Pero lo exponemos tanto al mundo y luego nos andamos quejando que anda perdido en el mundo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3237.77,
+      "end": 3245.21,
+      "text": "Tantos temas como les digo controversiales que sé que más de uno de los que ya me echaron miradita por aquí pues estarían en contra de ello, ¿verdad?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3245.97,
+      "end": 3251.99,
+      "text": "Sin embargo, todo lo que debajo del Sol se ofrece debajo del Sol se va a quedar."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3252.95,
+      "end": 3254.25,
+      "text": "Así de sencillo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3254.85,
+      "end": 3260.73,
+      "text": "Y todo lo que Dios ofrece para el cielo, ahí en el cielo, lo vamos a mantener."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3262.88,
+      "end": 3264.6,
+      "text": "Ahora sí, ¿qué cual vamos a elegir?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3266.73,
+      "end": 3269.19,
+      "text": "¿Qué vas a poner de prioridad en tu vida?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3270.55,
+      "end": 3281.15,
+      "text": "Y este tema, mis queridos, no fue escrito, Dios no lo impresionó en la mente, no lo puso en la mente para tratar de hacerlo se enojar, sino si de incomodar."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3282.93,
+      "end": 3287.77,
+      "text": "Porque Dios, déjame decirte en esta mañana que Dios ha venido a echar a perder tus planes."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3289.85,
+      "end": 3293.21,
+      "text": "Dios ha venido a estropear lo que tú pensabas que era mejor para ti."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3294.21,
+      "end": 3299.39,
+      "text": "Dios ha venido a decir que lo que tú necesitas es más simple de lo que tú planeas."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3300.77,
+      "end": 3308.15,
+      "text": "Dios lo que te dice, que ocupamos todos es a él, dos letras, él."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3310.53,
+      "end": 3317.45,
+      "text": "Vamos a seguir avanzando un poquito aquí, primera de Juan, dos dieciséis al diecisiete, por favor, primera de Juan, dos dieciséis al diecisiete."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3318.07,
+      "end": 3362.91,
+      "text": "Otro versículo muy conocido, intenté no irme lejos para que podamos meditar en los versículos que diario a diario repetimos como grabadora, pero que muy pocas veces vivimos de manera sincera. Según primera de Juan 2 16 y 17 nos dice de la siguiente manera vamos a empezar desde el 15 no améis al mundo ni las cosas que están en el mundo si alguno ama el mundo el amor del padre no está en él si hay más en tu vida de este mundo que lo que el cielo te puede ofrecer déjame decirte que ahí lo dice claramente que el padre no está en ti Dios no está en tu vida si pesa más las cosas de este mundo pagano que las cosas divinas del cielo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3365.25,
+      "end": 3381.29,
+      "text": "Espero que cuando estemos haciendo nuestros planes, nuestras metas, nuestros propósitos que el jueves vamos a andar con las uvas una tras otra, uno, dos, tres, cuatro, cinco, seis, siete, ocho, nueve, diez. Espero que dentro de esa lista estén estos consejos divinos para nuestra salvación."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3382.33,
+      "end": 3394.33,
+      "text": "Sigue diciendo porque todo lo que hay en el mundo, los deseos de la carne, los deseos de los ojos y la vanagloria de la vida, me voy a detener ahí, no acabamos esto, no la Biblia nos acaba de hablar del fomo,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3396.03,
+      "end": 3409.99,
+      "text": "la Biblia nos acaba de explicar, nos acaba de decir que todo el miedo que tentimos de no ser parte de las tendencias, de las acumulaciones, de las compras innecesarias del consumismo,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3411.49,
+      "end": 3468.62,
+      "text": "mis queridos hermanos, cuando eso importa más que lo que Jesús pueda hacer en nuestros corazón ahí está el problema cuando le damos más importancia a eso entonces que dice la palabra de Dios esto no proviene del padre sino de quién y el mundo pasa y sus diseos pero el que la hace la voluntad de Dios permanece para siempre quiero preguntarte mi querido hermano quiere ser de esos que cuando viene el viento se los lleva por las tendencias, quieres ser de esos que cuando Cristo venga te va a decir apartados nos conozco o quieres de esos ser de esos que caminan firmes a la canaán celestial, aquellos que cuando Cristo venga los cuatro vientos Él les declarará tu nombre y les dirá, hey ven buen siervo fiel, sobre pocos si fuiste fiel, sobre mucho te pondré,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3470.5,
+      "end": 3472.58,
+      "text": "¿dónde vamos a poner las inversiones?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3473.44,
+      "end": 3481.98,
+      "text": "Platicaba con estos amigos empresarios y decía no, las mejores inversiones en México, por ejemplo, los setes, en Nueva York, en el Nasdaq, podemos hacer esto, otro."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3483.34,
+      "end": 3488.8,
+      "text": "Y lamentablemente, mis queridos hermanos, nuestra sociedad, nuestra cultura nos ha empujado para eso."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3490.42,
+      "end": 3506.66,
+      "text": "Yo te invito a que sigamos nosotros invirtiendo en el Padre, un par de pensamientos que escribí, el problema no es disfrutar la vida, sino que buscar un placer inmediato o la aprobación terrenal, eso te haga perder y olvidarlo eterno."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3507.68,
+      "end": 3550.66,
+      "text": "De hecho, el Espíritu de Profecía, o esta parte me encanta, el Espíritu de Profecía menciona que cuando Satanás Lucifer en aquel momento, Dios iba a decir los planes de la creación del el mundo, y entonces Lucifer encargado de la adoración de la alabanza con todas las huésteres angelicales allí, él en vez de dirigirlos para adorar a Dios, lo que hizo fue declarar palabras en contra del Altísimo, y nosotros sabemos la historia que Dios le dio la oportunidad a los ángeles, se quedan o se van, y tuvieron un segundo para decidir, y un tercio de los ángeles salieron, y Lucifer fue expulsado del cielo, y dice el Espíritu de Profecía que Lucifer satanás en ese momento y expulsado del cielo. ¿Saben qué sintió?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3552.08,
+      "end": 3553.46,
+      "text": "¿Saben qué dice el espíritu de profecía?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3554.78,
+      "end": 3558.96,
+      "text": "Se dio cuenta que su felicidad se había disipado."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3561.74,
+      "end": 3571.96,
+      "text": "El mismo enemigo, satanás, el diablo, Lucifer, reconocía que él lejos de Dios no iba a ser feliz."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3574.2,
+      "end": 3586.56,
+      "text": "Entonces, ¿por qué nosotros nosotros, seguimos haciéndole caso a las cosas que él nos ofrece, sabiendo que él sabe, que nosotros sabemos que"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3588.68,
+      "end": 3591.48,
+      "text": "lo que él ofrece no nos sirve para bien."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3593.28,
+      "end": 3598.38,
+      "text": "Familia, esto es una premisa espiritual importante que nosotros debemos vivir."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3598.98,
+      "end": 3620.1,
+      "text": "Mateo 16-26 nos pregunta y nos cuestiona, no es solo un versículo para ir a agarrar de bibliazos a la gente cuando ves que alguien peca no es algo que nos cuestiona nosotros Mateo 16 26 de qué te va a servir ganar el mundo si vas a perder tu alma de qué te va a servir este 2026 comerte el mundo"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3621.72,
+      "end": 3642.66,
+      "text": "desgastarte físicamente si tu familia se queda sin mamá y sin papá de qué te va a servir poner todo tu dinero en inversiones en el banco comparte carros de último momento si tu mente y tu corazón están lejos de Dios porque de labios le honras, pero tu corazón está lejos de papá."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3644.62,
+      "end": 3686.64,
+      "text": "Por eso mis queridos hermanos necesitamos nosotros poner prioridad en lo que importa y no ignorar, no distraernos Lucas 14, 15 al 24. Vámonos un poquito por favor a detener ahí a la parábola Lucas 14 15 al 24 es un mensaje impresionante porque nos los reta y nos relata la parábola de la gran cena la voy a para fraciar un poquito porque está un poquito larga pero allí nos dijo que hubo una invitación a un gran banquete y entonces él les dijo que venía que vinieran que comieran y nadie quiso llegar todos buscaban excusarse."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3687.68,
+      "end": 3698.24,
+      "text": "Nadie quería asistir, algunos por trabajo, otros porque tenían algunos negocios que hacer, pero no llegaron."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3699.86,
+      "end": 3709.16,
+      "text": "Están ya dando las 12.4 esta tarde, Dios reafirma su invitación a cada uno de nosotros."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3711.44,
+      "end": 3714.06,
+      "text": "Agonizantemente la invitación de urgencia es para ti."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3715.08,
+      "end": 3724.98,
+      "text": "Si nosotros no planeamos asistir, no con nuestras mejores galas vestidas, sino con las mejores vestimentas que el corazón pueda tener, nos vamos a quedar fuera."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3725.66,
+      "end": 3776.02,
+      "text": "Y el día de mañana que cuando los ángeles prediquen por allá, las piedras se levanten para hablar de Dios y los que están firmes, estén predicando con su ejemplo y aquel que pensabas que se iba a perder el drogadicto, el de la cárcel, el que estaba bajo el puente, el adinerado que Dios alcanzó al último momento y que vengan, que vengan aquí a la iglesia y que también son perseguidos y que también van al cielo, tú te vas a cuestionar y porque ellos sí y yo no, porque ellos sí dijeron que sí a la invitación, porque a pesar de que estaban distraídos allá de último momento atendieron al llamado que nos estaba mostrando esta parábola de la gran cena, porque Dios abrió la invitación a todos, a todos los que estamos aquí y a todos los que están allá afuera, pero no los estamos perdiendo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3777.64,
+      "end": 3785.5,
+      "text": "Dice Primera de Pedro 5, capítulo 5, 16, por ahí 16, 17, que el juicio inicia con los que están en la casa de de Dios."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3787,
+      "end": 3790.26,
+      "text": "Por eso, a sí mismo, la invitación inicia con nosotros."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3792.04,
+      "end": 3800.3,
+      "text": "Es importante familia que prioricemos y no me voy a alcanzar de repetir esa palabra. No descuidemos nuestra salvación que es tan grande."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3802.34,
+      "end": 3808.62,
+      "text": "No abaratemos el valor de la sangre de Cristo cuando Él pagó por nuestra salvación."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3810.02,
+      "end": 3812.18,
+      "text": "De hecho, déjame decirte un secreto."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3813.1,
+      "end": 3817.04,
+      "text": "No sé si sabías, pero es más fácil salvarse que perderse."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3817.86,
+      "end": 3818.52,
+      "text": "¿Sabías eso?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3819.42,
+      "end": 3819.98,
+      "text": "¿Sí lo sabías?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3820.72,
+      "end": 3831.36,
+      "text": "Porque miren, para empezar muchos de nosotros, muchos de nosotros lo que hacemos es agarrar a Dios y a Satanás y ponerlos en dos caminos. ¿A cuál vas a elegir? ¿A Dios o Satanás?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3831.92,
+      "end": 3832.82,
+      "text": "Déjame decirte algo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3833.76,
+      "end": 3849.26,
+      "text": "A mí se me hace una falta de respeto a Dios a hacer eso. ¿Te vas a decir por qué? Porque Satanás no es de Dios, Satanás no está a la altura de Dios, Satanás simplemente es un ángel caído, ¿cómo pudiera yo comparar a Dios con Satanás como otro camino?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3850.02,
+      "end": 3859.26,
+      "text": "Para mí es simple, Dios o no salvarme, así es sencillo, Satanás no tiene tal poder como Dios lo tiene, por lo tanto para mí no es una opción,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3860.78,
+      "end": 3886.54,
+      "text": "entonces las opciones son, o te salvas Dios o te pierdes y para perderte es decir que Dios está frente de ti, agarra el regalo, te lo ofrece aquí, abiertamente te dice, se llama salvación, es el regalo que tengo para ti esta Navidad por usar una celebración, está frente a ti, lo quieres o no? Para tú perderte tienes que ser capaz de mirar a los ojos a Dios y decirles, ¿sabes qué? No me interesa tu regalo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3894.4,
+      "end": 3910.96,
+      "text": "¿Quién de Por eso mis queridos hermanos, cuando nosotros conscientizamos esas ideas que tal vez suenan un poquito radicales o fuertes, se los digo de corazón, no estoy tratando a regañarlos, estoy tratando de transmitir una urgencia de priorizar nuestra vida espiritual."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3911.98,
+      "end": 3922.26,
+      "text": "Estoy tratando de transmitir el mensaje de la palabra de Dios que nosotros podamos caer en cuenta que vale la pena ir al cielo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3922.26,
+      "end": 3927.34,
+      "text": "¿Qué eso debe ser el top de importancia de nosotros?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3928.22,
+      "end": 3930.74,
+      "text": "Que si existe un fomo debe ser el miedo a perderte."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3931.64,
+      "end": 3933.2,
+      "text": "Tengo otra pregunta para ustedes."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3934.12,
+      "end": 3937.48,
+      "text": "¿Alguna vez se han preguntado por qué vale la pena ir al cielo?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3937.72,
+      "end": 3941.74,
+      "text": "Me gustaría escuchar a dos o tres de ustedes que respondan esto."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3942.24,
+      "end": 3944.06,
+      "text": "¿Por qué vale la pena ir al cielo?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3945.1,
+      "end": 3947.98,
+      "text": "Vamos a ver si estamos claros en nuestras ideas."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3948.98,
+      "end": 3950.54,
+      "text": "Darien, te pregunto directamente de la gente a ti."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3951.14,
+      "end": 3954.78,
+      "text": "Pastor Darien, ¿Por qué crees que vale la penina al cielo?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3957.21,
+      "end": 3958.75,
+      "text": "Porque no hay nada que buscar aquí, gracias."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3959.51,
+      "end": 3960.15,
+      "text": "De este lado,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3963.4,
+      "end": 3965.12,
+      "text": "para dejar de sufrir en esta tierra,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3967.25,
+      "end": 3967.63,
+      "text": "perdón,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3974.34,
+      "end": 3982.18,
+      "text": "amén, no haber llanto ni tristeza ni dolor porque solo Jesús el rey del cielo será nuestro consolador. Ahí atrás."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3985.67,
+      "end": 3989.83,
+      "text": "Porque si Jesús no hay nada, ni nadie, amén, gloria a Dios."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3989.99,
+      "end": 3992.57,
+      "text": "Alguien más, este lado está muy calladito."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 3998.51,
+      "end": 4011.93,
+      "text": "Amén mi hermano Moisés, muchas gracias. Yo anote tres que me gustaría compartir compartir con ustedes. Según la Biblia, según la Biblia, hebrós once dieciséis y Juan catorce uno al tres, porque el cielo es nuestro verdadero hogar."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4013.43,
+      "end": 4017.29,
+      "text": "Aunque luego nos vamos a mudar con todo el cielo aquí a la Nueva Jerusalén, ¿verdad?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4017.97,
+      "end": 4019.43,
+      "text": "Pero el cielo es nuestra verdadero hogar."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4020.45,
+      "end": 4025.05,
+      "text": "quien, teniendo la oportunidad de estar en su hogar, va a dejar su hogar."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4025.61,
+      "end": 4033.35,
+      "text": "Número dos, Apocalipsis 21-4, porque en el cielo no hay dolor, ansiedad o comparaciones."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4034.85,
+      "end": 4039.07,
+      "text": "Primero de Juan 3-2, porque le veremos cara a cara."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4039.75,
+      "end": 4046.77,
+      "text": "Dice el libro de la educación página 301, El cielo comenzará en la tierra para los que aprenden a amar a Dios aquí."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4048.96,
+      "end": 4061.74,
+      "text": "Entonces, mis queridos hermanos, hagamos una suposición, dos realidades diferentes, realidad número uno, 27 de diciembre del año 2026, estamos en el cielo, todos felices, cantando y adorando a Dios. Amen."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4063.46,
+      "end": 4066.06,
+      "text": "What if, ¿qué pasaría si no suceder eso?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4067.12,
+      "end": 4072.22,
+      "text": "27 de diciembre del año 2026, entonces, ¿dónde estaríamos? ¿Aquí en la tierra, verdad?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4073.08,
+      "end": 4074.32,
+      "text": "Primero Dios, con vida."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4075.24,
+      "end": 4086.54,
+      "text": "Entonces, si estuviéramos con vida aquí en la Tierra nosotros podemos empezar a vivir el cielo aquí en la Tierra, lo dice el Espíritu de Profecia, no lo estoy diciendo yo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4087.4,
+      "end": 4102.12,
+      "text": "Entonces, porque nosotros no nos ponemos un plan como número uno de nuestros propósitos de año nuevo, como número uno en el top de nuestras prioridades del año 2026, el Amar a Cristo y creerle a Él."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4103.16,
+      "end": 4107.26,
+      "text": "Es muy fácil creer en Dios, pero más difícil es creerle a Dios, ¿verdad?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4108.3,
+      "end": 4116.86,
+      "text": "Entonces, mis queridos hermanos, nosotros necesitamos delimitar esa prioridad, estar seguros del por qué queremos ir al cielo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4117.48,
+      "end": 4125.66,
+      "text": "Hay otra pregunta importante aquí para seguir casi ya a la conclusión de nuestro tema de hoy, es, ¿qué necesitamos para ir al cielo?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4126.28,
+      "end": 4129.62,
+      "text": "Obviamente, solo creerle a él, lo acabamos de decir."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4129.76,
+      "end": 4153.72,
+      "text": "De hecho, si vamos a Romano 19, necesitamos declarar a Cristo, de hecho, de hecho, de hecho, de hecho, si nosotros vamos a la aplicación del celular, de la Biblia, el versículo del día de hoy, lo que dice Romanos 19 es que nosotros declaremos a Cristo y le creamos a Él y entonces vamos a ir, vamos a ser salvos, si van a la aplicación de la Biblia, en el celular, ese es el versículo que aparece justamente hoy."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4154.46,
+      "end": 4208.46,
+      "text": "Entonces lo que necesitamos hacer es nosotros declarar a Cristo y creerle a Él, ok, pero en el medio en el que nosotros otros vamos al cielo en el medio en el que Cristo viene otra vez en el medio en el que vamos cumpliendo nuestras metas en este mundo cómo podemos mantenernos conectados a él ah ahí está la clave donde estamos fallando porque en vez de buscar primeramente el reino de Dios y su justicia buscamos meramente el dinero y el estatus social en vez de primero orar a Dios como dice Mateo 633 en vez de orar a Dios, buscar su dirección en si ya sabemos que el sábado es el día que Dios ha elegido y nos ponemos a trabajar y nos podemos a comprar y nos ponemos a estudiar y nos ponemos a presentar exámenes y nos ponemos a hacer toda cualquier cosa humana, menos las que son el bien y conectarnos con Dios, entonces están mal nuestras prioridades."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4210.26,
+      "end": 4214.04,
+      "text": "Eso necesitamos hacer, buscar primeramente a Dios."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4214.88,
+      "end": 4225.6,
+      "text": "Hebreos 12-1, vamos por favor a leerlo juntos, ese es un versículo igual, un poquito fuerte, pero vamos a leerlo en familia para que sea un poquito más manejable para su iglesia."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4226.28,
+      "end": 4299.06,
+      "text": "Hebreos 12-1 nos dice lo siguiente, por tanto nosotros también, teniendo en alrededor nuestro tan grande nube de testigos, despojémonos de todo peso y del pecado que nos acedia, corramos con paciencia la carrera que tenemos por delante, este dios te dice en esta mañana bueno ya tarde que dejes de cargar lo que el mundo te ofrece que te despojes de eso que te estás estorbando este es un maratón de la vida es un maratón para una medalla bonita no es un medallita para que no se me sientan malos que sí corren es la medez tu vida mi querido hermano es la gran importancia y la urgencia de todos nosotros si no nos despojamos de ese peso extra, si no nos quitamos el pecado, si no empezamos a mejorar nuestros hábitos de vida, si no nos acercamos más a Dios, si no priorizamos esto, mis queridos hermanos, no vamos a llegar, vamos a perder esa carrera y Dios nos invita a que corramos con paciencia, no es de velocidad, no es saber quién es perfecto primero, es como nosotros en familia y Y también de manera personal, nos santificamos como"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4301.4,
+      "end": 4302.78,
+      "text": "caminamos al lado de Él."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4304.14,
+      "end": 4310.64,
+      "text": "Santiago 1 a 27 es el siguiente que necesitamos para seguir conectados a Él."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4311.22,
+      "end": 4314.06,
+      "text": "Puedes vivir una fe auténtica y no sólo religiosa,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4318.57,
+      "end": 4327.95,
+      "text": "que nuestras acciones, nuestros pensamientos, nuestra personalidad, pueda mostrar el carácter de Cristo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4327.95,
+      "end": 4372.97,
+      "text": "no sólo los versículos que me sé de memoria sino todo lo que yo vivo como un estilo de vida hechos de los apóstoles capítulo perdón página 560 dice recordar que la santificación es un proceso de toda la vida y no es obra de sólo un momento voy a abrir la última pregunta de esta de mis queridos hermanos y va a ser una pregunta más cómo lo podemos decir más local para central del valle y les digo va con amor y de corazón no hay nada malo aquí sólo me gusta expresar que que vamos con amor que nos falta como iglesia para ir al cielo"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4376.68,
+      "end": 4381.52,
+      "text": "tener un carácter cambiado que más nos falta mis queridos hermanos"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4384.56,
+      "end": 4391.7,
+      "text": "cumplir la misión que tenemos que nos falta como central del valle para ir al cielo. ¿Por ahí escuché una voz?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4393.36,
+      "end": 4393.66,
+      "text": "¿Perdón?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4394.98,
+      "end": 4395.42,
+      "text": "Unidad."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4395.98,
+      "end": 4397.18,
+      "text": "¿Ok? ¿Alguien por este lado?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4398.84,
+      "end": 4400.98,
+      "text": "Amarnos más unos a otros. ¿Qué más?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4402.58,
+      "end": 4403.12,
+      "text": "Humildad."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4403.94,
+      "end": 4404.38,
+      "text": "¿Qué más?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4407.46,
+      "end": 4409.34,
+      "text": "Un corazón conforme al de Dios, tal vez."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4410.1,
+      "end": 4441.84,
+      "text": "Miren, orando a Dios y pidiéndole dirección a él, escribe unas líneas por acá dice no nos falta doctrina para ir al cielo no nos falta doctrina tenemos seis doctrinas y 28 creencias amén no nos falta estructura tenemos 13 divisiones un campo misionero uniones conferencias y una gran iglesia local nos falta estructura no nos faltan creencias no nos falta conocimiento."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4442.64,
+      "end": 4447.36,
+      "text": "Tenemos a central del valle llena de profesionistas y personas que lo saben todo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4449.7,
+      "end": 4450.82,
+      "text": "¿Nos falta conocimiento?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4452.14,
+      "end": 4452.96,
+      "text": "No, no."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4454.58,
+      "end": 4455.68,
+      "text": "Bueno, no."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4456.54,
+      "end": 4462.58,
+      "text": "Lo que sí nos falta, según Isaías 29-13, menos apariencia y más entrega."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4463.16,
+      "end": 4467.16,
+      "text": "Juan 13-35, menos crítica y más compasión."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4467.82,
+      "end": 4473.66,
+      "text": "Según Mateo 28, 19 y 20, y mi hermano le dio al tino, menos distracción y más misión."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4474.58,
+      "end": 4489.72,
+      "text": "El señor esta mañana mis queridos hermanos nos está invitando abiertamente a que tú y yo nos vayamos sin condiciones, sin excusas, sin justificaciones a seguirlo a él."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4490.68,
+      "end": 4504.48,
+      "text": "Seamos bautizados o no, no, seamos amigos de la comunidad, amigos de nosotros o miembros ya de antaño de esos que estamos parte del activo fijo de la iglesia, todos tenemos la misma invitación y necesidad esta mañana."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4505.5,
+      "end": 4531.82,
+      "text": "La diferencia va a radicar en que si vamos a decir el sí o el no, en si vamos a decir que estamos listos para el encuentro, en que si le vamos a decir a Dios que nosotros ya queremos verle, en que si nos queremos preparar para observarle a él, para encontrarlo cara a cara, ¿por qué entonces agradeceremos tercera vez que lo pregunto? Y esta es la retórica."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4532.44,
+      "end": 4534.64,
+      "text": "¿Por qué entonces agradeceremos el próximo año?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4535.06,
+      "end": 4537.54,
+      "text": "¿Por qué nos divertimos? ¿O por qué perseveramos?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4538.56,
+      "end": 4541.86,
+      "text": "¿Por qué seguimos tendencias? ¿O por qué seguimos a Cristo?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4542.84,
+      "end": 4544.78,
+      "text": "¿Por qué le ganamos a cierta persona?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4545.38,
+      "end": 4563.52,
+      "text": "¿O por qué ayudamos a cierta persona, Apocalipsis 311 nos invita, retén lo que tienes para que ninguno tome tu corona, no tengas miedo de perderte una fiesta, un partido, tu trabajo, una beca, ten miedo, ten pendiente a perderte el cielo,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4565.08,
+      "end": 4612.3,
+      "text": "perdiste una beca porque no fuiste cierto partido o entrenamiento, perdiste una beca porque no presentaste un examen en sábado, te voy a dar un secreto, no le voy a decir a tus papás Dios es el dueño de todo el dinero del universo que dije Dios es el dueño de todo Dios lo es y Dios no falla entonces mis queridos y con esto termino sabiendo todo lo que la palabra de Dios nos ha dicho en esta tarde y mañana sabiendo a dónde Dios nos ha conducido en el estudio quiero preguntarte quién de nosotros nos gustaría alistarnos para el encuentro"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4616.14,
+      "end": 4633.86,
+      "text": "quiero invitar para este llamado este llamado final mis queridos hermanos va a ser el último llamado que vamos a tener en un sábado en esta iglesia quiero invitarte de manera simbólica a"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4635.68,
+      "end": 4638.6,
+      "text": "dejar todo y venir a Cristo."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4640.14,
+      "end": 4645.58,
+      "text": "Si sabes que hay algo en tu vida que te estorba para priorizar a Cristo, ven al frente."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4646.56,
+      "end": 4650.48,
+      "text": "Si a lo mejor las malas influencias, el dinero, el conocimiento,"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4653.5,
+      "end": 4661.86,
+      "text": "relaciones, tu celular, está pudiendo ser más fuerte en tu vida que Cristo, ven al frente o"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4663.62,
+      "end": 4670.06,
+      "text": "si tan sólo quieres declarar a Cristo que te prepare para estar listos para ese encuentro ven al frente"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4672.08,
+      "end": 4693.6,
+      "text": "el venir al frente mis queridos no es algo mágico como que ya está es una demostración de que estás dispuesto a dejar la comodidad de tu banca de tu vida y permitir que Dios incomode de tus planes."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4695.22,
+      "end": 4696,
+      "text": "¿Cómo estás, Johnny?"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4696.48,
+      "end": 4697.04,
+      "text": "Gustavo Arte."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4698.58,
+      "end": 4702.84,
+      "text": "Vamos a entonar un canto con Israel ahorita."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4703.42,
+      "end": 4704.48,
+      "text": "Es muy corto."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4704.74,
+      "end": 4707.58,
+      "text": "Por lo tanto, no pienses que por"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4709.74,
+      "end": 4711.66,
+      "text": "esperar el canto no vas a venir al frente."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4712.44,
+      "end": 4715.38,
+      "text": "Yo quiero invitarte, va a durar 2 minutos 30 segundos el canto."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4716.44,
+      "end": 4718.8,
+      "text": "Yo quiero invitarte que te atrevas a venir al frente."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4719.26,
+      "end": 4719.98,
+      "text": "Voy a orar por ti."
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4719.98,
+      "end": 4737.61,
+      "text": "no te quedes que porque mucha gente me quedó a mi banca no ven ven nada más no vengan por el frente porque es peligroso pero vengan por los lados y si te sabes este canto cántalo con nosotros se llaman listos para nuestro encuentro y deja tu comodidad y ven a cristo"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4791.26,
+      "end": 4798.44,
+      "text": "mi corazón desea el día en que regreses por tu amada iglesia"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4807.86,
+      "end": 4809.3,
+      "text": "corazón será"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4811.89,
+      "end": 4813.21,
+      "text": "comprehacido de"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4829.02,
+      "end": 4832.02,
+      "text": "Dios ahora sí que habla tu corazón y"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4833.84,
+      "end": 4857,
+      "text": "en el cual tú le puedes responder desde acá, desde acá y desde acá caminando y diciendo Cristo, yo quiero estar listo para ese encuentro quiero vivir solo por ti y para ti, todavía tenemos mucho espacio para nuestra oración final, no te quedes en la comunidad y ven aquí al frente"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4883.51,
+      "end": 4887.75,
+      "text": "Para nuestro encuentro listo estaré"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4894.06,
+      "end": 4895.06,
+      "text": "Ya esperé el"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4898.67,
+      "end": 4899.49,
+      "text": "corazón de"
+    },
+    {
+      "chapter_index": 5,
+      "chapter_title": "Sermón principal",
+      "start": 4902.69,
+      "end": 4904.19,
+      "text": "esporto amada y"
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 4929.79,
+      "end": 4930.55,
+      "text": "glamado señor"
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 4932.85,
+      "end": 4934.79,
+      "text": "Esta tarde, señor de sábado,"
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 4936.98,
+      "end": 4939.42,
+      "text": "queremos entregarte todo, señor"
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 4941.66,
+      "end": 4977.8,
+      "text": "Y no porque seamos dueños de ello, sino porque reconocemos que tú eres el dueño Que al terminar este dos mil veinticinco Padre Puedas resanar esas heridas que a lo mejor señor están impidiendo que tu gloria pueda llenar nuestros corazones y mentes de dar el mejor potencial que has planeado para cada uno de nosotros señor y honestamente te pedimos disculpas por ello el factor humano señor y sin escudarnos es"
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 4979.4,
+      "end": 5005.58,
+      "text": "muy inestable hoy pasamos hoy hablamos mañana se nos olvida sin embargo padre no te rindas con nosotros así como no te rendiste la cruz así como en el jet semaní decías padre que pase por mi esta copa pero porque tu cuerpo físico señor pensabas que no ibas soportar sin embargo ahí fuiste y lo lograste y lo diste. Moriste en la línea por nosotros, Señor."
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 5006.48,
+      "end": 5010.88,
+      "text": "A sí mismo, Padre, no te rindas el día de hoy con nosotros."
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 5011.76,
+      "end": 5029.5,
+      "text": "Si es algo en nuestra mente, en nuestro corazón, Señor, que necesita ser pulido, cambiado, si nos toca morder el polvo este 2026, Señor, si nos toca irnos lo más abajo posible y perderlo todo, Señor, pero con tal de que te ganemos a ti, Señor, hazlo."
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 5029.5,
+      "end": 5030.48,
+      "text": "no"
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 5032.18,
+      "end": 5055.14,
+      "text": "nos gusta el sufrimiento señor, pero tengamos que ser honestos, a veces decidimos a la llano, nosotros como pastores, podamos hacerte caso priorizarte señor, mejorar nuestra manera de llevarnos, mejorar nuestra manera en la que te vivimos y la que te creemos, sin caer señor, en la desgracia, te pido que esa sea la primera opción para nosotros,"
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 5059.86,
+      "end": 5073.66,
+      "text": "que no pongamos nada más en nuestros planes que pueda distraer o entorpecer la obra que estás haciendo a nosotros porque queremos estar listos para nuestro encuentro."
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 5074.74,
+      "end": 5077.34,
+      "text": "Gracias Padre por tu amor y misericordia."
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 5077.88,
+      "end": 5086.14,
+      "text": "En el nombre del Padre, del Hijo y del Espíritu Santo, todos como familia decimos."
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 5087.36,
+      "end": 5087.88,
+      "text": "Amén,"
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 5089.4,
+      "end": 5100.9,
+      "text": "que Dios te bendiga mucho en esta tarde, Señor está viniendo a tu casa y a tu vida, abrázalo, abrázalo y no lo de seguir, que Dios te bendiga mucho."
+    },
+    {
+      "chapter_index": 6,
+      "chapter_title": "Cierre y bendición final",
+      "start": 5101.54,
+      "end": 5103.98,
+      "text": "Nos vemos el miércoles en cinco de la tarde."
+    }
+  ],
+  "inputs": {
+    "transcript_segments": 950,
+    "audio_events_source": "local-dsp-heuristic-v1"
+  }
+}

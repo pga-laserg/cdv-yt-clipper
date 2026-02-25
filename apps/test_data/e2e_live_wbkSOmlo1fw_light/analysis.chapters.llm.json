@@ -1,0 +1,60 @@
+{
+  "chapters": [
+    {
+      "start": 0,
+      "end": 135,
+      "title": "Bienvenida y saludo inicial",
+      "type": "welcome",
+      "confidence": 0.9,
+      "reason": "saludos iniciales y exhorto de inicio"
+    },
+    {
+      "start": 135,
+      "end": 270,
+      "title": "Oración de apertura",
+      "type": "opening_prayer",
+      "confidence": 0.9,
+      "reason": "invitación a cerrar ojos y orar"
+    },
+    {
+      "start": 270,
+      "end": 585,
+      "title": "Presentación infantil / fábula y oración",
+      "type": "child_presentation",
+      "confidence": 0.92,
+      "reason": "fábula para niños y plegaria infantil"
+    },
+    {
+      "start": 585,
+      "end": 720,
+      "title": "Témpanos, ofrenda y anuncios cortos",
+      "type": "offering",
+      "confidence": 0.8,
+      "reason": "lectura de Malacías 3:10 y llamado a diezmos/ofrendas"
+    },
+    {
+      "start": 720,
+      "end": 1870.031,
+      "title": "Alabanza congregacional / tiempo de adoración",
+      "type": "congregational_music",
+      "confidence": 0.85,
+      "reason": "anuncio de alabanza y varios minutos de música/interludio"
+    },
+    {
+      "start": 1870.031,
+      "end": 4929.79,
+      "title": "Sermón principal",
+      "type": "sermon",
+      "confidence": 0.95,
+      "reason": "coincide con límites locales de inicio y fin del sermón"
+    },
+    {
+      "start": 4929.79,
+      "end": 5103.98,
+      "title": "Cierre y bendición final",
+      "type": "post_sermon_response",
+      "confidence": 0.88,
+      "reason": "comentarios finales, amén y despedida"
+    }
+  ]
+}

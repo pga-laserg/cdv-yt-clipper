@@ -1,0 +1,410 @@
+{
+  "guess": {
+    "start_sec": 1940,
+    "end_sec": 4941,
+    "start_candidates_sec": [
+      1940,
+      1960
+    ],
+    "end_candidates_sec": [
+      4941,
+      4920
+    ]
+  },
+  "selected_target_speaker": {
+    "start": "pre:SPEAKER_00",
+    "end": "post:SPEAKER_00"
+  },
+  "boundary_confirmation": {
+    "start_confirmed_change_of_speaker": false,
+    "end_confirmed_change_of_speaker": true,
+    "start_chosen_by": "scored-candidate:1940",
+    "end_chosen_by": "scored-candidate:4920",
+    "start_previous_turn": null,
+    "end_next_turn": {
+      "start": 4929.83221875,
+      "end": 4930.87846875,
+      "speaker": "post:SPEAKER_00"
+    },
+    "start_audio_signal": {
+      "beforeMusicRatio": 0,
+      "afterMusicRatio": 0,
+      "beforeNoenergyRatio": 0,
+      "afterNoenergyRatio": 0,
+      "beforeSpeechRatio": 1,
+      "afterSpeechRatio": 1,
+      "beforeGender": "male",
+      "afterGender": "male",
+      "genderChange": false,
+      "musicToSpeech": false,
+      "speechToMusic": false,
+      "pauseToSpeech": false,
+      "speechToPause": false
+    },
+    "end_audio_signal": {
+      "beforeMusicRatio": 0,
+      "afterMusicRatio": 0,
+      "beforeNoenergyRatio": 0,
+      "afterNoenergyRatio": 0,
+      "beforeSpeechRatio": 1,
+      "afterSpeechRatio": 1,
+      "beforeGender": "female",
+      "afterGender": "male",
+      "genderChange": true,
+      "musicToSpeech": false,
+      "speechToMusic": false,
+      "pauseToSpeech": false,
+      "speechToPause": false
+    }
+  },
+  "targeted_windows": {
+    "pre": {
+      "start_sec": 1880,
+      "end_sec": 1980,
+      "anchor_speaker": "pre:SPEAKER_00",
+      "turns": [
+        {
+          "start": 1880.03096875,
+          "end": 1880.80721875,
+          "speaker": "pre:SPEAKER_00"
+        },
+        {
+          "start": 1882.03909375,
+          "end": 1886.27471875,
+          "speaker": "pre:SPEAKER_00"
+        },
+        {
+          "start": 1886.74721875,
+          "end": 1894.74596875,
+          "speaker": "pre:SPEAKER_00"
+        },
+        {
+          "start": 1895.47159375,
+          "end": 1918.52284375,
+          "speaker": "pre:SPEAKER_00"
+        },
+        {
+          "start": 1918.55659375,
+          "end": 1929.05284375,
+          "speaker": "pre:SPEAKER_00"
+        },
+        {
+          "start": 1929.13721875,
+          "end": 1933.81159375,
+          "speaker": "pre:SPEAKER_00"
+        },
+        {
+          "start": 1934.41909375,
+          "end": 1939.16096875,
+          "speaker": "pre:SPEAKER_00"
+        },
+        {
+          "start": 1940.00471875,
+          "end": 1962.93784375,
+          "speaker": "pre:SPEAKER_00"
+        },
+        {
+          "start": 1963.57909375,
+          "end": 1969.02971875,
+          "speaker": "pre:SPEAKER_00"
+        },
+        {
+          "start": 1969.70471875,
+          "end": 1972.72534375,
+          "speaker": "pre:SPEAKER_00"
+        },
+        {
+          "start": 1973.99096875,
+          "end": 1979.66096875,
+          "speaker": "pre:SPEAKER_00"
+        }
+      ]
+    },
+    "post": {
+      "start_sec": 4900,
+      "end_sec": 5001,
+      "anchor_speaker": "post:SPEAKER_00",
+      "turns": [
+        {
+          "start": 4900.03096875,
+          "end": 4906.34221875,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4901.02659375,
+          "end": 4902.66346875,
+          "speaker": "post:SPEAKER_01"
+        },
+        {
+          "start": 4903.35534375,
+          "end": 4904.57034375,
+          "speaker": "post:SPEAKER_01"
+        },
+        {
+          "start": 4909.05909375,
+          "end": 4919.58909375,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4910.15596875,
+          "end": 4910.76346875,
+          "speaker": "post:SPEAKER_01"
+        },
+        {
+          "start": 4915.06659375,
+          "end": 4915.91034375,
+          "speaker": "post:SPEAKER_01"
+        },
+        {
+          "start": 4919.75784375,
+          "end": 4923.50409375,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4924.48284375,
+          "end": 4926.03534375,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4926.76096875,
+          "end": 4927.03096875,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4929.83221875,
+          "end": 4930.87846875,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4933.00471875,
+          "end": 4934.87784375,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4937.03784375,
+          "end": 4939.55221875,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4941.94846875,
+          "end": 4947.24721875,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4949.03596875,
+          "end": 4951.63471875,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4953.20409375,
+          "end": 4954.77346875,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4955.98846875,
+          "end": 4957.28784375,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4957.72659375,
+          "end": 4964.15596875,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4965.82659375,
+          "end": 4970.50096875,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4970.72034375,
+          "end": 4973.79159375,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4973.82534375,
+          "end": 4973.92659375,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4974.29784375,
+          "end": 4977.03159375,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4979.1747187500005,
+          "end": 4980.50784375,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4981.25034375,
+          "end": 4984.06846875,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4984.70971875,
+          "end": 4987.35909375,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4988.8778437500005,
+          "end": 4994.90221875,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4995.79659375,
+          "end": 4998.05784375,
+          "speaker": "post:SPEAKER_00"
+        },
+        {
+          "start": 4998.5809687500005,
+          "end": 5000.97721875,
+          "speaker": "post:SPEAKER_00"
+        }
+      ]
+    }
+  },
+  "audio_events": {
+    "source": "local-dsp-heuristic-v1",
+    "duration_sec": 5149.860875,
+    "total_segments": 928
+  },
+  "candidate_scoring": {
+    "start": [
+      {
+        "seed": 1940,
+        "candidateStart": 1880.03096875,
+        "prev": null,
+        "diarChange": false,
+        "audio": {
+          "beforeMusicRatio": 0,
+          "afterMusicRatio": 0,
+          "beforeNoenergyRatio": 0,
+          "afterNoenergyRatio": 0,
+          "beforeSpeechRatio": 1,
+          "afterSpeechRatio": 1,
+          "beforeGender": "male",
+          "afterGender": "male",
+          "genderChange": false,
+          "musicToSpeech": false,
+          "speechToMusic": false,
+          "pauseToSpeech": false,
+          "speechToPause": false
+        },
+        "score": -0.6663225694444438
+      },
+      {
+        "seed": 1960,
+        "candidateStart": 1880.03096875,
+        "prev": null,
+        "diarChange": false,
+        "audio": {
+          "beforeMusicRatio": 0,
+          "afterMusicRatio": 0,
+          "beforeNoenergyRatio": 0,
+          "afterNoenergyRatio": 0,
+          "beforeSpeechRatio": 1,
+          "afterSpeechRatio": 1,
+          "beforeGender": "male",
+          "afterGender": "male",
+          "genderChange": false,
+          "musicToSpeech": false,
+          "speechToMusic": false,
+          "pauseToSpeech": false,
+          "speechToPause": false
+        },
+        "score": -0.6663225694444438
+      }
+    ],
+    "end": [
+      {
+        "seed": 4920,
+        "candidateEnd": 4927.03096875,
+        "next": {
+          "start": 4929.83221875,
+          "end": 4930.87846875,
+          "speaker": "post:SPEAKER_00"
+        },
+        "diarChange": false,
+        "audio": {
+          "beforeMusicRatio": 0,
+          "afterMusicRatio": 0,
+          "beforeNoenergyRatio": 0,
+          "afterNoenergyRatio": 0,
+          "beforeSpeechRatio": 1,
+          "afterSpeechRatio": 1,
+          "beforeGender": "female",
+          "afterGender": "male",
+          "genderChange": true,
+          "musicToSpeech": false,
+          "speechToMusic": false,
+          "pauseToSpeech": false,
+          "speechToPause": false
+        },
+        "handoffCue": true,
+        "score": 3.6447885416666694
+      },
+      {
+        "seed": 4941,
+        "candidateEnd": 4939.55221875,
+        "next": {
+          "start": 4941.94846875,
+          "end": 4947.24721875,
+          "speaker": "post:SPEAKER_00"
+        },
+        "diarChange": false,
+        "audio": {
+          "beforeMusicRatio": 0,
+          "afterMusicRatio": 0,
+          "beforeNoenergyRatio": 0,
+          "afterNoenergyRatio": 0,
+          "beforeSpeechRatio": 1,
+          "afterSpeechRatio": 1,
+          "beforeGender": "male",
+          "afterGender": "male",
+          "genderChange": false,
+          "musicToSpeech": false,
+          "speechToMusic": false,
+          "pauseToSpeech": false,
+          "speechToPause": false
+        },
+        "handoffCue": true,
+        "score": 1.7839135416666674
+      }
+    ]
+  },
+  "refined_speaker_bounds": {
+    "start_sec": 1880.03096875,
+    "end_sec": 4927.03096875
+  },
+  "final_clip_bounds": {
+    "clip_start_sec": 1867.46,
+    "clip_end_sec": 5101.54,
+    "applied_pre_pad_sec": 10,
+    "applied_post_pad_sec": 0.6400000000003274,
+    "next_speech_start_sec": 4929.79,
+    "prev_other_speaker_end_sec": null,
+    "next_other_speaker_start_sec": null,
+    "padding_source": "analyze.llm_single_adjudicator"
+  },
+  "llm_fallback": {
+    "invoked": false,
+    "reason": "local_confidence_ok"
+  },
+  "llm_end_style": {
+    "invoked": false,
+    "reason": "disabled"
+  },
+  "llm_single_adjudicator": {
+    "start": 1877.46,
+    "end": 5100.9,
+    "confidence": 0.95,
+    "decision": "adjust",
+    "reason": "Chapter and local boundaries agree; end placed at post-sermon boundary before closing/bendición section.; closing_arbiter(benediction): Includes altar/decision invitation and the final closing prayer/benediction; stops before the post-service announcement ('Nos vemos el miércoles...')."
+  },
+  "llm_single_adjudicator_padded": {
+    "clip_start_sec": 1867.46,
+    "clip_end_sec": 5101.54,
+    "applied_pre_pad_sec": 10,
+    "applied_post_pad_sec": 0.6400000000003274
+  }
+}

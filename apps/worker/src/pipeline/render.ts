@@ -218,6 +218,8 @@ async function detectSpeakerTrack(videoPath: string, start: number, end: number)
         const maxAccelPerSec2 = Number(process.env.VERTICAL_DYNAMIC_CROP_MAX_ACCEL_PER_SEC2 ?? 0.06);
         const followKp = Number(process.env.VERTICAL_DYNAMIC_CROP_FOLLOW_KP ?? 7.0);
         const followKd = Number(process.env.VERTICAL_DYNAMIC_CROP_FOLLOW_KD ?? 4.0);
+        const activeIdWeight = Number(process.env.VERTICAL_DYNAMIC_CROP_ACTIVE_ID_WEIGHT ?? 0.20);
+        const talkWeight = Number(process.env.VERTICAL_DYNAMIC_CROP_TALK_WEIGHT ?? 0.15);
         const compositionFaceWeight = Number(process.env.VERTICAL_DYNAMIC_CROP_COMPOSITION_FACE_WEIGHT ?? 0.75);
         const lookaheadSec = Number(process.env.VERTICAL_DYNAMIC_CROP_LOOKAHEAD_SEC ?? 1.2);
         const keyframeSec = Number(process.env.VERTICAL_DYNAMIC_CROP_KEYFRAME_SEC ?? 1.5);
@@ -251,6 +253,10 @@ async function detectSpeakerTrack(videoPath: string, start: number, end: number)
             String(followKp),
             '--follow_kd',
             String(followKd),
+            '--active_id_weight',
+            String(activeIdWeight),
+            '--talk_weight',
+            String(talkWeight),
             '--composition_face_weight',
             String(compositionFaceWeight),
             '--lookahead_sec',

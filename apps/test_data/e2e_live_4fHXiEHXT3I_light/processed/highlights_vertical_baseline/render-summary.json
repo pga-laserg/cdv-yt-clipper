@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-02-25T00:46:28.051Z",
+  "elapsed_sec": 113.5,
+  "center_x": 0.4859375,
+  "clips_rendered": 2,
+  "track_stats": [
+    {
+      "clip_index": 1,
+      "track": {
+        "points": 601,
+        "avg_step": 0.0005,
+        "max_step": 0.0025
+      }
+    },
+    {
+      "clip_index": 2,
+      "track": {
+        "points": 614,
+        "avg_step": 0.0002,
+        "max_step": 0.0015
+      }
+    }
+  ],
+  "outputs": [
+    "/Volumes/SSD Daniel/CDV/apps/test_data/e2e_live_4fHXiEHXT3I_light/processed/highlights_vertical/highlight_01.vertical.mp4",
+    "/Volumes/SSD Daniel/CDV/apps/test_data/e2e_live_4fHXiEHXT3I_light/processed/highlights_vertical/highlight_02.vertical.mp4"
+  ]
+}
