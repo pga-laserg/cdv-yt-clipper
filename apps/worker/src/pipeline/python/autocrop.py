@@ -403,14 +403,14 @@ def detect_face_track(
     end_sec = min(full_duration, start_sec + float(duration_sec)) if full_duration > 0 else start_sec + float(duration_sec)
     if end_sec <= start_sec:
         cap.release()
-        return []
+        return [], [], []
 
     step = max(1, int(fps * max(0.2, float(window_sec))))
     start_frame = int(start_sec * fps)
     end_frame = int(end_sec * fps)
     if end_frame <= start_frame:
         cap.release()
-        return []
+        return [], [], []
 
     raw = []
     last_center = float(target_center)
@@ -424,6 +424,9 @@ def detect_face_track(
     insightface_app = None
     allow_unanchored = os.getenv("VERTICAL_DYNAMIC_CROP_ALLOW_UNANCHORED", "true").lower() == "true"
     center_gate = float(os.getenv("VERTICAL_DYNAMIC_CROP_CENTER_GATE", 0.18))
+    identity_margin = float(os.getenv("VERTICAL_DYNAMIC_CROP_IDENTITY_MARGIN", 0.06))
+    min_face_h_abs = float(os.getenv("VERTICAL_DYNAMIC_CROP_MIN_FACE_H", 0.07))
+    min_rel_face_h = float(os.getenv("VERTICAL_DYNAMIC_CROP_MIN_REL_FACE_H", 0.55))
     np = None
     active_emb = None
     prev_gray = None
@@ -546,6 +549,8 @@ def detect_face_track(
     prev_scene_frame = None
     cut_fast_mode_frames = 0
     scene_fixed_center = None
+    scene_cut_times = []
+    scene_cut_min_gap = float(os.getenv("VERTICAL_SCENE_CUT_MIN_GAP_SEC", 0.35))
     scene_hold_enabled = os.getenv("VERTICAL_SCENE_HOLD_ENABLED", "true").lower() == "true"
     scene_hold_window = float(os.getenv("VERTICAL_SCENE_HOLD_WINDOW_SEC", 2.0))
     scene_hold_samples = []
@@ -564,6 +569,9 @@ def detect_face_track(
         # detect cuts every ~0.5s of source footage
         if frame_idx - last_sample_frame >= int(max(1, fps * 0.5)):
             if _is_cut(prev_scene_frame, frame, thresh=0.38):
+                t_cut = max(0.0, (frame_idx / fps) - start_sec)
+                if (not scene_cut_times) or abs(float(t_cut) - float(scene_cut_times[-1])) >= max(0.05, scene_cut_min_gap):
+                    scene_cut_times.append(float(t_cut))
                 # on cut: reset to identity anchor center, enable fast catch-up window
                 if identity_emb is not None:
                     cx = last_center if has_last else target_center
@@ -618,6 +626,23 @@ def detect_face_track(
                     })
 
                 if candidates:
+                    if identity_emb is not None:
+                        best_identity = max(c["identity_sim"] for c in candidates)
+                        best_fhh = max(c["fhh"] for c in candidates)
+                        dyn_min_h = float(min_face_h_abs)
+                        if has_last:
+                            dyn_min_h = max(dyn_min_h, float(last_face_h) * float(min_rel_face_h))
+                        anchored = []
+                        for c in candidates:
+                            if c["identity_sim"] < (best_identity - float(identity_margin)):
+                                continue
+                            # Reject persistent tiny/background faces, but allow fallback when all faces are small.
+                            if c["fhh"] < dyn_min_h and c["fhh"] < best_fhh * 0.85:
+                                continue
+                            anchored.append(c)
+                        if anchored:
+                            candidates = anchored
+
                     max_talk = max(c["talk_raw"] for c in candidates)
                     talk_scale = max(1e-6, max_talk)
                     for c in candidates:
@@ -627,9 +652,9 @@ def detect_face_track(
                             score = (
                                 0.50 * c["identity_sim"] +
                                 float(active_id_weight) * c["active_sim"] +
-                                0.12 * c["prev_score"] +
-                                0.08 * c["center_score"] +
-                                0.05 * c["area_score"] +
+                                0.14 * c["prev_score"] +
+                                0.06 * c["center_score"] +
+                                0.10 * c["area_score"] +
                                 float(talk_weight) * talk_score
                             )
                         else:
@@ -737,7 +762,7 @@ def detect_face_track(
 
     cap.release()
     if not raw:
-        return []
+        return [], [], []
 
     alpha = max(0.05, min(0.95, float(smooth_alpha)))
     smoothed = []
@@ -811,7 +836,8 @@ def detect_face_track(
         min_move=float(keyframe_min_move),
         max_hold_sec=float(keyframe_max_hold_sec)
     )
-    return final_track, camera_keyframes
+    scene_cuts = [float(t) for t in scene_cut_times if 0.0 < float(t) < float(end_rel)]
+    return final_track, camera_keyframes, scene_cuts
 
 if __name__ == "__main__":
     import argparse
@@ -848,7 +874,7 @@ if __name__ == "__main__":
     
     try:
         if args.track:
-            track, camera_keyframes = detect_face_track(
+            track, camera_keyframes, scene_cuts = detect_face_track(
                 video_file,
                 start_sec=args.start_sec,
                 duration_sec=args.duration_sec,
@@ -878,7 +904,7 @@ if __name__ == "__main__":
             else:
                 centers = sorted([p["center_x"] for p in track])
                 median = centers[len(centers) // 2]
-                print(json.dumps({"center_x": median, "track": track, "camera_keyframes": camera_keyframes}))
+                print(json.dumps({"center_x": median, "track": track, "camera_keyframes": camera_keyframes, "scene_cuts_sec": scene_cuts}))
         else:
             center_x = detect_face_opencv(video_file, limit_seconds)
             print(json.dumps({"center_x": center_x}))

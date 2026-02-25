@@ -28,6 +28,21 @@ interface CropTrackPoint {
     face_h?: number;
 }
 
+function getWorkerPythonCandidates(): string[] {
+    const override = String(process.env.WORKER_PYTHON_BIN ?? '').trim();
+    const candidates = [
+        path.resolve(__dirname, '../venv311/bin/python3'),
+        path.resolve(__dirname, '../venv/bin/python3'),
+        path.resolve(__dirname, '../../venv311/bin/python3'),
+        path.resolve(__dirname, '../../venv/bin/python3'),
+        path.resolve(process.cwd(), 'apps/worker/venv311/bin/python3'),
+        path.resolve(process.cwd(), 'apps/worker/venv/bin/python3'),
+        path.resolve(process.cwd(), 'venv311/bin/python3'),
+        path.resolve(process.cwd(), 'venv/bin/python3')
+    ];
+    return override ? [override, ...candidates] : candidates;
+}
+
 function resampleTrackUniform(points: CropTrackPoint[], dt: number): CropTrackPoint[] {
     if (!points.length) return [];
     const sorted = [...points].sort((a, b) => a.t - b.t);
@@ -200,15 +215,7 @@ async function detectSpeakerCenter(videoPath: string): Promise<number> {
         const pythonScript = scriptCandidates.find((p) => fs.existsSync(p));
         if (!pythonScript) return reject(new Error(`autocrop.py not found. Tried: ${scriptCandidates.join(', ')}`));
 
-        const candidates = [
-            path.resolve(__dirname, '../venv311/bin/python3'),
-            path.resolve(__dirname, '../venv/bin/python3'),
-            path.resolve(__dirname, '../../venv/bin/python3'),
-            path.resolve(process.cwd(), 'apps/worker/venv/bin/python3'),
-            path.resolve(process.cwd(), 'apps/worker/venv311/bin/python3'),
-            path.resolve(process.cwd(), 'venv311/bin/python3'),
-            path.resolve(process.cwd(), 'venv/bin/python3')
-        ];
+        const candidates = getWorkerPythonCandidates();
         const venvPython = candidates.find((p) => fs.existsSync(p));
         if (!venvPython) return reject(new Error(`python3 not found in expected venv paths: ${candidates.join(', ')}`));
 
@@ -245,15 +252,7 @@ async function detectSpeakerTrack(videoPath: string, start: number, end: number)
         const pythonScript = scriptCandidates.find((p) => fs.existsSync(p));
         if (!pythonScript) return reject(new Error(`autocrop.py not found. Tried: ${scriptCandidates.join(', ')}`));
 
-        const candidates = [
-            path.resolve(__dirname, '../venv311/bin/python3'),
-            path.resolve(__dirname, '../venv/bin/python3'),
-            path.resolve(__dirname, '../../venv/bin/python3'),
-            path.resolve(process.cwd(), 'apps/worker/venv/bin/python3'),
-            path.resolve(process.cwd(), 'apps/worker/venv311/bin/python3'),
-            path.resolve(process.cwd(), 'venv311/bin/python3'),
-            path.resolve(process.cwd(), 'venv/bin/python3')
-        ];
+        const candidates = getWorkerPythonCandidates();
         const venvPython = candidates.find((p) => fs.existsSync(p));
         if (!venvPython) return reject(new Error(`python3 not found in expected venv paths: ${candidates.join(', ')}`));
 
@@ -513,7 +512,7 @@ function renderVerticalClip(
             : buildCenterExpr(centerTrack || [{ t: 0, center_x: centerX }]);
         const xs = (processedTrack || centerTrack || []).map((p) => p.center_x);
         const torsoXAnchor = quantile(xs, 0.5);
-        const torsoXPull = Math.max(0, Math.min(0.8, Number(process.env.VERTICAL_TORSO_X_CENTER_PULL ?? 0.28)));
+        const torsoXPull = Math.max(0, Math.min(0.8, Number(process.env.VERTICAL_TORSO_X_CENTER_PULL ?? 0.40)));
         const centerExpr = Number.isFinite(torsoXAnchor) && torsoXPull > 0
             ? `((${(1 - torsoXPull).toFixed(4)})*(${centerExprRaw})+(${torsoXPull.toFixed(4)})*${torsoXAnchor.toFixed(6)})`
             : centerExprRaw;
@@ -521,16 +520,16 @@ function renderVerticalClip(
         // Looser vertical framing by default, with only mild motion-driven tighten when needed.
         const motionSignal = Math.max(0, quantile(zoomTrack.map((p) => p.z), 0.8) - 1);
         const zoomBase = Math.max(1, Number(process.env.VERTICAL_CROP_ZOOM_BASE ?? 1.0));
-        const zoomMotionGain = Math.max(0, Number(process.env.VERTICAL_CROP_ZOOM_MOTION_GAIN ?? 0.15));
-        const zoomMax = Math.max(1, Number(process.env.VERTICAL_CROP_ZOOM_MAX ?? 1.10));
+        const zoomMotionGain = Math.max(0, Number(process.env.VERTICAL_CROP_ZOOM_MOTION_GAIN ?? 0.08));
+        const zoomMax = Math.max(1, Number(process.env.VERTICAL_CROP_ZOOM_MAX ?? 1.04));
         const zoomConst = Math.max(1, Math.min(zoomMax, zoomBase + zoomMotionGain * motionSignal));
         const cropWidthExpr = `(ih/${zoomConst.toFixed(4)})*9/16`;
         const cropHeightExpr = `ih/${zoomConst.toFixed(4)}`;
         const xExpr = `max(min((${centerExpr})*iw-(${cropWidthExpr})/2\\,iw-(${cropWidthExpr}))\\,0)`;
         const ys = (processedTrack || centerTrack || []).map((p) => p.center_y ?? 0.5);
         const hs = (processedTrack || centerTrack || []).map((p) => p.face_h ?? 0.18);
-        const torsoBias = Number(process.env.VERTICAL_TORSO_BIAS_MULT ?? 0.95);
-        const headroomPos = Number(process.env.VERTICAL_TORSO_HEADROOM_POS ?? 0.30);
+        const torsoBias = Number(process.env.VERTICAL_TORSO_BIAS_MULT ?? 1.10);
+        const headroomPos = Number(process.env.VERTICAL_TORSO_HEADROOM_POS ?? 0.26);
         const anchorY = Math.max(0, Math.min(1, quantile(ys, 0.5) + torsoBias * quantile(hs, 0.5)));
         const yExpr = `max(min(${anchorY.toFixed(4)}*ih-(${cropHeightExpr})*${headroomPos.toFixed(4)}\\,ih-(${cropHeightExpr}))\\,0)`;
 
