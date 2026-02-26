@@ -60,6 +60,42 @@ def _calc_mouth_motion(prev_gray, curr_gray, bbox):
     diff = cv2.absdiff(curr_patch, prev_patch)
     return float(diff.mean() / 255.0)
 
+
+def _calc_motion_centroid(prev_gray, curr_gray):
+    """
+    Motion saliency proxy:
+    derive a robust centroid from frame-to-frame motion mask.
+    """
+    if prev_gray is None or curr_gray is None:
+        return None
+    if prev_gray.shape != curr_gray.shape:
+        return None
+    h, w = curr_gray.shape[:2]
+    if h <= 0 or w <= 0:
+        return None
+    diff = cv2.absdiff(curr_gray, prev_gray)
+    diff = cv2.GaussianBlur(diff, (0, 0), 1.0)
+    _, mask = cv2.threshold(diff, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=1)
+    area = float(cv2.countNonZero(mask))
+    area_ratio = area / float(max(1, w * h))
+    if area_ratio <= 1e-4:
+        return None
+    moments = cv2.moments(mask)
+    if abs(moments.get("m00", 0.0)) < 1e-6:
+        return None
+    cx = float(moments["m10"] / moments["m00"]) / float(max(1, w))
+    cy = float(moments["m01"] / moments["m00"]) / float(max(1, h))
+    cx = max(0.0, min(1.0, cx))
+    cy = max(0.0, min(1.0, cy))
+    return {
+        "center_x": cx,
+        "center_y": cy,
+        "strength": float(max(0.0, min(1.0, area_ratio * 12.0)))
+    }
+
+
 def _largest_face_center(face_cascade, frame, target_detection_height=360, prev_center=None, target_center=0.5):
     height = frame.shape[0]
     if height <= 0:
@@ -245,6 +281,115 @@ def _apply_motion_filter(
     return out
 
 
+def _apply_speed_accel_limits(points, max_speed_per_sec=0.05, max_accel_per_sec2=0.03):
+    if not points:
+        return []
+    out = [{"t": float(points[0]["t"]), "center_x": float(points[0]["center_x"])}]
+    v = 0.0
+    max_speed = max(1e-4, float(max_speed_per_sec))
+    max_accel = max(1e-4, float(max_accel_per_sec2))
+    for i in range(1, len(points)):
+        prev = out[-1]
+        cur = points[i]
+        t0 = float(prev["t"])
+        t1 = float(cur["t"])
+        dt = max(1e-4, t1 - t0)
+        desired = (float(cur["center_x"]) - float(prev["center_x"])) / dt
+        dv = desired - v
+        max_dv = max_accel * dt
+        if dv > max_dv:
+            desired = v + max_dv
+        elif dv < -max_dv:
+            desired = v - max_dv
+        if desired > max_speed:
+            desired = max_speed
+        elif desired < -max_speed:
+            desired = -max_speed
+        x1 = float(prev["center_x"]) + desired * dt
+        x1 = max(0.0, min(1.0, x1))
+        out.append({"t": t1, "center_x": x1})
+        v = desired
+    return out
+
+
+def _apply_global_optimizer(
+    points,
+    end_rel,
+    sample_dt=0.08,
+    lambda_vel=0.20,
+    lambda_acc=1.20,
+    lambda_jerk=0.60,
+    iterations=120,
+    step_size=0.035,
+    max_speed_per_sec=0.05,
+    max_accel_per_sec2=0.03
+):
+    """
+    Tier-C global optimizer (quadratic objective, solved iteratively):
+      data fidelity + velocity + acceleration + jerk penalties.
+    """
+    if not points:
+        return []
+    dt = max(0.02, float(sample_dt))
+    end_rel = max(0.0, float(end_rel))
+    n = int(max(2, math.ceil(end_rel / dt))) + 1
+    times = [min(end_rel, i * dt) for i in range(n)]
+    z = [_interp_center(points, t) for t in times]
+    x = list(z)
+    lv = max(0.0, float(lambda_vel))
+    la = max(0.0, float(lambda_acc))
+    lj = max(0.0, float(lambda_jerk))
+    iters = max(1, int(iterations))
+    eta = max(1e-4, float(step_size))
+
+    # Anchor clip endpoints to avoid drift at boundaries.
+    x[0] = z[0]
+    x[-1] = z[-1]
+
+    for _ in range(iters):
+        g = [2.0 * (x[i] - z[i]) for i in range(n)]
+
+        if lv > 0.0:
+            for i in range(1, n):
+                d = x[i] - x[i - 1]
+                w = 2.0 * lv
+                g[i] += w * d
+                g[i - 1] -= w * d
+
+        if la > 0.0 and n >= 3:
+            for i in range(1, n - 1):
+                a = x[i + 1] - 2.0 * x[i] + x[i - 1]
+                w = 2.0 * la
+                g[i + 1] += w * a
+                g[i] += -2.0 * w * a
+                g[i - 1] += w * a
+
+        if lj > 0.0 and n >= 4:
+            for i in range(1, n - 2):
+                j = x[i + 2] - 3.0 * x[i + 1] + 3.0 * x[i] - x[i - 1]
+                w = 2.0 * lj
+                g[i + 2] += w * j
+                g[i + 1] += -3.0 * w * j
+                g[i] += 3.0 * w * j
+                g[i - 1] += -1.0 * w * j
+
+        for i in range(1, n - 1):
+            x[i] = x[i] - eta * g[i]
+            if x[i] < 0.0:
+                x[i] = 0.0
+            elif x[i] > 1.0:
+                x[i] = 1.0
+        x[0] = z[0]
+        x[-1] = z[-1]
+
+    path = [{"t": float(times[i]), "center_x": float(x[i])} for i in range(n)]
+    return _apply_speed_accel_limits(
+        path,
+        max_speed_per_sec=float(max_speed_per_sec),
+        max_accel_per_sec2=float(max_accel_per_sec2)
+    )
+
+
 def _apply_hold_ramp(
     points,
     threshold=0.03,
@@ -427,6 +572,13 @@ def detect_face_track(
     identity_margin = float(os.getenv("VERTICAL_DYNAMIC_CROP_IDENTITY_MARGIN", 0.06))
     min_face_h_abs = float(os.getenv("VERTICAL_DYNAMIC_CROP_MIN_FACE_H", 0.07))
     min_rel_face_h = float(os.getenv("VERTICAL_DYNAMIC_CROP_MIN_REL_FACE_H", 0.55))
+    motion_weight = float(os.getenv("VERTICAL_DYNAMIC_CROP_MOTION_WEIGHT", 0.08))
+    motion_fallback_min_strength = float(os.getenv("VERTICAL_DYNAMIC_CROP_MOTION_FALLBACK_MIN_STRENGTH", 0.12))
+    motion_fallback_blend = float(os.getenv("VERTICAL_DYNAMIC_CROP_MOTION_FALLBACK_BLEND", 0.35))
+    deadband_px = float(os.getenv("VERTICAL_DYNAMIC_CROP_DEADBAND_PX", 8.0))
+    hysteresis_px = float(os.getenv("VERTICAL_DYNAMIC_CROP_HYSTERESIS_PX", 12.0))
+    hold_sec_override = float(os.getenv("VERTICAL_DYNAMIC_CROP_HOLD_SEC", 0.0))
+    hold_windows_dyn = int(max(1, round(hold_sec_override / max(0.05, float(window_sec))))) if hold_sec_override > 0 else int(max(1, hold_windows))
     np = None
     active_emb = None
     prev_gray = None
@@ -561,6 +713,8 @@ def detect_face_track(
         if not ok:
             break
         curr_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        frame_h, frame_w = curr_gray.shape[:2]
+        motion_info = _calc_motion_centroid(prev_gray, curr_gray)
         cx = None
         cy = None
         fh = None
@@ -612,6 +766,12 @@ def detect_face_track(
                     prev_score = 1.0 - abs(cxx - last_center) if has_last else 0.0
                     center_score = 1.0 - abs(cxx - float(target_center))
                     talk_raw = _calc_mouth_motion(prev_gray, curr_gray, bbox)
+                    motion_score = 0.0
+                    if motion_info is not None:
+                        mx = float(motion_info.get("center_x", 0.5))
+                        my = float(motion_info.get("center_y", 0.5))
+                        mstr = float(motion_info.get("strength", 0.0))
+                        motion_score = max(0.0, 1.0 - (0.65 * abs(cxx - mx) + 0.35 * abs(cyy - my))) * mstr
                     candidates.append({
                         "cxx": float(cxx),
                         "cyy": float(cyy),
@@ -622,6 +782,7 @@ def detect_face_track(
                         "center_score": float(max(0.0, min(1.0, center_score))),
                         "area_score": float(max(0.0, min(1.0, area_ratio * 20.0))),
                         "talk_raw": float(max(0.0, talk_raw)),
+                        "motion_score": float(max(0.0, min(1.0, motion_score))),
                         "emb": norm_emb,
                     })
 
@@ -655,7 +816,8 @@ def detect_face_track(
                                 0.14 * c["prev_score"] +
                                 0.06 * c["center_score"] +
                                 0.10 * c["area_score"] +
-                                float(talk_weight) * talk_score
+                                float(talk_weight) * talk_score +
+                                float(motion_weight) * c["motion_score"]
                             )
                         else:
                             # Unanchored mode: continuity/talk drive the decision.
@@ -664,7 +826,8 @@ def detect_face_track(
                                 0.45 * c["prev_score"] +
                                 0.15 * c["center_score"] +
                                 0.20 * c["area_score"] +
-                                float(talk_weight) * talk_score
+                                float(talk_weight) * talk_score +
+                                float(motion_weight) * c["motion_score"]
                             )
                         c["score"] = float(score)
                         if score > best_score:
@@ -687,6 +850,18 @@ def detect_face_track(
             )
             if face_info is not None:
                 cx, cy, fh = face_info
+        if cx is None and motion_info is not None:
+            m_strength = float(motion_info.get("strength", 0.0))
+            if m_strength >= float(motion_fallback_min_strength):
+                mx = float(motion_info.get("center_x", last_center if has_last else target_center))
+                my = float(motion_info.get("center_y", last_center_y if has_last else 0.5))
+                blend = max(0.0, min(1.0, float(motion_fallback_blend)))
+                if has_last:
+                    cx = (1.0 - blend) * float(last_center) + blend * mx
+                else:
+                    cx = mx
+                cy = my
+                fh = last_face_h if has_last else 0.18
         if cx is None:
             cx = last_center if has_last else 0.5
         if cy is None:
@@ -724,23 +899,29 @@ def detect_face_track(
                 cx = last_center + max_step if cx > last_center else last_center - max_step
             # deadband: ignore tiny changes that cause visual jitter
             delta = cx - last_center
-            if abs(delta) < float(deadband):
+            norm_deadband_px = float(deadband_px) / float(max(1, frame_w))
+            deadband_eff = max(float(deadband), norm_deadband_px)
+            norm_hysteresis_px = float(hysteresis_px) / float(max(1, frame_w))
+            hysteresis_eff = max(deadband_eff, norm_hysteresis_px)
+            if abs(delta) < deadband_eff:
                 cx = last_center
                 pending_dir = 0
                 pending_count = 0
             else:
                 # hold: require sustained movement direction for a few windows
                 direction = 1 if delta > 0 else -1
+                if abs(delta) < hysteresis_eff:
+                    direction = pending_dir if pending_dir != 0 else direction
                 if pending_dir != direction:
                     pending_dir = direction
                     pending_count = 1
                     cx = last_center
                 else:
                     pending_count += 1
-                    if pending_count < int(max(1, hold_windows)):
+                    if pending_count < int(max(1, hold_windows_dyn)):
                         cx = last_center
                     else:
-                        pending_count = int(max(1, hold_windows))
+                        pending_count = int(max(1, hold_windows_dyn))
         last_center = cx
         last_center_y = cy
         last_face_h = fh
@@ -794,8 +975,28 @@ def detect_face_track(
             "center_y": float(smoothed[-1].get("center_y", 0.5)),
             "face_h": float(smoothed[-1].get("face_h", 0.18))
         })
+    use_global_optimizer = os.getenv("VERTICAL_DYNAMIC_CROP_GLOBAL_OPTIMIZER", "false").lower() == "true"
     use_hold_ramp = os.getenv("VERTICAL_DYNAMIC_CROP_USE_HOLD_RAMP", "false").lower() == "true"
-    if use_hold_ramp:
+    if use_global_optimizer:
+        go_dt = float(os.getenv("VERTICAL_DYNAMIC_CROP_GO_DT", 0.08))
+        go_lambda_vel = float(os.getenv("VERTICAL_DYNAMIC_CROP_GO_LAMBDA_VEL", 0.20))
+        go_lambda_acc = float(os.getenv("VERTICAL_DYNAMIC_CROP_GO_LAMBDA_ACC", 1.20))
+        go_lambda_jerk = float(os.getenv("VERTICAL_DYNAMIC_CROP_GO_LAMBDA_JERK", 0.60))
+        go_iters = int(float(os.getenv("VERTICAL_DYNAMIC_CROP_GO_ITERS", 120)))
+        go_step = float(os.getenv("VERTICAL_DYNAMIC_CROP_GO_STEP", 0.035))
+        filtered = _apply_global_optimizer(
+            [{"t": p["t"], "center_x": p["center_x"]} for p in smoothed],
+            end_rel=end_rel,
+            sample_dt=go_dt,
+            lambda_vel=go_lambda_vel,
+            lambda_acc=go_lambda_acc,
+            lambda_jerk=go_lambda_jerk,
+            iterations=go_iters,
+            step_size=go_step,
+            max_speed_per_sec=float(max_delta_per_sec),
+            max_accel_per_sec2=float(max_accel_per_sec2)
+        )
+    elif use_hold_ramp:
         threshold = float(os.getenv("VERTICAL_DYNAMIC_CROP_RAMP_THRESHOLD", 0.03))
         confirm_sec = float(os.getenv("VERTICAL_DYNAMIC_CROP_RAMP_CONFIRM_SEC", 0.3))
         ramp_sec = float(os.getenv("VERTICAL_DYNAMIC_CROP_RAMP_SEC", 0.9))

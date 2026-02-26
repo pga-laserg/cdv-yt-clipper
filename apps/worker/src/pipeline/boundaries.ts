@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import { OpenAI } from 'openai';
 import { v2 as speechV2 } from '@google-cloud/speech';
 import { Storage } from '@google-cloud/storage';
@@ -42,6 +42,60 @@ interface AudioEventPassResult {
     segments: AudioEvent[];
 }
 
+interface OcrEvent {
+    start: number;
+    end: number;
+    text: string;
+    type: 'speaker_name' | 'bible_verse' | 'sermon_title' | 'song_lyric' | 'on_screen_text';
+    region: 'lower_third' | 'slide' | 'full';
+    confidence: number;
+    near_scene_cut?: boolean;
+}
+
+interface OcrEventPassResult {
+    source: string;
+    duration_sec: number;
+    sample_sec: number;
+    scene_cuts_sec: number[];
+    segments: OcrEvent[];
+}
+
+interface SlideOcrEvent {
+    start: number;
+    end: number;
+    text: string;
+    type: 'speaker_name' | 'bible_verse' | 'sermon_title' | 'song_lyric' | 'on_screen_text';
+    confidence: number;
+    slide_id?: string;
+}
+
+interface SlideOcrPassResult {
+    source: string;
+    duration_sec: number;
+    sample_sec: number;
+    shot_boundaries_sec?: number[];
+    events: SlideOcrEvent[];
+    summary?: Record<string, any>;
+}
+
+type OcrPipeline = 'v1' | 'v2' | 'v3';
+
+interface TranscriptBoundarySignal {
+    sermonCueScore: number;
+    prayerCueScore: number;
+    worshipCueScore: number;
+    announcementCueScore: number;
+    closingCueScore: number;
+    handoffCueScore: number;
+    hasFelizSabado: boolean;
+    sermonLikely: boolean;
+    prayerDominant: boolean;
+    worshipDominant: boolean;
+    announcementDominant: boolean;
+    closingLikely: boolean;
+    handoffLikely: boolean;
+}
+
 interface FindBoundariesOptions {
     workDir?: string;
     audioPath?: string;
@@ -80,6 +134,23 @@ type BoundaryPipelineProfile = 'default' | 'light';
 function getBoundaryPipelineProfile(): BoundaryPipelineProfile {
     const raw = String(process.env.BOUNDARY_PIPELINE_PROFILE ?? 'default').trim().toLowerCase();
     return raw === 'light' ? 'light' : 'default';
+}
+
+function normalizeOcrPipeline(raw: string | undefined | null): OcrPipeline {
+    const v = String(raw ?? 'v1').trim().toLowerCase();
+    if (v === 'v2' || v === '2' || v === 'ocr_v2') return 'v2';
+    if (v === 'v3' || v === '3' || v === 'ocr_v3') return 'v3';
+    return 'v1';
+}
+
+function getBoundaryOcrPipeline(): OcrPipeline {
+    return normalizeOcrPipeline(process.env.BOUNDARY_OCR_PIPELINE ?? process.env.OCR_PIPELINE ?? 'v1');
+}
+
+function getOcrEventsFilename(pipeline: OcrPipeline): string {
+    if (pipeline === 'v2') return 'ocr.events.v2.json';
+    if (pipeline === 'v3') return 'ocr.events.v3.json';
+    return 'ocr.events.json';
 }
 
 function profileNumber(
@@ -705,6 +776,112 @@ function boundaryAudioSignal(events: AudioEvent[], t: number, windowSec = 12) {
     };
 }
 
+function getOcrWindowDurations(events: OcrEvent[], start: number, end: number): Map<string, number> {
+    const durations = new Map<string, number>();
+    for (const e of events) {
+        const ol = overlap(e.start, e.end, start, end);
+        if (ol <= 0) continue;
+        const key = String(e.type ?? 'on_screen_text').toLowerCase();
+        durations.set(key, (durations.get(key) ?? 0) + ol);
+    }
+    return durations;
+}
+
+function boundaryOcrSignal(ocr: OcrEventPassResult, t: number, windowSec = 18) {
+    const segments = Array.isArray(ocr?.segments) ? ocr.segments : [];
+    if (segments.length === 0) return null;
+    const beforeStart = Math.max(0, t - windowSec);
+    const beforeEnd = t;
+    const afterStart = t;
+    const afterEnd = t + windowSec;
+    const before = getOcrWindowDurations(segments, beforeStart, beforeEnd);
+    const after = getOcrWindowDurations(segments, afterStart, afterEnd);
+    const beforeTotal = Math.max(0.001, beforeEnd - beforeStart);
+    const afterTotal = Math.max(0.001, afterEnd - afterStart);
+
+    const beforeSermonCueRatio =
+        ((before.get('sermon_title') ?? 0) + (before.get('bible_verse') ?? 0)) / beforeTotal;
+    const afterSermonCueRatio =
+        ((after.get('sermon_title') ?? 0) + (after.get('bible_verse') ?? 0)) / afterTotal;
+    const beforeLyricRatio = (before.get('song_lyric') ?? 0) / beforeTotal;
+    const afterLyricRatio = (after.get('song_lyric') ?? 0) / afterTotal;
+    const beforeSpeakerNameRatio = (before.get('speaker_name') ?? 0) / beforeTotal;
+    const afterSpeakerNameRatio = (after.get('speaker_name') ?? 0) / afterTotal;
+    const lyricToSermon = beforeLyricRatio >= 0.12 && afterSermonCueRatio >= 0.08;
+    const sermonToLyric = beforeSermonCueRatio >= 0.08 && afterLyricRatio >= 0.12;
+    const lyricDominantNear = (beforeLyricRatio + afterLyricRatio) / 2 >= 0.2;
+    const hasSpeakerNameNear = beforeSpeakerNameRatio >= 0.08 || afterSpeakerNameRatio >= 0.08;
+    const hasSermonCueNear = beforeSermonCueRatio >= 0.08 || afterSermonCueRatio >= 0.08;
+    const nearSceneCut = Array.isArray(ocr.scene_cuts_sec)
+        ? ocr.scene_cuts_sec.some((c) => Math.abs(Number(c) - t) <= 3.0)
+        : false;
+
+    return {
+        beforeSermonCueRatio,
+        afterSermonCueRatio,
+        beforeLyricRatio,
+        afterLyricRatio,
+        beforeSpeakerNameRatio,
+        afterSpeakerNameRatio,
+        lyricToSermon,
+        sermonToLyric,
+        lyricDominantNear,
+        hasSpeakerNameNear,
+        hasSermonCueNear,
+        nearSceneCut
+    };
+}
+
+function getSlideWindowDurations(events: SlideOcrEvent[], start: number, end: number): Map<string, number> {
+    const durations = new Map<string, number>();
+    for (const e of events) {
+        const ol = overlap(e.start, e.end, start, end);
+        if (ol <= 0) continue;
+        const key = String(e.type ?? 'on_screen_text').toLowerCase();
+        durations.set(key, (durations.get(key) ?? 0) + ol);
+    }
+    return durations;
+}
+
+function boundarySlideSignal(slide: SlideOcrPassResult, t: number, windowSec = 18) {
+    const events = Array.isArray(slide?.events) ? slide.events : [];
+    if (events.length === 0) return null;
+    const beforeStart = Math.max(0, t - windowSec);
+    const beforeEnd = t;
+    const afterStart = t;
+    const afterEnd = t + windowSec;
+    const before = getSlideWindowDurations(events, beforeStart, beforeEnd);
+    const after = getSlideWindowDurations(events, afterStart, afterEnd);
+    const beforeTotal = Math.max(0.001, beforeEnd - beforeStart);
+    const afterTotal = Math.max(0.001, afterEnd - afterStart);
+
+    const beforeSermonCueRatio =
+        ((before.get('sermon_title') ?? 0) + (before.get('bible_verse') ?? 0)) / beforeTotal;
+    const afterSermonCueRatio =
+        ((after.get('sermon_title') ?? 0) + (after.get('bible_verse') ?? 0)) / afterTotal;
+    const beforeLyricRatio = (before.get('song_lyric') ?? 0) / beforeTotal;
+    const afterLyricRatio = (after.get('song_lyric') ?? 0) / afterTotal;
+    const lyricToSermon = beforeLyricRatio >= 0.12 && afterSermonCueRatio >= 0.08;
+    const sermonToLyric = beforeSermonCueRatio >= 0.08 && afterLyricRatio >= 0.12;
+    const lyricDominantNear = (beforeLyricRatio + afterLyricRatio) / 2 >= 0.2;
+    const hasSermonCueNear = beforeSermonCueRatio >= 0.08 || afterSermonCueRatio >= 0.08;
+    const hasSermonTitleNear = events.some((e) => e.type === 'sermon_title' && overlap(e.start, e.end, t - 15, t + 15) > 0);
+    const hasBibleVerseNear = events.some((e) => e.type === 'bible_verse' && overlap(e.start, e.end, t - 15, t + 15) > 0);
+
+    return {
+        beforeSermonCueRatio,
+        afterSermonCueRatio,
+        beforeLyricRatio,
+        afterLyricRatio,
+        lyricToSermon,
+        sermonToLyric,
+        lyricDominantNear,
+        hasSermonCueNear,
+        hasSermonTitleNear,
+        hasBibleVerseNear,
+    };
+}
+
 function isNonSpeech(text?: string): boolean {
     const t = (text ?? '').toLowerCase().trim();
     if (!t) return true;
@@ -729,6 +906,190 @@ function hasSermonHandoffCue(segments: Segment[], aroundSec: number, windowSec =
         /\b(les queremos agradecer|gracias pastor)\b/
     ];
     return patterns.some((rx) => rx.test(text));
+}
+
+function collectSpeechText(segments: Segment[], start: number, end: number): string {
+    return segmentsInRange(segments, start, end)
+        .filter((s) => !isNonSpeech(s.text))
+        .map((s) => cleanText(s.text).toLowerCase())
+        .join(' ');
+}
+
+function scoreRegexMatches(text: string, patterns: RegExp[]): number {
+    if (!text) return 0;
+    let score = 0;
+    for (const rx of patterns) {
+        const m = text.match(rx);
+        if (!m) continue;
+        score += Array.isArray(m) ? Math.max(1, m.length) : 1;
+    }
+    return score;
+}
+
+function boundaryTranscriptSignal(segments: Segment[], t: number, kind: 'start' | 'end'): TranscriptBoundarySignal {
+    const beforeSec = kind === 'start' ? 180 : 160;
+    const afterSec = kind === 'start' ? 210 : 170;
+    const beforeText = collectSpeechText(segments, Math.max(0, t - beforeSec), Math.max(0, t - 8));
+    const afterText = collectSpeechText(segments, Math.max(0, t - 8), t + afterSec);
+    const nearText = `${beforeText} ${afterText}`.trim();
+
+    const sermonPatterns = [
+        /\bfeliz s[áa]bado\b/g,
+        /\b(predicaci[oó]n|serm[oó]n|mensaje)\b/g,
+        /\b(tema|t[ií]tulo)\b/g,
+        /\b(abr(a|an|amos)\s+(su|sus)?\s*biblias?|abra su biblia)\b/g,
+        /\b(palabra de dios|evangelio|texto b[ií]blico|pasaje)\b/g,
+        /\b(vamos a estudiar|estudiemos)\b/g
+    ];
+    const prayerPatterns = [
+        /\b(oremos|oraci[oó]n|orar|inclinar el rostro|inclinen el rostro|pong[aá]monos de rodillas)\b/g,
+        /\b(te lo pedimos|en el nombre de jes[uú]s|am[eé]n[,.\s]|am[eé]n$)\b/g,
+        /\b(padre nuestro|se[ñn]or te damos gracias)\b/g
+    ];
+    const worshipPatterns = [
+        /\b(cantemos|vamos a cantar|alabanza|adoraci[oó]n|himno|canci[oó]n|m[uú]sica)\b/g,
+        /\b(grupo de alabanza|equipo de alabanza|coro)\b/g
+    ];
+    const announcementPatterns = [
+        /\b(anuncios|anuncio|recordatorio|actividad|programaci[oó]n)\b/g,
+        /\b(diezmos?|ofrendas?|ofertorio|potluck|convivio)\b/g,
+        /\b(abrazo al que est[aá] al lado|saluda al que est[aá] a tu lado)\b/g
+    ];
+    const closingPatterns = [
+        /\b(am[eé]n[,.\s]|am[eé]n$)\b/g,
+        /\b(oraci[oó]n final|oramos|oremos)\b/g,
+        /\b(bendici[oó]n|despedida|que dios les bendiga)\b/g
+    ];
+    const handoffPatterns = [
+        /\b(vamos a cantar|cantemos|alabanza)\b/g,
+        /\b(invito al (equipo|grupo) de alabanza)\b/g,
+        /\b(p[óo]nganse de pie|ponerse de pie|pasen aqu[ií]|pasar aqu[ií])\b/g,
+        /\b(les queremos agradecer|gracias pastor)\b/g
+    ];
+
+    const sermonCueScore =
+        scoreRegexMatches(afterText, sermonPatterns) * 1.0 + scoreRegexMatches(beforeText, sermonPatterns) * 0.4;
+    const prayerCueScore =
+        scoreRegexMatches(afterText, prayerPatterns) * 0.95 + scoreRegexMatches(beforeText, prayerPatterns) * 0.6;
+    const worshipCueScore =
+        scoreRegexMatches(afterText, worshipPatterns) * 1.0 + scoreRegexMatches(beforeText, worshipPatterns) * 0.6;
+    const announcementCueScore =
+        scoreRegexMatches(afterText, announcementPatterns) * 1.0 + scoreRegexMatches(beforeText, announcementPatterns) * 0.5;
+    const closingCueScore =
+        scoreRegexMatches(afterText, closingPatterns) * 1.0 + scoreRegexMatches(beforeText, closingPatterns) * 0.4;
+    const handoffCueScore =
+        scoreRegexMatches(afterText, handoffPatterns) * 1.0 + scoreRegexMatches(beforeText, handoffPatterns) * 0.5;
+
+    const hasFelizSabado = /\bfeliz s[áa]bado\b/.test(afterText);
+    const prayerDominant = prayerCueScore >= 2.2 && sermonCueScore < 1.2;
+    const worshipDominant = worshipCueScore >= 1.9 && sermonCueScore < 1.2;
+    const announcementDominant = announcementCueScore >= 1.7 && sermonCueScore < 1.2;
+    const sermonLikely =
+        (sermonCueScore + (hasFelizSabado ? 1.2 : 0)) >= 1.8 &&
+        !(prayerDominant || worshipDominant || announcementDominant);
+    const closingLikely = closingCueScore >= 1.3 || (closingCueScore >= 0.8 && handoffCueScore >= 0.8);
+    const handoffLikely = handoffCueScore >= 1.0 || hasSermonHandoffCue(segments, t, 95);
+
+    return {
+        sermonCueScore,
+        prayerCueScore,
+        worshipCueScore,
+        announcementCueScore,
+        closingCueScore,
+        handoffCueScore,
+        hasFelizSabado,
+        sermonLikely,
+        prayerDominant,
+        worshipDominant,
+        announcementDominant,
+        closingLikely,
+        handoffLikely
+    };
+}
+
+function deriveTranscriptStartCandidates(
+    segments: Segment[],
+    guessStart: number,
+    guessEnd: number,
+    searchBackSec = 420,
+    searchForwardSec = 1800,
+    limit = 8
+): number[] {
+    const startMin = Math.max(0, guessStart - searchBackSec);
+    const startMax = Math.max(startMin + 30, Math.min(guessEnd - 30, guessStart + searchForwardSec));
+    const cuePatterns: Array<{ rx: RegExp; score: number }> = [
+        { rx: /\bfeliz s[áa]bado\b/i, score: 2.4 },
+        { rx: /\b(abr(a|an|amos)\s+(su|sus)?\s*biblias?|abra su biblia)\b/i, score: 2.0 },
+        { rx: /\b(predicaci[oó]n|serm[oó]n|mensaje)\b/i, score: 1.8 },
+        { rx: /\b(tema|t[ií]tulo)\b/i, score: 1.2 },
+        { rx: /\b(vamos a estudiar|estudiemos|palabra de dios)\b/i, score: 1.2 }
+    ];
+    const rejectPatterns = [
+        /\b(cantemos|vamos a cantar|alabanza|adoraci[oó]n|himno)\b/i,
+        /\b(ofrendas?|diezmos?|anuncios?)\b/i
+    ];
+    const scored = segments
+        .filter((s) => s.start >= startMin && s.start <= startMax && !isNonSpeech(s.text))
+        .map((s) => {
+            const text = cleanText(s.text).toLowerCase();
+            let score = 0;
+            for (const cue of cuePatterns) {
+                if (cue.rx.test(text)) score += cue.score;
+            }
+            for (const rx of rejectPatterns) {
+                if (rx.test(text)) score -= 1.4;
+            }
+            score += Math.max(0, 1 - Math.abs(s.start - guessStart) / 900);
+            return { start: s.start, score };
+        })
+        .filter((v) => v.score >= 1.2)
+        .sort((a, b) => b.score - a.score || a.start - b.start);
+    const out: number[] = [];
+    for (const row of scored) {
+        if (out.some((v) => Math.abs(v - row.start) < 15)) continue;
+        out.push(row.start);
+        if (out.length >= limit) break;
+    }
+    return out;
+}
+
+function deriveTranscriptEndCandidates(
+    segments: Segment[],
+    guessStart: number,
+    guessEnd: number,
+    searchBackSec = 1600,
+    searchForwardSec = 500,
+    limit = 8
+): number[] {
+    const endMin = Math.max(guessStart + 60, guessEnd - searchBackSec);
+    const endMax = guessEnd + searchForwardSec;
+    const cuePatterns: Array<{ rx: RegExp; score: number }> = [
+        { rx: /\b(am[eé]n[,.\s]|am[eé]n$)\b/i, score: 1.3 },
+        { rx: /\b(oraci[oó]n final|oremos|oramos)\b/i, score: 1.6 },
+        { rx: /\b(vamos a cantar|cantemos|equipo de alabanza)\b/i, score: 1.4 },
+        { rx: /\b(les queremos agradecer|gracias pastor|que dios les bendiga)\b/i, score: 1.4 },
+        { rx: /\b(ponerse de pie|p[óo]nganse de pie)\b/i, score: 1.0 }
+    ];
+    const scored = segments
+        .filter((s) => s.end >= endMin && s.end <= endMax && !isNonSpeech(s.text))
+        .map((s) => {
+            const text = cleanText(s.text).toLowerCase();
+            let score = 0;
+            for (const cue of cuePatterns) {
+                if (cue.rx.test(text)) score += cue.score;
+            }
+            score += Math.max(0, 1 - Math.abs(s.end - guessEnd) / 900);
+            return { end: s.end, score };
+        })
+        .filter((v) => v.score >= 1.0)
+        .sort((a, b) => b.score - a.score || a.end - b.end);
+    const out: number[] = [];
+    for (const row of scored) {
+        if (out.some((v) => Math.abs(v - row.end) < 15)) continue;
+        out.push(row.end);
+        if (out.length >= limit) break;
+    }
+    return out;
 }
 
 async function extractChunk(audioPath: string, outPath: string, startSec: number, endSec: number): Promise<void> {
@@ -977,6 +1338,176 @@ async function runAudioEventPass(audioPath: string, outPath: string): Promise<Au
     return raw;
 }
 
+function pythonHasOcrModule(pythonBin: string): boolean {
+    try {
+        const probe = spawnSync(
+            pythonBin,
+            ['-c', 'import importlib.util as u; print(int(bool(u.find_spec("easyocr") or u.find_spec("pytesseract"))))'],
+            { encoding: 'utf8' }
+        );
+        if (probe.status !== 0) return false;
+        return String(probe.stdout ?? '').trim() === '1';
+    } catch {
+        return false;
+    }
+}
+
+function resolveOcrPythonBin(): { pythonBin: string; hasOcrModule: boolean } {
+    const venv311 = path.resolve(__dirname, '../../venv311/bin/python3');
+    const workerVenv = path.resolve(__dirname, '../../venv/bin/python3');
+    const explicitBins = [process.env.OCR_PYTHON_BIN, process.env.FACE_PYTHON_BIN]
+        .map((v) => (v ? path.resolve(v) : ''))
+        .filter(Boolean);
+    const candidates = [...explicitBins, venv311, workerVenv, 'python3', 'python'];
+    let fallback = explicitBins[0] || (fs.existsSync(venv311) ? venv311 : workerVenv);
+    for (const c of candidates) {
+        const exists = c === 'python3' || c === 'python' ? true : fs.existsSync(c);
+        if (!exists) continue;
+        if (!fallback) fallback = c;
+        if (pythonHasOcrModule(c)) return { pythonBin: c, hasOcrModule: true };
+    }
+    return { pythonBin: fallback || 'python3', hasOcrModule: false };
+}
+
+function resolvePreferredOcrVideoPath(videoPath: string, outPath: string): string {
+    const preferHq = String(process.env.OCR_PREFER_HQ_SOURCE ?? 'true').toLowerCase() === 'true';
+    if (!preferHq) return videoPath;
+    const workDir = path.dirname(outPath);
+    const candidates = [
+        path.join(workDir, 'source.mp4'),
+        path.join(workDir, 'source.original.mp4'),
+        path.join(workDir, 'source.original.mkv'),
+        path.join(workDir, 'source.original.webm'),
+        path.join(workDir, 'source.original.mov'),
+    ];
+    const providedLooksLight = /source\.light\./i.test(path.basename(videoPath));
+    if (providedLooksLight) {
+        const better = candidates.find((p) => fs.existsSync(p));
+        if (better) return better;
+    }
+    if (fs.existsSync(videoPath)) return videoPath;
+    const fallback = candidates.find((p) => fs.existsSync(p));
+    return fallback ?? videoPath;
+}
+
+async function runOcrEventPass(
+    videoPath: string,
+    outPath: string,
+    durationSec: number,
+    pipeline: OcrPipeline
+): Promise<OcrEventPassResult> {
+    const pythonScriptCandidates =
+        pipeline === 'v2'
+            ? [path.resolve(__dirname, 'python/ocr_v2.py'), path.resolve(__dirname, '../../src/pipeline/python/ocr_v2.py')]
+            : pipeline === 'v3'
+              ? [path.resolve(__dirname, 'python/ocr_v3.py'), path.resolve(__dirname, '../../src/pipeline/python/ocr_v3.py')]
+              : [path.resolve(__dirname, 'python/ocr_events.py'), path.resolve(__dirname, '../../src/pipeline/python/ocr_events.py')];
+    const pythonScript = pythonScriptCandidates.find((p) => fs.existsSync(p)) ?? pythonScriptCandidates[0];
+    const { pythonBin, hasOcrModule } = resolveOcrPythonBin();
+    if (!hasOcrModule) {
+        console.warn(
+            `[ocr-events] No OCR Python modules found (easyocr/pytesseract). Running probe anyway with ${pythonBin}; source may become ocr-none.`
+        );
+    }
+    const sampleSec =
+        pipeline === 'v2'
+            ? process.env.BOUNDARY_OCR_V2_SAMPLE_SEC ??
+              process.env.OCR_V2_SAMPLE_SEC ??
+              process.env.BOUNDARY_OCR_SAMPLE_SEC ??
+              process.env.OCR_SAMPLE_SEC ??
+              '1.0'
+            : pipeline === 'v3'
+              ? process.env.BOUNDARY_OCR_V3_SAMPLE_SEC ??
+                process.env.OCR_V3_SAMPLE_SEC ??
+                process.env.BOUNDARY_OCR_SAMPLE_SEC ??
+                process.env.OCR_SAMPLE_SEC ??
+                '1.0'
+              : process.env.BOUNDARY_OCR_SAMPLE_SEC ?? process.env.OCR_SAMPLE_SEC ?? '2.5';
+    const configuredMaxSec = Number(
+        pipeline === 'v2'
+            ? process.env.BOUNDARY_OCR_V2_MAX_DURATION_SEC ??
+              process.env.OCR_V2_MAX_DURATION_SEC ??
+              process.env.BOUNDARY_OCR_MAX_DURATION_SEC ??
+              process.env.OCR_MAX_DURATION_SEC ??
+              0
+            : pipeline === 'v3'
+              ? process.env.BOUNDARY_OCR_V3_MAX_DURATION_SEC ??
+                process.env.OCR_V3_MAX_DURATION_SEC ??
+                process.env.BOUNDARY_OCR_MAX_DURATION_SEC ??
+                process.env.OCR_MAX_DURATION_SEC ??
+                0
+              : process.env.BOUNDARY_OCR_MAX_DURATION_SEC ?? process.env.OCR_MAX_DURATION_SEC ?? 0
+    );
+    const maxSec = configuredMaxSec > 0 ? Math.min(configuredMaxSec, durationSec) : durationSec;
+    const selectedVideoPath = resolvePreferredOcrVideoPath(videoPath, outPath);
+    const args = [
+        pythonScript,
+        selectedVideoPath,
+        '--out',
+        outPath,
+        '--sample-sec',
+        String(sampleSec),
+        '--max-sec',
+        String(maxSec)
+    ];
+    console.log(`[ocr-events] pipeline=${pipeline} video=${path.basename(selectedVideoPath)} sample=${sampleSec}s max_sec=${maxSec.toFixed(1)}`);
+    const ocrLogPrefix = pipeline === 'v2' ? '[ocr-v2]' : pipeline === 'v3' ? '[ocr-v3]' : '[ocr-events]';
+    await runProcess(pythonBin, args, { streamStderr: true, logPrefix: ocrLogPrefix });
+    const raw = JSON.parse(fs.readFileSync(outPath, 'utf8')) as OcrEventPassResult;
+    if (!Array.isArray(raw?.segments)) throw new Error('Invalid ocr-events output');
+    return raw;
+}
+
+async function runSlideOcrPass(
+    videoPath: string,
+    outPath: string,
+    durationSec: number
+): Promise<SlideOcrPassResult> {
+    const pythonScriptCandidates = [
+        path.resolve(__dirname, 'python/slide_ocr_v2.py'),
+        path.resolve(__dirname, '../../src/pipeline/python/slide_ocr_v2.py')
+    ];
+    const pythonScript = pythonScriptCandidates.find((p) => fs.existsSync(p)) ?? pythonScriptCandidates[0];
+    const { pythonBin } = resolveOcrPythonBin();
+
+    const workDir = path.dirname(outPath);
+    const lowCandidates = [
+        path.join(workDir, 'source.light.mp4'),
+        videoPath,
+        path.join(workDir, 'source.mp4'),
+    ];
+    const lowVideoPath = lowCandidates.find((p) => fs.existsSync(p)) ?? videoPath;
+    const hqVideoPath = resolvePreferredOcrVideoPath(videoPath, outPath);
+    const sampleSec = process.env.BOUNDARY_SLIDE_OCR_SAMPLE_SEC ?? process.env.SLIDE_OCR_SAMPLE_SEC ?? '1.0';
+    const configuredMaxSec = Number(
+        process.env.BOUNDARY_SLIDE_OCR_MAX_DURATION_SEC ??
+        process.env.SLIDE_OCR_MAX_DURATION_SEC ??
+        process.env.BOUNDARY_OCR_MAX_DURATION_SEC ??
+        process.env.OCR_MAX_DURATION_SEC ??
+        0
+    );
+    const maxSec = configuredMaxSec > 0 ? Math.min(configuredMaxSec, durationSec) : durationSec;
+    const args = [
+        pythonScript,
+        lowVideoPath,
+        '--hq-video',
+        hqVideoPath,
+        '--out',
+        outPath,
+        '--sample-sec',
+        String(sampleSec),
+        '--max-sec',
+        String(maxSec),
+    ];
+    console.log(
+        `[slide-ocr] low=${path.basename(lowVideoPath)} hq=${path.basename(hqVideoPath)} sample=${sampleSec}s max_sec=${maxSec.toFixed(1)}`
+    );
+    await runProcess(pythonBin, args, { streamStderr: true, logPrefix: '[slide-ocr]' });
+    const raw = JSON.parse(fs.readFileSync(outPath, 'utf8')) as SlideOcrPassResult;
+    if (!Array.isArray(raw?.events)) throw new Error('Invalid slide-ocr output');
+    return raw;
+}
+
 function absoluteTurns(turns: SpeakerTurn[], offsetSec: number, speakerPrefix?: string): SpeakerTurn[] {
     return turns.map((t) => ({
         ...t,
@@ -1211,16 +1742,34 @@ export async function findSermonBoundaries(
         );
 
         const maxCandidateDeltaSec = Number(process.env.TARGET_DIAR_MAX_CANDIDATE_DELTA_SEC ?? 900);
+        const transcriptStartCandidates = deriveTranscriptStartCandidates(
+            normalized,
+            guess.start,
+            guess.end,
+            Number(process.env.TARGET_DIAR_TRANSCRIPT_START_SEARCH_BACK_SEC ?? 420),
+            Number(process.env.TARGET_DIAR_TRANSCRIPT_START_SEARCH_FWD_SEC ?? 1800),
+            Number(process.env.TARGET_DIAR_TRANSCRIPT_START_CANDIDATE_LIMIT ?? 8)
+        );
+        const transcriptEndCandidates = deriveTranscriptEndCandidates(
+            normalized,
+            guess.start,
+            guess.end,
+            Number(process.env.TARGET_DIAR_TRANSCRIPT_END_SEARCH_BACK_SEC ?? 1600),
+            Number(process.env.TARGET_DIAR_TRANSCRIPT_END_SEARCH_FWD_SEC ?? 500),
+            Number(process.env.TARGET_DIAR_TRANSCRIPT_END_CANDIDATE_LIMIT ?? 8)
+        );
         const startCandidates = sanitizeCandidates(
             guess.start,
-            guess.startCandidates.length > 0 ? guess.startCandidates : [guess.start],
+            guess.startCandidates.length > 0
+                ? [...guess.startCandidates, ...transcriptStartCandidates]
+                : [guess.start, ...transcriptStartCandidates],
             0,
             guess.end - 30,
             maxCandidateDeltaSec
         );
         const endCandidates = sanitizeCandidates(
             guess.end,
-            guess.endCandidates.length > 0 ? guess.endCandidates : [guess.end],
+            guess.endCandidates.length > 0 ? [...guess.endCandidates, ...transcriptEndCandidates] : [guess.end, ...transcriptEndCandidates],
             guess.start + 30,
             audioEnd,
             maxCandidateDeltaSec
@@ -1245,6 +1794,37 @@ export async function findSermonBoundaries(
                 : await runAudioEventPass(options.audioPath, audioEventsPath);
         } catch (error) {
             console.warn('Audio-event pass unavailable, continuing without it:', error);
+        }
+        let ocrEvents: OcrEventPassResult | null = null;
+        const ocrEnabled =
+            String(process.env.BOUNDARY_ENABLE_OCR_SIGNALS ?? process.env.ANALYSIS_ENABLE_OCR_SIGNALS ?? 'true').toLowerCase() ===
+            'true';
+        const ocrPipeline = getBoundaryOcrPipeline();
+        const ocrEventsPath = path.join(workDir, getOcrEventsFilename(ocrPipeline));
+        if (ocrEnabled && options.videoPath) {
+            try {
+                ocrEvents = fs.existsSync(ocrEventsPath)
+                    ? (JSON.parse(fs.readFileSync(ocrEventsPath, 'utf8')) as OcrEventPassResult)
+                    : await runOcrEventPass(options.videoPath, ocrEventsPath, audioEnd, ocrPipeline);
+                if (!Array.isArray(ocrEvents?.segments)) ocrEvents = null;
+            } catch (error) {
+                console.warn('OCR-event pass unavailable, continuing without it:', error);
+            }
+        }
+        let slideOcrEvents: SlideOcrPassResult | null = null;
+        const slideOcrEnabled =
+            String(process.env.BOUNDARY_ENABLE_SLIDE_OCR_SIGNALS ?? process.env.SLIDE_OCR_ENABLED ?? 'false').toLowerCase() ===
+            'true';
+        const slideOcrEventsPath = path.join(workDir, 'slide.events.json');
+        if (slideOcrEnabled && options.videoPath) {
+            try {
+                slideOcrEvents = fs.existsSync(slideOcrEventsPath)
+                    ? (JSON.parse(fs.readFileSync(slideOcrEventsPath, 'utf8')) as SlideOcrPassResult)
+                    : await runSlideOcrPass(options.videoPath, slideOcrEventsPath, audioEnd);
+                if (!Array.isArray(slideOcrEvents?.events)) slideOcrEvents = null;
+            } catch (error) {
+                console.warn('Slide-OCR pass unavailable, continuing without it:', error);
+            }
         }
 
         const preChunk = path.join(tmpDir, 'diar.pre.wav');
@@ -1272,30 +1852,79 @@ export async function findSermonBoundaries(
         let startChosenBy = 'primary';
         let endChosenBy = 'primary';
 
+        const ocrWindowSec = Number(process.env.BOUNDARY_OCR_WINDOW_SEC ?? 18);
         const startSeedList = [guess.start, ...startCandidates].filter((v, i, arr) => arr.indexOf(v) === i);
         const scoredStart = startSeedList.map((seed) => {
-            const candidateStart = refineStart(preTurnsAbs, startSpeaker, seed);
+            let candidateStart = refineStart(preTurnsAbs, startSpeaker, seed);
+            const seedTranscriptSignal = boundaryTranscriptSignal(normalized, seed, 'start');
+            let transcriptSignal = boundaryTranscriptSignal(normalized, candidateStart, 'start');
+            const draggedIntoPreSection =
+                candidateStart < seed - 10 &&
+                (transcriptSignal.prayerDominant || transcriptSignal.worshipDominant || transcriptSignal.announcementDominant) &&
+                (seedTranscriptSignal.sermonLikely || seedTranscriptSignal.hasFelizSabado || seedTranscriptSignal.sermonCueScore >= 1.6);
+            if (draggedIntoPreSection) {
+                candidateStart = seed;
+                transcriptSignal = seedTranscriptSignal;
+            }
             const prev = previousTurnBefore(preTurnsAbs, candidateStart);
             const diarChange = Boolean(prev && prev.speaker !== startSpeaker && candidateStart - prev.end <= maxConfirmGapSec);
             const audio = audioEvents ? boundaryAudioSignal(audioEvents.segments, candidateStart) : null;
+            const ocr = ocrEvents ? boundaryOcrSignal(ocrEvents, candidateStart, ocrWindowSec) : null;
+            const slide = slideOcrEvents ? boundarySlideSignal(slideOcrEvents, candidateStart, ocrWindowSec) : null;
             const score =
                 (diarChange ? 3 : 0) +
-                (audio?.genderChange ? 2 : 0) +
+                ((audio?.genderChange && (audio.musicToSpeech || audio.pauseToSpeech)) ? 1.8 : 0) +
                 (audio?.musicToSpeech ? 1.25 : 0) +
-                (audio?.pauseToSpeech ? 1.5 : 0) -
+                (audio?.pauseToSpeech ? 1.5 : 0) +
+                (ocr?.lyricToSermon ? 1.6 : 0) +
+                (slide?.lyricToSermon ? 1.6 : 0) +
+                ((ocr?.afterSermonCueRatio ?? 0) >= 0.1 ? 1.1 : 0) +
+                ((slide?.afterSermonCueRatio ?? 0) >= 0.1 ? 1.1 : 0) +
+                (slide?.hasSermonTitleNear ? 0.8 : 0) +
+                (slide?.hasBibleVerseNear ? 0.55 : 0) +
+                (ocr?.hasSpeakerNameNear ? 0.4 : 0) +
+                (ocr?.nearSceneCut ? 0.25 : 0) -
+                ((ocr && !ocr.lyricToSermon && ocr.afterLyricRatio >= 0.18) ? 1.2 : 0) -
+                ((ocr && !ocr.lyricToSermon && ocr.lyricDominantNear) ? 0.6 : 0) -
+                ((slide && !slide.lyricToSermon && slide.afterLyricRatio >= 0.18) ? 1.2 : 0) -
+                ((slide && !slide.lyricToSermon && slide.lyricDominantNear) ? 0.6 : 0) -
+                transcriptSignal.prayerCueScore * 0.45 -
+                transcriptSignal.worshipCueScore * 0.4 -
+                transcriptSignal.announcementCueScore * 0.35 +
+                transcriptSignal.sermonCueScore * 1.2 +
+                (transcriptSignal.hasFelizSabado ? 1.6 : 0) -
+                (transcriptSignal.prayerDominant ? 2.2 : 0) -
+                (transcriptSignal.worshipDominant ? 2.0 : 0) -
+                (transcriptSignal.announcementDominant ? 1.4 : 0) -
                 Math.abs(candidateStart - guess.start) / 90;
-            return { seed, candidateStart, prev, diarChange, audio, score };
+            return { seed, candidateStart, prev, diarChange, audio, ocr, slide, transcriptSignal, score };
         });
         scoredStart.sort((a, b) => b.score - a.score);
         if (scoredStart.length > 0) {
             refinedStart = scoredStart[0].candidateStart;
             startChosenBy = `scored-candidate:${scoredStart[0].seed}`;
         }
-        if (!(scoredStart[0]?.diarChange || scoredStart[0]?.audio?.genderChange)) {
+        const startCandidateStrong =
+            Boolean(scoredStart[0]?.diarChange) ||
+            Boolean(scoredStart[0]?.audio && (scoredStart[0].audio.musicToSpeech || scoredStart[0].audio.pauseToSpeech)) ||
+            Boolean(scoredStart[0]?.transcriptSignal?.sermonLikely);
+        if (!startCandidateStrong) {
             const fallbackStart = findLatestOtherToTargetStartTransition(preTurnsAbs, startSpeaker, refinedStart);
             if (fallbackStart != null) {
-                refinedStart = refineStart(preTurnsAbs, startSpeaker, fallbackStart);
-                startChosenBy = 'sequential-fallback';
+                const fallbackTranscript = boundaryTranscriptSignal(normalized, fallbackStart, 'start');
+                const maxFallbackDriftSec = Number(process.env.TARGET_DIAR_START_FALLBACK_MAX_DRIFT_SEC ?? 360);
+                const referenceStart = scoredStart[0]?.candidateStart ?? refinedStart;
+                const fallbackDrift = Math.abs(fallbackStart - referenceStart);
+                const fallbackAllowed =
+                    fallbackDrift <= maxFallbackDriftSec &&
+                    (fallbackTranscript.sermonLikely || fallbackTranscript.hasFelizSabado) &&
+                    !(fallbackTranscript.prayerDominant || fallbackTranscript.worshipDominant || fallbackTranscript.announcementDominant);
+                if (fallbackAllowed) {
+                    refinedStart = refineStart(preTurnsAbs, startSpeaker, fallbackStart);
+                    startChosenBy = 'sequential-fallback';
+                } else {
+                    startChosenBy = `scored-candidate:${scoredStart[0]?.seed}:fallback-rejected`;
+                }
             }
         }
 
@@ -1305,26 +1934,57 @@ export async function findSermonBoundaries(
             const next = nextTurnAfter(postTurnsAbs, candidateEnd);
             const diarChange = Boolean(next && next.speaker !== endSpeaker && next.start - candidateEnd <= maxConfirmGapSec);
             const audio = audioEvents ? boundaryAudioSignal(audioEvents.segments, candidateEnd) : null;
+            const ocr = ocrEvents ? boundaryOcrSignal(ocrEvents, candidateEnd, ocrWindowSec) : null;
+            const slide = slideOcrEvents ? boundarySlideSignal(slideOcrEvents, candidateEnd, ocrWindowSec) : null;
+            const transcriptSignal = boundaryTranscriptSignal(normalized, candidateEnd, 'end');
             const handoffCue = hasSermonHandoffCue(normalized, candidateEnd, 110);
             const score =
                 (diarChange ? 3 : 0) +
-                (audio?.genderChange ? 2 : 0) +
+                ((audio?.genderChange && (audio.speechToMusic || audio.speechToPause)) ? 1.8 : 0) +
                 (audio?.speechToMusic ? 1.25 : 0) +
                 (audio?.speechToPause ? 1.0 : 0) +
-                (handoffCue ? 1.8 : 0) -
+                (handoffCue ? 1.8 : 0) +
+                (ocr?.sermonToLyric ? 1.7 : 0) +
+                (slide?.sermonToLyric ? 1.7 : 0) +
+                ((ocr?.afterLyricRatio ?? 0) >= 0.16 ? 0.9 : 0) +
+                ((slide?.afterLyricRatio ?? 0) >= 0.16 ? 0.9 : 0) +
+                ((ocr?.afterSpeakerNameRatio ?? 0) >= 0.08 ? 0.45 : 0) +
+                (ocr?.nearSceneCut ? 0.25 : 0) -
+                ((ocr?.beforeLyricRatio ?? 0) >= 0.2 ? 1.2 : 0) -
+                ((slide?.beforeLyricRatio ?? 0) >= 0.2 ? 1.2 : 0) -
+                ((ocr?.afterSermonCueRatio ?? 0) >= 0.16 ? 0.8 : 0) -
+                ((slide?.afterSermonCueRatio ?? 0) >= 0.16 ? 0.8 : 0) -
+                transcriptSignal.closingCueScore * 0.9 +
+                transcriptSignal.handoffCueScore * 1.0 -
+                (transcriptSignal.sermonCueScore >= 1.6 ? 0.8 : 0) -
                 Math.abs(candidateEnd - guess.end) / 90;
-            return { seed, candidateEnd, next, diarChange, audio, handoffCue, score };
+            return { seed, candidateEnd, next, diarChange, audio, ocr, slide, transcriptSignal, handoffCue, score };
         });
         scoredEnd.sort((a, b) => b.score - a.score);
         if (scoredEnd.length > 0) {
             refinedEnd = scoredEnd[0].candidateEnd;
             endChosenBy = `scored-candidate:${scoredEnd[0].seed}`;
         }
-        if (!(scoredEnd[0]?.diarChange || scoredEnd[0]?.audio?.genderChange)) {
+        const endCandidateStrong =
+            Boolean(scoredEnd[0]?.diarChange) ||
+            Boolean(scoredEnd[0]?.audio && (scoredEnd[0].audio.speechToMusic || scoredEnd[0].audio.speechToPause)) ||
+            Boolean(scoredEnd[0]?.transcriptSignal?.closingLikely || scoredEnd[0]?.transcriptSignal?.handoffLikely);
+        if (!endCandidateStrong) {
             const fallbackEnd = findEarliestTargetToOtherEndTransition(postTurnsAbs, endSpeaker, refinedEnd);
             if (fallbackEnd != null) {
-                refinedEnd = refineEnd(postTurnsAbs, endSpeaker, fallbackEnd);
-                endChosenBy = 'sequential-fallback';
+                const fallbackTranscript = boundaryTranscriptSignal(normalized, fallbackEnd, 'end');
+                const maxFallbackDriftSec = Number(process.env.TARGET_DIAR_END_FALLBACK_MAX_DRIFT_SEC ?? 420);
+                const referenceEnd = scoredEnd[0]?.candidateEnd ?? refinedEnd;
+                const fallbackDrift = Math.abs(fallbackEnd - referenceEnd);
+                const fallbackAllowed =
+                    fallbackDrift <= maxFallbackDriftSec &&
+                    (fallbackTranscript.closingLikely || fallbackTranscript.handoffLikely);
+                if (fallbackAllowed) {
+                    refinedEnd = refineEnd(postTurnsAbs, endSpeaker, fallbackEnd);
+                    endChosenBy = 'sequential-fallback';
+                } else {
+                    endChosenBy = `scored-candidate:${scoredEnd[0]?.seed}:fallback-rejected`;
+                }
             }
         }
 
@@ -1333,9 +1993,55 @@ export async function findSermonBoundaries(
         const nextAtEnd = nextTurnAfter(postTurnsAbs, refinedEnd);
         const startAudioSignal = audioEvents ? boundaryAudioSignal(audioEvents.segments, refinedStart) : null;
         const endAudioSignal = audioEvents ? boundaryAudioSignal(audioEvents.segments, refinedEnd) : null;
+        const startOcrSignal = ocrEvents ? boundaryOcrSignal(ocrEvents, refinedStart, ocrWindowSec) : null;
+        const endOcrSignal = ocrEvents ? boundaryOcrSignal(ocrEvents, refinedEnd, ocrWindowSec) : null;
+        const startSlideSignal = slideOcrEvents ? boundarySlideSignal(slideOcrEvents, refinedStart, ocrWindowSec) : null;
+        const endSlideSignal = slideOcrEvents ? boundarySlideSignal(slideOcrEvents, refinedEnd, ocrWindowSec) : null;
+        const startTranscriptSignal = boundaryTranscriptSignal(normalized, refinedStart, 'start');
+        const endTranscriptSignal = boundaryTranscriptSignal(normalized, refinedEnd, 'end');
 
-        const startConfirmed = Boolean((prevAtStart && prevAtStart.speaker !== startSpeaker) || startAudioSignal?.genderChange);
-        const endConfirmed = Boolean((nextAtEnd && nextAtEnd.speaker !== endSpeaker) || endAudioSignal?.genderChange);
+        const startDiarChange = Boolean(prevAtStart && prevAtStart.speaker !== startSpeaker && refinedStart - prevAtStart.end <= maxConfirmGapSec);
+        const startAudioStrong = Boolean(startAudioSignal && (startAudioSignal.musicToSpeech || startAudioSignal.pauseToSpeech));
+        const startGenderSupported = Boolean(
+            startAudioSignal?.genderChange && (startAudioStrong || startTranscriptSignal.sermonLikely || startOcrSignal?.lyricToSermon)
+        );
+        const startOcrStrong = Boolean(
+            startOcrSignal?.lyricToSermon ||
+                (((startOcrSignal?.afterSermonCueRatio ?? 0) >= 0.12) && (startOcrSignal?.afterLyricRatio ?? 0) < 0.2)
+        );
+        const startSlideStrong = Boolean(
+            startSlideSignal?.lyricToSermon ||
+                (((startSlideSignal?.afterSermonCueRatio ?? 0) >= 0.12) && (startSlideSignal?.afterLyricRatio ?? 0) < 0.2) ||
+                startSlideSignal?.hasSermonTitleNear
+        );
+        const startTranscriptStrong = Boolean(
+            startTranscriptSignal.sermonLikely ||
+                startTranscriptSignal.hasFelizSabado ||
+                startTranscriptSignal.sermonCueScore >= 1.9
+        );
+        const startTranscriptBlocked = Boolean(
+            startTranscriptSignal.prayerDominant || startTranscriptSignal.worshipDominant || startTranscriptSignal.announcementDominant
+        );
+        const startConfirmed = Boolean(
+            !startTranscriptBlocked &&
+                (startDiarChange || startAudioStrong || startGenderSupported || startOcrStrong || startSlideStrong || startTranscriptStrong)
+        );
+
+        const endDiarChange = Boolean(nextAtEnd && nextAtEnd.speaker !== endSpeaker && nextAtEnd.start - refinedEnd <= maxConfirmGapSec);
+        const endAudioStrong = Boolean(endAudioSignal && (endAudioSignal.speechToMusic || endAudioSignal.speechToPause));
+        const endGenderSupported = Boolean(
+            endAudioSignal?.genderChange && (endAudioStrong || endTranscriptSignal.closingLikely || endTranscriptSignal.handoffLikely)
+        );
+        const endOcrStrong = Boolean(
+            endOcrSignal?.sermonToLyric ||
+                (((endOcrSignal?.afterLyricRatio ?? 0) >= 0.14) && ((endOcrSignal?.beforeLyricRatio ?? 0) < 0.2))
+        );
+        const endSlideStrong = Boolean(
+            endSlideSignal?.sermonToLyric ||
+                (((endSlideSignal?.afterLyricRatio ?? 0) >= 0.14) && ((endSlideSignal?.beforeLyricRatio ?? 0) < 0.2))
+        );
+        const endTranscriptStrong = Boolean(endTranscriptSignal.closingLikely || endTranscriptSignal.handoffLikely);
+        const endConfirmed = Boolean(endDiarChange || endAudioStrong || endGenderSupported || endOcrStrong || endSlideStrong || endTranscriptStrong);
 
         let finalClipBounds: any = padded;
         let llmFallback: any = null;
@@ -1474,7 +2180,9 @@ export async function findSermonBoundaries(
                 start_sec: guess.start,
                 end_sec: guess.end,
                 start_candidates_sec: startCandidates,
-                end_candidates_sec: endCandidates
+                end_candidates_sec: endCandidates,
+                transcript_start_candidates_sec: transcriptStartCandidates,
+                transcript_end_candidates_sec: transcriptEndCandidates
             },
             selected_target_speaker: {
                 start: startSpeaker,
@@ -1488,7 +2196,13 @@ export async function findSermonBoundaries(
                 start_previous_turn: prevAtStart,
                 end_next_turn: nextAtEnd,
                 start_audio_signal: startAudioSignal,
-                end_audio_signal: endAudioSignal
+                end_audio_signal: endAudioSignal,
+                start_ocr_signal: startOcrSignal,
+                end_ocr_signal: endOcrSignal,
+                start_slide_signal: startSlideSignal,
+                end_slide_signal: endSlideSignal,
+                start_transcript_signal: startTranscriptSignal,
+                end_transcript_signal: endTranscriptSignal
             },
             targeted_windows: {
                 pre: { start_sec: preWindowStart, end_sec: preWindowEnd, anchor_speaker: preSpeaker, turns: preTurnsAbs },
@@ -1499,6 +2213,26 @@ export async function findSermonBoundaries(
                       source: audioEvents.source,
                       duration_sec: audioEvents.duration_sec,
                       total_segments: audioEvents.segments.length
+                  }
+                : null,
+            ocr_events: ocrEvents
+                ? {
+                      source: ocrEvents.source,
+                      duration_sec: ocrEvents.duration_sec,
+                      sample_sec: ocrEvents.sample_sec,
+                      total_segments: ocrEvents.segments.length,
+                      scene_cuts: Array.isArray(ocrEvents.scene_cuts_sec) ? ocrEvents.scene_cuts_sec.length : 0
+                  }
+                : null,
+            slide_ocr_events: slideOcrEvents
+                ? {
+                      source: slideOcrEvents.source,
+                      duration_sec: slideOcrEvents.duration_sec,
+                      sample_sec: slideOcrEvents.sample_sec,
+                      total_events: slideOcrEvents.events.length,
+                      shot_boundaries: Array.isArray(slideOcrEvents.shot_boundaries_sec)
+                          ? slideOcrEvents.shot_boundaries_sec.length
+                          : 0
                   }
                 : null,
             candidate_scoring: {

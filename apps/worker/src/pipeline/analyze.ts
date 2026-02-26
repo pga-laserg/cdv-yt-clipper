@@ -28,7 +28,8 @@ export async function analyze(
     let finalBoundaries = boundaries;
     try {
         await generateAnalysisArtifacts(transcript as { start: number; end: number; text: string }[], finalBoundaries, {
-            workDir: options.workDir
+            workDir: options.workDir,
+            videoPath: options.videoPath
         });
     } catch (error) {
         console.warn('Analysis artifact generation failed:', error);
@@ -75,7 +76,8 @@ export async function analyze(
             }
 
             await generateAnalysisArtifacts(transcript as { start: number; end: number; text: string }[], finalBoundaries, {
-                workDir: options.workDir
+                workDir: options.workDir,
+                videoPath: options.videoPath
             });
         } catch (error) {
             console.warn('Single LLM adjudicator failed; keeping local boundaries:', error);

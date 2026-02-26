@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { spawn } from 'child_process';
 import { OpenAI } from 'openai';
 import type { SermonBoundaries } from './boundaries';
 import { emitLlmCueEvents } from './llm-cue-telemetry';
@@ -21,6 +22,26 @@ interface AudioEventPassResult {
     duration_sec: number;
     segments: AudioEvent[];
 }
+
+interface OcrEvent {
+    start: number;
+    end: number;
+    text: string;
+    type: 'speaker_name' | 'bible_verse' | 'sermon_title' | 'song_lyric' | 'on_screen_text';
+    region: 'lower_third' | 'slide' | 'full';
+    confidence: number;
+    near_scene_cut?: boolean;
+}
+
+interface OcrEventPassResult {
+    source: string;
+    duration_sec: number;
+    sample_sec: number;
+    scene_cuts_sec: number[];
+    segments: OcrEvent[];
+}
+
+type OcrPipeline = 'v1' | 'v2' | 'v3';
 
 type ChapterType =
     | 'pre_service'
@@ -99,10 +120,21 @@ interface AnalysisDoc {
         noenergy_sections: number;
         long_pause_sections: number;
     };
+    ocr: {
+        source: string | null;
+        segments: number;
+        scene_cuts: number;
+        speaker_name_cues: number;
+        bible_verse_cues: number;
+        sermon_title_cues: number;
+        song_lyric_cues: number;
+    };
+    ocr_segments?: OcrEvent[];
     paragraphs: ParagraphEntry[];
     inputs: {
         transcript_segments: number;
         audio_events_source: string | null;
+        ocr_events_source: string | null;
     };
 }
 
@@ -112,8 +144,98 @@ function cleanText(text: string): string {
         .trim();
 }
 
+function isSabbathGreetingCue(text: string): boolean {
+    const t = cleanText(text);
+    if (!t) return false;
+    return /(buenos d[ií]as[, ]+feliz s[áa]bado|feliz s[áa]bado(?:\s+(?:nuevamente|familia|iglesia|hermanos?|a todos))?)/i.test(
+        t
+    );
+}
+
+function inferTypeFromTextHeuristic(text: string, fallback: ChapterType): ChapterType {
+    const t = cleanText(text).toLowerCase();
+    if (!t) return fallback;
+    if (/(abran? (sus )?biblias|mensaje de hoy|tema de hoy|la biblia|vers[íi]culo|cap[íi]tulo|hoy quiero|quiero compartir|quiero preguntar)/i.test(t)) {
+        return 'sermon';
+    }
+    if (/(oremos|oraci[oó]n|inclinemos|inclinar.*rostro|arrodill|te lo pedimos|en el nombre de (tu hijo )?cristo jes[uú]s|\bam[eé]n\b)/i.test(t)) {
+        return 'prayer';
+    }
+    if (/(vamos a cantar|cantemos|equipo de alabanza|alabemos|worship|himno|coro|reproclamamos|en lo alto est[aá]s)/i.test(t)) {
+        return 'congregational_music';
+    }
+    if (/(diezmo[s]?|ofrenda[s]?|mayordom[ií]a|regresar lo que te pertenece)/i.test(t)) {
+        return 'offering';
+    }
+    if (/(anuncios?|announcement|actividades|recuerden|les invitamos|esta tarde|despu[eé]s del culto|hoy tenemos|les queremos agradecer)/i.test(t)) {
+        return 'announcement';
+    }
+    if (isSabbathGreetingCue(t)) {
+        return 'welcome';
+    }
+    return fallback;
+}
+
+function chapterTitleForType(type: ChapterType): string {
+    switch (type) {
+        case 'sermon':
+            return 'Sermón principal';
+        case 'prayer':
+            return 'Oración congregacional';
+        case 'congregational_music':
+            return 'Alabanza congregacional';
+        case 'offering':
+            return 'Ofrendas y diezmos';
+        case 'announcement':
+            return 'Anuncios';
+        case 'welcome':
+            return 'Bienvenida';
+        default:
+            return 'Transición';
+    }
+}
+
 function clamp(n: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, n));
+}
+
+function normalizeOcrPipeline(raw: string | undefined | null): OcrPipeline {
+    const v = String(raw ?? 'v1').trim().toLowerCase();
+    if (v === 'v2' || v === '2' || v === 'ocr_v2') return 'v2';
+    if (v === 'v3' || v === '3' || v === 'ocr_v3') return 'v3';
+    return 'v1';
+}
+
+function getAnalysisOcrPipeline(): OcrPipeline {
+    return normalizeOcrPipeline(process.env.ANALYSIS_OCR_PIPELINE ?? process.env.OCR_PIPELINE ?? 'v1');
+}
+
+function getOcrEventsFilename(pipeline: OcrPipeline): string {
+    if (pipeline === 'v2') return 'ocr.events.v2.json';
+    if (pipeline === 'v3') return 'ocr.events.v3.json';
+    return 'ocr.events.json';
+}
+
+function resolvePreferredOcrVideoPath(workDir: string, videoPath?: string): string {
+    const preferHq = String(process.env.OCR_PREFER_HQ_SOURCE ?? 'true').toLowerCase() === 'true';
+    const candidatePaths = [
+        path.join(workDir, 'source.mp4'),
+        path.join(workDir, 'source.original.mp4'),
+        path.join(workDir, 'source.original.mkv'),
+        path.join(workDir, 'source.original.webm'),
+        path.join(workDir, 'source.original.mov'),
+    ];
+    if (!preferHq) {
+        if (videoPath && fs.existsSync(videoPath)) return videoPath;
+        return candidatePaths.find((p) => fs.existsSync(p)) ?? path.join(workDir, 'source.mp4');
+    }
+    const providedLooksLight = videoPath ? /source\.light\./i.test(path.basename(videoPath)) : false;
+    if (providedLooksLight) {
+        const better = candidatePaths.find((p) => fs.existsSync(p));
+        if (better) return better;
+    }
+    if (videoPath && fs.existsSync(videoPath)) return videoPath;
+    return candidatePaths.find((p) => fs.existsSync(p)) ?? path.join(workDir, 'source.mp4');
 }
 
 function safeJsonParse<T>(raw: string, fallback: T): T {
@@ -122,6 +244,139 @@ function safeJsonParse<T>(raw: string, fallback: T): T {
     } catch {
         return fallback;
     }
+}
+
+function runProcess(
+    cmd: string,
+    args: string[],
+    options: { streamStdout?: boolean; streamStderr?: boolean; logPrefix?: string } = {}
+): Promise<{ stdout: string; stderr: string }> {
+    return new Promise((resolve, reject) => {
+        const proc = spawn(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+        let stdout = '';
+        let stderr = '';
+        const prefix = options.logPrefix ? `${options.logPrefix} ` : '';
+
+        proc.stdout.on('data', (d) => {
+            const chunk = d.toString();
+            stdout += chunk;
+            if (options.streamStdout) process.stdout.write(`${prefix}${chunk}`);
+        });
+        proc.stderr.on('data', (d) => {
+            const chunk = d.toString();
+            stderr += chunk;
+            if (options.streamStderr) process.stderr.write(`${prefix}${chunk}`);
+        });
+        proc.on('error', (err) => reject(err));
+        proc.on('close', (code) => {
+            if (code !== 0) {
+                return reject(new Error(`${cmd} exited with code ${code}. stderr tail: ${stderr.slice(-1200)}`));
+            }
+            resolve({ stdout, stderr });
+        });
+    });
+}
+
+async function ensureOcrEvents(
+    workDir: string,
+    durationSec: number,
+    videoPath?: string
+): Promise<OcrEventPassResult | null> {
+    const enabled = String(process.env.ANALYSIS_ENABLE_OCR_SIGNALS ?? 'true').toLowerCase() === 'true';
+    if (!enabled) return null;
+
+    const ocrPipeline = getAnalysisOcrPipeline();
+    const ocrPath = path.join(workDir, getOcrEventsFilename(ocrPipeline));
+    if (fs.existsSync(ocrPath)) {
+        const cached = safeJsonParse<OcrEventPassResult | null>(fs.readFileSync(ocrPath, 'utf8'), null);
+        if (cached && Array.isArray(cached.segments)) return cached;
+    }
+
+    const resolvedVideoPath = resolvePreferredOcrVideoPath(workDir, videoPath);
+    if (!fs.existsSync(resolvedVideoPath)) return null;
+
+    const scriptCandidates =
+        ocrPipeline === 'v2'
+            ? [
+                  path.resolve(__dirname, 'python/ocr_v2.py'),
+                  path.resolve(__dirname, '../../src/pipeline/python/ocr_v2.py'),
+                  path.resolve(process.cwd(), 'apps/worker/src/pipeline/python/ocr_v2.py'),
+                  path.resolve(process.cwd(), 'src/pipeline/python/ocr_v2.py')
+              ]
+            : ocrPipeline === 'v3'
+              ? [
+                    path.resolve(__dirname, 'python/ocr_v3.py'),
+                    path.resolve(__dirname, '../../src/pipeline/python/ocr_v3.py'),
+                    path.resolve(process.cwd(), 'apps/worker/src/pipeline/python/ocr_v3.py'),
+                    path.resolve(process.cwd(), 'src/pipeline/python/ocr_v3.py')
+                ]
+              : [
+                    path.resolve(__dirname, 'python/ocr_events.py'),
+                    path.resolve(__dirname, '../../src/pipeline/python/ocr_events.py'),
+                    path.resolve(process.cwd(), 'apps/worker/src/pipeline/python/ocr_events.py'),
+                    path.resolve(process.cwd(), 'src/pipeline/python/ocr_events.py')
+                ];
+    const scriptPath = scriptCandidates.find((p) => fs.existsSync(p));
+    if (!scriptPath) return null;
+
+    const explicitPython = process.env.OCR_PYTHON_BIN || process.env.DIARIZATION_PYTHON_BIN;
+    const pythonCandidates = [
+        explicitPython ? path.resolve(explicitPython) : '',
+        path.resolve(__dirname, '../../venv311/bin/python3'),
+        path.resolve(__dirname, '../../venv/bin/python3'),
+        path.resolve(process.cwd(), 'apps/worker/venv311/bin/python3'),
+        path.resolve(process.cwd(), 'apps/worker/venv/bin/python3'),
+        'python3'
+    ].filter(Boolean);
+    const pythonBin =
+        pythonCandidates.find((candidate) => candidate === 'python3' || fs.existsSync(candidate)) ?? 'python3';
+    const sampleSec = Math.max(
+        0.5,
+        Number(
+            ocrPipeline === 'v2'
+                ? process.env.ANALYSIS_OCR_V2_SAMPLE_SEC ?? process.env.OCR_V2_SAMPLE_SEC ?? process.env.OCR_SAMPLE_SEC ?? 1.0
+                : ocrPipeline === 'v3'
+                  ? process.env.ANALYSIS_OCR_V3_SAMPLE_SEC ?? process.env.OCR_V3_SAMPLE_SEC ?? process.env.OCR_SAMPLE_SEC ?? 1.0
+                  : process.env.ANALYSIS_OCR_SAMPLE_SEC ?? process.env.OCR_SAMPLE_SEC ?? 2.5
+        )
+    );
+    const maxSec = Number(
+        ocrPipeline === 'v2'
+            ? process.env.ANALYSIS_OCR_V2_MAX_DURATION_SEC ?? process.env.OCR_V2_MAX_DURATION_SEC ?? process.env.OCR_MAX_DURATION_SEC ?? 0
+            : ocrPipeline === 'v3'
+              ? process.env.ANALYSIS_OCR_V3_MAX_DURATION_SEC ?? process.env.OCR_V3_MAX_DURATION_SEC ?? process.env.OCR_MAX_DURATION_SEC ?? 0
+              : process.env.ANALYSIS_OCR_MAX_DURATION_SEC ?? process.env.OCR_MAX_DURATION_SEC ?? 0
+    );
+    const effectiveMaxSec = maxSec > 0 ? Math.min(maxSec, durationSec) : durationSec;
+
+    const args = [
+        scriptPath,
+        resolvedVideoPath,
+        '--out',
+        ocrPath,
+        '--sample-sec',
+        String(sampleSec),
+        '--max-sec',
+        String(effectiveMaxSec)
+    ];
+
+    console.log(
+        `[analysis-doc] OCR pass started pipeline=${ocrPipeline} sample=${sampleSec}s max_sec=${effectiveMaxSec.toFixed(1)} video=${path.basename(resolvedVideoPath)}`
+    );
+    try {
+        const ocrLogPrefix = ocrPipeline === 'v2' ? '[ocr-v2]' : ocrPipeline === 'v3' ? '[ocr-v3]' : '[ocr-events]';
+        await runProcess(pythonBin, args, { streamStderr: true, logPrefix: ocrLogPrefix });
+    } catch (error) {
+        console.warn('[analysis-doc] OCR pass failed; continuing without OCR cues:', error);
+        return null;
+    }
+    const parsed = safeJsonParse<OcrEventPassResult | null>(
+        fs.existsSync(ocrPath) ? fs.readFileSync(ocrPath, 'utf8') : '',
+        null
+    );
+    if (!parsed || !Array.isArray(parsed.segments)) return null;
+    console.log(`[analysis-doc] OCR pass wrote ${parsed.segments.length} segments -> ${ocrPath}`);
+    return parsed;
 }
 
 function getOpenAIClient(): OpenAI | null {
@@ -237,6 +492,7 @@ async function inferChaptersWithLlm(
     transcript: Segment[],
     boundaries: SermonBoundaries,
     audioEvents: AudioEvent[] | null,
+    ocrEvents: OcrEventPassResult | null,
     durationSec: number,
     workDir?: string
 ): Promise<Chapter[] | null> {
@@ -261,6 +517,7 @@ async function inferChaptersWithLlm(
     const binLines = bins
         .map((b) => `B${b.idx}|${formatSec(b.start)}-${formatSec(b.end)}|sp=${b.sp}|mu=${b.mu}|sil=${b.sil}|${b.text || '[empty]'}`)
         .join('\n');
+    const ocrLines = buildOcrPromptLines(ocrEvents).join('\n');
 
     const prompt = [
         'Create chapter timeline for a church livestream transcript.',
@@ -269,11 +526,18 @@ async function inferChaptersWithLlm(
         'Rules:',
         '- Keep chapter count between 4 and 14.',
         '- Use clear transitions: music, prayer, sermon start, sermon end, offering, announcements, child presentation.',
+        '- In Hispanic SDA services, "feliz sábado" greetings are strong section-boundary cues (even if speaker changes).',
+        '- OCR cues from lower-thirds/slides/lyrics are high-value contextual signals: speaker names, sermon title, Bible verses, worship lyrics.',
+        '- Do not start a sermon chapter inside prayer or worship lyrics.',
+        '- If prayer/worship happens before preaching, start sermon at the first sustained preaching statement.',
         '- The sermon chapter should align with these local bounds unless strong evidence says otherwise.',
         `local_sermon_start=${boundaries.start.toFixed(3)} local_sermon_end=${boundaries.end.toFixed(3)}`,
         `duration_sec=${durationSec.toFixed(3)}`,
         'Bins:',
-        binLines
+        binLines,
+        '',
+        'OCR:',
+        ocrLines || '[none]'
     ].join('\n');
 
     const response = await openai.chat.completions.create({
@@ -493,6 +757,42 @@ function buildCueSummary(events: AudioEvent[] | null) {
     };
 }
 
+function buildOcrSummary(ocr: OcrEventPassResult | null) {
+    const segments = ocr?.segments ?? [];
+    const count = (type: OcrEvent['type']) => segments.filter((s) => s.type === type).length;
+    return {
+        source: ocr?.source ?? null,
+        segments: segments.length,
+        scene_cuts: Array.isArray(ocr?.scene_cuts_sec) ? ocr!.scene_cuts_sec.length : 0,
+        speaker_name_cues: count('speaker_name'),
+        bible_verse_cues: count('bible_verse'),
+        sermon_title_cues: count('sermon_title'),
+        song_lyric_cues: count('song_lyric')
+    };
+}
+
+function buildOcrPromptLines(ocr: OcrEventPassResult | null): string[] {
+    if (!ocr || !Array.isArray(ocr.segments) || ocr.segments.length === 0) return [];
+    const importantTypes = new Set<OcrEvent['type']>(['speaker_name', 'bible_verse', 'sermon_title', 'song_lyric']);
+    const important = ocr.segments
+        .filter((s) => importantTypes.has(s.type))
+        .sort((a, b) => a.start - b.start)
+        .slice(0, 80)
+        .map(
+            (s, i) =>
+                `O${i}|${formatSec(s.start)}-${formatSec(s.end)}|${s.type}|${s.region}|cut=${s.near_scene_cut ? 1 : 0}|${trimForPrompt(s.text, 120)}`
+        );
+    const sceneCuts = (ocr.scene_cuts_sec ?? [])
+        .slice(0, 120)
+        .map((t) => formatSec(t))
+        .join(', ');
+    const header = [
+        `OCR source=${ocr.source} segments=${ocr.segments.length} sample_sec=${Number(ocr.sample_sec ?? 0).toFixed(2)}`,
+        sceneCuts ? `OCR scene_cuts=${sceneCuts}` : 'OCR scene_cuts=[none]'
+    ];
+    return header.concat(important.length > 0 ? important : ['OCR cues=[none-important]']);
+}
+
 function computeChapterSignal(chapter: Chapter, events: AudioEvent[] | null): ChapterSignal {
     if (!events || events.length === 0) {
         return {
@@ -636,7 +936,8 @@ function splitMixedAnnouncementSermonIntro(chapters: Chapter[], transcript: Segm
     const result: Chapter[] = [];
 
     const sermonIntroCue = (text: string) =>
-        /(feliz s[áa]bado nuevamente|est[aá]s listo para el mensaje|hoy que vamos a estudiar la palabra|quiero comenzar dici[eé]ndote|abran? sus biblias|mensaje de hoy|tema de hoy)/i.test(
+        isSabbathGreetingCue(text) ||
+        /(est[aá]s listo para el mensaje|hoy que vamos a estudiar la palabra|quiero comenzar dici[eé]ndote|abran? sus biblias|mensaje de hoy|tema de hoy)/i.test(
             text
         );
     const announcementCue = (text: string) =>
@@ -722,7 +1023,8 @@ function enforceSermonIntroType(chapters: Chapter[]): Chapter[] {
 
 function splitPreSermonIntro(chapters: Chapter[], transcript: Segment[], boundaries: SermonBoundaries): Chapter[] {
     const sermonIntroCue = (text: string) =>
-        /(feliz s[áa]bado nuevamente|est[aá]s listo para el mensaje|hoy que vamos a estudiar la palabra|quiero comenzar dici[eé]ndote)/i.test(
+        isSabbathGreetingCue(text) ||
+        /(est[aá]s listo para el mensaje|hoy que vamos a estudiar la palabra|quiero comenzar dici[eé]ndote)/i.test(
             text
         );
 
@@ -772,6 +1074,199 @@ function splitPreSermonIntro(chapters: Chapter[], transcript: Segment[], boundar
     return out.sort((a, b) => a.start - b.start);
 }
 
+function splitBySabbathGreetingCue(chapters: Chapter[], transcript: Segment[]): Chapter[] {
+    const minLeadSec = Number(process.env.ANALYSIS_SABBATH_CUE_MIN_LEAD_SEC ?? 20);
+    const minTailSec = Number(process.env.ANALYSIS_SABBATH_CUE_MIN_TAIL_SEC ?? 40);
+    const contextSec = Number(process.env.ANALYSIS_SABBATH_CUE_CONTEXT_SEC ?? 90);
+    const out: Chapter[] = [];
+
+    for (const ch of chapters) {
+        const duration = ch.end - ch.start;
+        if (duration < minLeadSec + minTailSec + 20) {
+            out.push(ch);
+            continue;
+        }
+
+        const inRange = transcript
+            .filter((s) => s.end >= ch.start && s.start <= ch.end)
+            .sort((a, b) => a.start - b.start);
+        if (inRange.length < 2) {
+            out.push(ch);
+            continue;
+        }
+
+        const splitSeg = inRange.find(
+            (s) =>
+                isSabbathGreetingCue(cleanText(s.text)) &&
+                s.start >= ch.start + minLeadSec &&
+                s.end <= ch.end - minTailSec
+        );
+        if (!splitSeg) {
+            out.push(ch);
+            continue;
+        }
+
+        const splitAt = clamp(splitSeg.start, ch.start, ch.end);
+        if (splitAt - ch.start < minLeadSec || ch.end - splitAt < minTailSec) {
+            out.push(ch);
+            continue;
+        }
+
+        const beforeText = inRange
+            .filter((s) => s.end >= splitAt - contextSec && s.start < splitAt)
+            .map((s) => s.text)
+            .join(' ');
+        const afterText = inRange
+            .filter((s) => s.start <= splitAt + contextSec && s.end > splitAt)
+            .map((s) => s.text)
+            .join(' ');
+
+        const beforeType = inferTypeFromTextHeuristic(beforeText, ch.type);
+        const afterType = inferTypeFromTextHeuristic(afterText, ch.type);
+        const transitionLikely =
+            beforeType !== afterType ||
+            afterType === 'sermon' ||
+            beforeType === 'prayer' ||
+            beforeType === 'congregational_music' ||
+            beforeType === 'announcement' ||
+            beforeType === 'offering';
+
+        if (!transitionLikely) {
+            out.push(ch);
+            continue;
+        }
+
+        const firstType = beforeType === afterType ? ch.type : beforeType;
+        const secondType = afterType;
+        const firstTitle = firstType === ch.type ? ch.title : chapterTitleForType(firstType);
+        const secondTitle =
+            secondType === ch.type
+                ? isSabbathGreetingCue(cleanText(splitSeg.text))
+                    ? `${ch.title} (reinicio)`
+                    : ch.title
+                : chapterTitleForType(secondType);
+
+        out.push({
+            ...ch,
+            end: splitAt,
+            type: firstType,
+            title: firstTitle,
+            reason: `${ch.reason ? `${ch.reason};` : ''}split_sabbath_greeting_cue`
+        });
+        out.push({
+            start: splitAt,
+            end: ch.end,
+            type: secondType,
+            title: secondTitle,
+            confidence: Number(Math.max(0.72, ch.confidence).toFixed(2)),
+            reason: `${ch.reason ? `${ch.reason};` : ''}split_sabbath_greeting_cue`
+        });
+    }
+
+    return out.sort((a, b) => a.start - b.start);
+}
+
+function splitLeadingLiturgicalPreludeFromSermon(chapters: Chapter[], transcript: Segment[]): Chapter[] {
+    const sermonIntroCue = (text: string) =>
+        isSabbathGreetingCue(text) ||
+        /(abran? (sus )?biblias|mensaje de hoy|tema de hoy|hoy quiero|quiero compartir|la biblia|vers[íi]culo|cap[íi]tulo)/i.test(
+            text
+        );
+    const prayerCue = (text: string) =>
+        /(oremos|oraci[oó]n|inclinemos|inclinar.*rostro|arrodill|en el nombre de (tu hijo )?cristo jes[uú]s|te lo pedimos|am[eé]n)/i.test(
+            text
+        );
+    const worshipCue = (text: string) =>
+        /(vamos a cantar|cantemos|equipo de alabanza|alabemos|worship|himno|coro|reproclamamos|en lo alto est[aá]s)/i.test(
+            text
+        );
+
+    const out: Chapter[] = [];
+    for (const ch of chapters) {
+        if (ch.type !== 'sermon') {
+            out.push(ch);
+            continue;
+        }
+
+        const inRange = transcript
+            .filter((s) => s.end >= ch.start && s.start <= ch.end)
+            .sort((a, b) => a.start - b.start);
+        if (inRange.length < 6 || ch.end - ch.start < 120) {
+            out.push(ch);
+            continue;
+        }
+
+        const firstSermonSeg = inRange.find((s) => sermonIntroCue(cleanText(s.text)));
+        if (!firstSermonSeg) {
+            out.push(ch);
+            continue;
+        }
+
+        // Important Hispanic SDA cue: if speaker says "feliz sábado" again after already speaking,
+        // treat it as a likely section reset (often worship/prayer -> sermon transition).
+        const greetingMinGapSec = Number(process.env.ANALYSIS_REPEAT_SABBATH_CUE_MIN_GAP_SEC ?? 90);
+        const greetingSegments = inRange.filter((s) => isSabbathGreetingCue(cleanText(s.text)));
+        let splitCandidate = firstSermonSeg;
+        if (greetingSegments.length >= 2) {
+            const firstGreeting = greetingSegments[0];
+            const repeatedGreeting = greetingSegments.find(
+                (s) => s.start > firstGreeting.start + greetingMinGapSec
+            );
+            if (repeatedGreeting) {
+                const between = inRange.filter((s) => s.start > firstGreeting.end && s.end < repeatedGreeting.start);
+                const betweenPrayer = between.filter((s) => prayerCue(cleanText(s.text))).length;
+                const betweenWorship = between.filter((s) => worshipCue(cleanText(s.text))).length;
+                if (betweenPrayer + betweenWorship >= 1) {
+                    splitCandidate = repeatedGreeting;
+                }
+            }
+        }
+
+        const splitAt = clamp(splitCandidate.start, ch.start, ch.end);
+        if (splitAt - ch.start < 25 || ch.end - splitAt < 90) {
+            out.push(ch);
+            continue;
+        }
+
+        const preSegments = inRange.filter((s) => s.start < splitAt);
+        const prayerCount = preSegments.filter((s) => prayerCue(cleanText(s.text))).length;
+        const worshipCount = preSegments.filter((s) => worshipCue(cleanText(s.text))).length;
+        const liturgicalRatio = preSegments.length > 0 ? (prayerCount + worshipCount) / preSegments.length : 0;
+
+        if (preSegments.length < 2 || (prayerCount + worshipCount) < 1 || liturgicalRatio < 0.25) {
+            out.push(ch);
+            continue;
+        }
+
+        const preType: ChapterType = worshipCount > prayerCount ? 'congregational_music' : 'prayer';
+        const preTitle =
+            preType === 'congregational_music'
+                ? 'Alabanza congregacional'
+                : worshipCount > 0
+                  ? 'Oración y transición de adoración'
+                  : 'Oración congregacional';
+
+        out.push({
+            start: ch.start,
+            end: splitAt,
+            title: preTitle,
+            type: preType,
+            confidence: Number(Math.max(0.72, ch.confidence - 0.08).toFixed(2)),
+            reason: `${ch.reason ? `${ch.reason};` : ''}split_leading_liturgical_prelude`
+        });
+        out.push({
+            start: splitAt,
+            end: ch.end,
+            title: /sermon/i.test(ch.title) ? ch.title : 'Sermón principal',
+            type: 'sermon',
+            confidence: ch.confidence,
+            reason: `${ch.reason ? `${ch.reason};` : ''}split_leading_liturgical_prelude`
+        });
+    }
+
+    return out.sort((a, b) => a.start - b.start);
+}
+
 function toPolishedMarkdown(doc: AnalysisDoc): string {
     const lines: string[] = [];
     lines.push('# Transcript Polished Review');
@@ -803,6 +1298,9 @@ function toPolishedMultimodalMarkdown(doc: AnalysisDoc): string {
     lines.push(`Sermon bounds: ${formatSec(doc.boundaries.start)} - ${formatSec(doc.boundaries.end)}`);
     lines.push('');
     lines.push(`Audio cues: music_sections=${doc.cues.music_sections}, noenergy_sections=${doc.cues.noenergy_sections}, long_pause_sections=${doc.cues.long_pause_sections}`);
+    lines.push(
+        `OCR cues: source=${doc.ocr.source ?? 'none'}, segments=${doc.ocr.segments}, scene_cuts=${doc.ocr.scene_cuts}, speaker_names=${doc.ocr.speaker_name_cues}, bible_verses=${doc.ocr.bible_verse_cues}, sermon_titles=${doc.ocr.sermon_title_cues}, song_lyrics=${doc.ocr.song_lyric_cues}`
+    );
     lines.push('');
 
     for (let i = 0; i < doc.chapters.length; i++) {
@@ -816,6 +1314,17 @@ function toPolishedMultimodalMarkdown(doc: AnalysisDoc): string {
         lines.push(
             `- Signals: speech=${s?.speech_ratio ?? 0}, music=${s?.music_ratio ?? 0}, noenergy=${s?.noenergy_ratio ?? 0}, has_music=${s?.has_music ?? false}, has_long_pause=${s?.has_long_pause ?? false}`
         );
+        const ocrCues = (doc.ocr_segments ?? [])
+            .filter((o) => o.end >= c.start && o.start <= c.end)
+            .filter((o) => o.type !== 'on_screen_text')
+            .slice(0, 4);
+        if (ocrCues.length > 0) {
+            lines.push(
+                `- OCR in range: ${ocrCues
+                    .map((o) => `${o.type}@${formatSec(o.start)}="${trimForPrompt(o.text, 60)}"`)
+                    .join(' | ')}`
+            );
+        }
         lines.push('');
 
         const paras = doc.paragraphs.filter((p) => p.chapter_index === i);
@@ -829,6 +1338,7 @@ function toPolishedMultimodalMarkdown(doc: AnalysisDoc): string {
 
 function extractTextCues(transcript: Segment[]): Array<{ kind: string; section: string; text: string; t: number }> {
     const patterns: Array<{ kind: string; section: string; rx: RegExp }> = [
+        { kind: 'sabbath_greeting_boundary', section: 'other', rx: /(buenos d[ií]as[, ]+feliz s[áa]bado|feliz s[áa]bado(?:\s+nuevamente|\s+familia)?)/i },
         { kind: 'invite_pray', section: 'prayer', rx: /(inclinar.*rostro|pong[aá]monos de rodillas|oremos)/i },
         { kind: 'prayer_close', section: 'prayer', rx: /(te lo pedimos en cristo jes[uú]s|en el nombre de jes[uú]s|am[eé]n\\.?$)/i },
         { kind: 'invite_sing', section: 'congregational_music', rx: /(vamos a cantar|cantemos|equipo de alabanza|alabemos)/i },
@@ -853,7 +1363,7 @@ function extractTextCues(transcript: Segment[]): Array<{ kind: string; section: 
 export async function generateAnalysisArtifacts(
     transcriptInput: Segment[],
     boundaries: SermonBoundaries,
-    options: { workDir?: string }
+    options: { workDir?: string; videoPath?: string }
 ): Promise<void> {
     const workDir = options.workDir;
     if (!workDir) return;
@@ -871,10 +1381,11 @@ export async function generateAnalysisArtifacts(
         ? safeJsonParse<AudioEventPassResult | null>(fs.readFileSync(audioEventsPath, 'utf8'), null)
         : null;
     const audioEvents = audioEventsObj?.segments ?? null;
+    const ocrEventsObj = await ensureOcrEvents(workDir, durationSec, options.videoPath);
 
     const llmEnabled = String(process.env.ANALYSIS_ENABLE_LLM_CHAPTERS ?? 'true').toLowerCase() === 'true';
     const llmChapters = llmEnabled
-        ? await inferChaptersWithLlm(transcript, boundaries, audioEvents, durationSec, workDir)
+        ? await inferChaptersWithLlm(transcript, boundaries, audioEvents, ocrEventsObj, durationSec, workDir)
         : null;
     const baseChapters = llmChapters ?? fallbackChapters(boundaries, durationSec);
     const baseSignals = baseChapters.map((c) => computeChapterSignal(c, audioEvents));
@@ -883,7 +1394,9 @@ export async function generateAnalysisArtifacts(
     const renamedChapters = await renameLowConfidenceChapters(transcript, relabeledChapters, durationSec, workDir);
     const splitMixed = splitMixedAnnouncementSermonIntro(renamedChapters, transcript);
     const splitIntro = splitPreSermonIntro(splitMixed, transcript, boundaries);
-    const chapters = enforceSermonIntroType(splitIntro);
+    const splitGreetingCue = splitBySabbathGreetingCue(splitIntro, transcript);
+    const splitLiturgicalPrelude = splitLeadingLiturgicalPreludeFromSermon(splitGreetingCue, transcript);
+    const chapters = enforceSermonIntroType(splitLiturgicalPrelude);
     const chapterSignals = chapters.map((c) => computeChapterSignal(c, audioEvents));
     const paragraphs = buildParagraphs(transcript, chapters);
 
@@ -894,10 +1407,13 @@ export async function generateAnalysisArtifacts(
         chapters,
         chapter_signals: chapterSignals,
         cues: buildCueSummary(audioEvents),
+        ocr: buildOcrSummary(ocrEventsObj),
+        ocr_segments: (ocrEventsObj?.segments ?? []).slice(0, 300),
         paragraphs,
         inputs: {
             transcript_segments: transcript.length,
-            audio_events_source: audioEventsObj?.source ?? null
+            audio_events_source: audioEventsObj?.source ?? null,
+            ocr_events_source: ocrEventsObj?.source ?? null
         }
     };
 
@@ -923,6 +1439,34 @@ export async function generateAnalysisArtifacts(
         })),
         workDir
     );
+    if (ocrEventsObj && Array.isArray(ocrEventsObj.segments) && ocrEventsObj.segments.length > 0) {
+        await emitLlmCueEvents(
+            ocrEventsObj.segments
+                .filter((s) => s.type !== 'on_screen_text')
+                .slice(0, 500)
+                .map((s) => ({
+                    source_pass: 'analysis_ocr_cues',
+                    section_type:
+                        s.type === 'song_lyric'
+                            ? 'congregational_music'
+                            : s.type === 'bible_verse'
+                              ? 'scripture_reading'
+                              : s.type === 'sermon_title'
+                                ? 'sermon'
+                                : 'other',
+                    cue_kind: `ocr_${s.type}`,
+                    cue_text: s.text,
+                    cue_time_sec: s.start,
+                    confidence: Number.isFinite(s.confidence) ? s.confidence : 0.7,
+                    metadata: {
+                        end_sec: s.end,
+                        region: s.region,
+                        near_scene_cut: Boolean(s.near_scene_cut)
+                    }
+                })),
+            workDir
+        );
+    }
     console.log(`Analysis artifact written: ${analysisDocPath}`);
     console.log(`Polished transcript written: ${polishedJsonPath}`);
     console.log(`Polished markdown written: ${polishedMdPath}`);

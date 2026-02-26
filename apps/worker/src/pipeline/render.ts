@@ -409,9 +409,13 @@ function buildCenterExpr(track: CropTrackPoint[]): string {
 export async function render(
     videoPath: string,
     boundaries: { start: number; end: number },
-    clips: { start: number; end: number; id: string; score?: number; confidence?: number }[]
+    clips: { start: number; end: number; id: string; score?: number; confidence?: number }[],
+    options: { trackingVideoPath?: string } = {}
 ): Promise<string[]> {
     console.log('Rendering clips...');
+    const trackingVideoPath = options.trackingVideoPath && fs.existsSync(options.trackingVideoPath)
+        ? options.trackingVideoPath
+        : videoPath;
 
     const outputDir = path.join(path.dirname(videoPath), 'processed');
     if (!fs.existsSync(outputDir)) {
@@ -423,6 +427,7 @@ export async function render(
         version: string;
         generated_at: string;
         video_path: string;
+        tracking_video_path: string;
         center_x: number;
         clips_selected: number;
         clips_rendered: number;
@@ -439,22 +444,29 @@ export async function render(
         version: 'vertical-clipper-v3',
         generated_at: new Date().toISOString(),
         video_path: videoPath,
+        tracking_video_path: trackingVideoPath,
         center_x: 0.5,
         clips_selected: 0,
         clips_rendered: 0,
         clips: [],
     };
 
+    const horizontalFadeEnabled = String(process.env.HORIZONTAL_SERMON_FADE_ENABLED ?? 'true').toLowerCase() === 'true';
+    const horizontalFadeInSecRaw = Number(process.env.HORIZONTAL_SERMON_FADE_IN_SEC ?? 1);
+    const horizontalFadeOutSecRaw = Number(process.env.HORIZONTAL_SERMON_FADE_OUT_SEC ?? 1);
+    const horizontalFadeInSec = horizontalFadeEnabled && Number.isFinite(horizontalFadeInSecRaw) ? Math.max(0, horizontalFadeInSecRaw) : 0;
+    const horizontalFadeOutSec = horizontalFadeEnabled && Number.isFinite(horizontalFadeOutSecRaw) ? Math.max(0, horizontalFadeOutSecRaw) : 0;
+
     const sermonPath = path.join(outputDir, 'sermon_horizontal.mp4');
     await cutVideo(videoPath, boundaries.start, boundaries.end, sermonPath, {
-        fadeInSec: 1,
-        fadeOutSec: 1,
+        fadeInSec: horizontalFadeInSec,
+        fadeOutSec: horizontalFadeOutSec,
     });
     results.push(sermonPath);
 
     let centerX = 0.5;
     try {
-        centerX = await detectSpeakerCenter(videoPath);
+        centerX = await detectSpeakerCenter(trackingVideoPath);
         console.log(`Detected speaker center at relative X: ${centerX}`);
     } catch (e) {
         console.error('Failed to detect speaker, defaulting to center.', e);
@@ -479,7 +491,7 @@ export async function render(
         let trackData: CropTrackData | null = null;
         if (dynamicCropEnabled) {
             try {
-                trackData = await detectSpeakerTrack(videoPath, clip.start, clip.end);
+                trackData = await detectSpeakerTrack(trackingVideoPath, clip.start, clip.end);
                 if (trackData?.track && trackData.track.length > 0) {
                     const cuts = trackData.scene_cuts_sec?.length ?? 0;
                     console.log(`Detected dynamic center track points=${trackData.track.length}, scene_cuts=${cuts} for ${clip.id}`);
@@ -514,6 +526,7 @@ export async function render(
                     },
                     source: {
                         video_path: videoPath,
+                        tracking_video_path: trackingVideoPath,
                         center_x: centerX,
                     },
                     ...debug,

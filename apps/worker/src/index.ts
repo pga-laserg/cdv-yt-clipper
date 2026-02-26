@@ -19,7 +19,7 @@ async function runPipeline(jobId: string, source: string) {
         console.log('--- Stage 1: Ingest ---');
         currentStage = 'ingest';
         await updateJobStatus(jobId, 'processing:ingest');
-        const { videoPath, audioPath } = await ingest(source, workDir);
+        const { videoPathHQ, videoPathLight, audioPath } = await ingest(source, workDir);
         console.log(`Stage ingest completed in ${Math.round((Date.now() - startedAt) / 1000)}s`);
 
         // 2. Transcribe
@@ -53,7 +53,7 @@ async function runPipeline(jobId: string, source: string) {
         console.log('--- Stage 3: Analyze ---');
         currentStage = 'analyze';
         await updateJobStatus(jobId, 'processing:analyze');
-        const { boundaries, clips } = await analyze(segments, { workDir, audioPath, videoPath });
+        const { boundaries, clips } = await analyze(segments, { workDir, audioPath, videoPath: videoPathLight });
         console.log(`Stage analyze completed in ${Math.round((Date.now() - startedAt) / 1000)}s`);
 
         // 4. Render
@@ -61,7 +61,7 @@ async function runPipeline(jobId: string, source: string) {
         currentStage = 'render';
         await updateJobStatus(jobId, 'processing:render');
         const clipData = clips.map((c, i) => ({ ...c, id: `clip_${Date.now()}_${i + 1}` }));
-        const renderedFiles = await render(videoPath, boundaries, clipData);
+        const renderedFiles = await render(videoPathHQ, boundaries, clipData, { trackingVideoPath: videoPathLight });
         console.log(`Stage render completed in ${Math.round((Date.now() - startedAt) / 1000)}s`);
 
         // 5. Store & Metadata

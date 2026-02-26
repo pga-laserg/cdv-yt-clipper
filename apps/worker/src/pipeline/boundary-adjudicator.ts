@@ -41,6 +41,60 @@ function cleanText(text: string): string {
     return String(text ?? '').replace(/\s+/g, ' ').trim();
 }
 
+function isPrayerLikeText(text: string): boolean {
+    const t = cleanText(text).toLowerCase();
+    if (!t) return false;
+    return /(oremos|oraci[oó]n|inclinemos|inclinar.*rostro|arrodill|te lo pedimos|en el nombre de (tu hijo )?cristo jes[uú]s|\bam[eé]n\b|padre (nuestro|que est[aá]s))/i.test(
+        t
+    );
+}
+
+function isWorshipLikeText(text: string): boolean {
+    const t = cleanText(text).toLowerCase();
+    if (!t) return false;
+    return /(vamos a cantar|cantemos|equipo de alabanza|alabemos|worship|himno|coro|reproclamamos|en lo alto est[aá]s|tu nombre)/i.test(
+        t
+    );
+}
+
+function isLikelySermonKickoffText(text: string): boolean {
+    const t = cleanText(text).toLowerCase();
+    if (!t) return false;
+    return /(buenos d[ií]as[, ]+feliz s[áa]bado|feliz s[áa]bado(?:\s+nuevamente|\s+familia|\s+iglesia|\s+hermanos?)?|abran? (sus )?biblias|mensaje de hoy|tema de hoy|hoy quiero|quiero compartir|la biblia|vers[íi]culo|cap[íi]tulo|quiero preguntar)/i.test(
+        t
+    );
+}
+
+function refineChapterStartFromTranscript(chapter: ChapterLite, transcript: Segment[]): number {
+    const lookaheadMaxSec = Number(process.env.BOUNDARY_ADJ_SERMON_START_LOOKAHEAD_SEC ?? 900);
+    const lookaheadCheckSec = Number(process.env.BOUNDARY_ADJ_SERMON_START_WINDOW_SEC ?? 160);
+    const minSustainedSegments = Number(process.env.BOUNDARY_ADJ_SERMON_START_MIN_SEGMENTS ?? 4);
+
+    const rangeEnd = Math.min(Number(chapter.end), Number(chapter.start) + lookaheadMaxSec);
+    const inRange = transcript
+        .filter((s) => Number.isFinite(s.start) && Number.isFinite(s.end))
+        .filter((s) => s.end >= Number(chapter.start) && s.start <= rangeEnd)
+        .sort((a, b) => a.start - b.start);
+    if (inRange.length === 0) return Number(chapter.start);
+
+    for (const seg of inRange) {
+        const text = cleanText(seg.text);
+        if (!text || isPrayerLikeText(text) || isWorshipLikeText(text)) continue;
+
+        const window = inRange.filter((s) => s.start >= seg.start && s.start <= seg.start + lookaheadCheckSec);
+        const nonLiturgical = window.filter((s) => {
+            const st = cleanText(s.text);
+            return Boolean(st) && !isPrayerLikeText(st) && !isWorshipLikeText(st);
+        });
+        const hasKickoffNearby = window.some((s) => isLikelySermonKickoffText(s.text));
+        if (isLikelySermonKickoffText(text) || (hasKickoffNearby && nonLiturgical.length >= minSustainedSegments)) {
+            return seg.start;
+        }
+    }
+
+    return Number(chapter.start);
+}
+
 function clamp(n: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, n));
 }
@@ -111,7 +165,10 @@ function excerptParagraphsNearBounds(
     ].join('\n');
 }
 
-function deriveChapterSermonHint(chapters: ChapterLite[]): { start: number; end: number; confidence: number } | null {
+function deriveChapterSermonHint(
+    chapters: ChapterLite[],
+    transcript: Segment[]
+): { start: number; end: number; confidence: number } | null {
     const sermonStartPool = chapters
         .filter((c) => Number.isFinite(c.start) && Number.isFinite(c.end) && c.end > c.start)
         .filter((c) => {
@@ -132,10 +189,14 @@ function deriveChapterSermonHint(chapters: ChapterLite[]): { start: number; end:
             return t === 'sermon' || t === 'post_sermon_response' || title.includes('sermón');
         });
     if (sermonStartPool.length === 0 || sermonEndPool.length === 0) return null;
-    const start = Math.min(...sermonStartPool.map((c) => Number(c.start)));
+    const earliestStartChapter = sermonStartPool.reduce((best, cur) => (Number(cur.start) < Number(best.start) ? cur : best));
+    const rawStart = Number(earliestStartChapter.start);
+    const refinedStart = refineChapterStartFromTranscript(earliestStartChapter, transcript);
+    const start = Math.max(rawStart, refinedStart);
     const end = Math.max(...sermonEndPool.map((c) => Number(c.end)));
     const confItems = [...sermonStartPool, ...sermonEndPool];
-    const conf = confItems.reduce((a, c) => a + Number(c.confidence ?? 0.75), 0) / confItems.length;
+    let conf = confItems.reduce((a, c) => a + Number(c.confidence ?? 0.75), 0) / confItems.length;
+    if (start - rawStart > 45) conf = Math.min(1, conf + 0.03);
     return { start, end, confidence: clamp(conf, 0, 1) };
 }
 
@@ -359,7 +420,7 @@ export async function adjudicateBoundariesWithSingleLlm(
     const paragraphs = Array.isArray(analysis?.paragraphs) ? analysis.paragraphs : [];
     const cues = analysis?.cues ?? null;
     const duration = transcript.length > 0 ? transcript[transcript.length - 1].end : local.end;
-    const chapterHint = deriveChapterSermonHint(chapters);
+    const chapterHint = deriveChapterSermonHint(chapters, transcript);
     const chapterWeight = clamp(Number(process.env.BOUNDARY_ADJ_CHAPTER_WEIGHT ?? 0.72), 0, 1);
     const chapterStartWeight = clamp(
         Number(process.env.BOUNDARY_ADJ_CHAPTER_START_WEIGHT ?? Math.max(chapterWeight, 0.95)),

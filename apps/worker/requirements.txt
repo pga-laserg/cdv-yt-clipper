@@ -2,5 +2,11 @@ faster-whisper
 python-dotenv
 openai-whisper
 mediapipe
-opencv-python-headless
+opencv-contrib-python-headless
 pyannote.audio>=3.1,<4
+pytesseract
+easyocr==1.7.2
+rapidfuzz
+torch==2.8.0
+torchaudio==2.8.0
+torchvision==0.23.0
