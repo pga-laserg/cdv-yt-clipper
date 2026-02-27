@@ -14,6 +14,8 @@
         "test:ocr-v2": "ts-node-dev src/test-ocr-v2.ts",
         "test:ocr-v3": "ts-node-dev src/test-ocr-v3.ts",
         "test:slide-ocr-v2": "ts-node-dev src/test-slide-ocr-v2.ts",
+        "test:gcv-ocr-engine": "ts-node-dev src/test-gcv-ocr-engine.ts",
+        "test:slide-ocr-cloud-provenance": "ts-node-dev src/test-slide-ocr-cloud-provenance.ts",
         "report:ocr-positive": "ts-node-dev src/test-ocr-positive-findings.ts",
         "test:openai-analysis": "ts-node-dev src/test-openai-analysis.ts",
         "test:diarization": "ts-node-dev src/test-diarization.ts",

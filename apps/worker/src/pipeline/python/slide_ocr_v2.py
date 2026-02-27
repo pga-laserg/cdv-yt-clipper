@@ -1004,7 +1004,8 @@ def enrich_events_with_cloud_text(
         return summary
 
     backend, engine, engine_errors = init_ocr_engine("gcv_text_detection", str(lang_hint))
-    summary["backend"] = str(backend)
+    cloud_backend = str(backend)
+    summary["backend"] = cloud_backend
     if backend not in ("gcv_text_detection", "openai_text_detection") or engine is None:
         if engine_errors:
             summary["errors"].extend([f"cloud_enrichment_unavailable:{e}" for e in engine_errors])
@@ -1104,9 +1105,8 @@ def enrich_events_with_cloud_text(
         ev["confidence"] = round(max(local_conf, conf), 3)
         ev["type"] = classify_text(text, "slide")
         prev_ocr_input = str(ev.get("ocr_input", "")).strip()
-        ev["ocr_input"] = (
-            f"{prev_ocr_input}+gcv_text_detection:extract" if prev_ocr_input else "gcv_text_detection:extract"
-        )
+        source_tag = f"{cloud_backend}:extract"
+        ev["ocr_input"] = f"{prev_ocr_input}+{source_tag}" if prev_ocr_input else source_tag
         ev["ocr_cloud_applied"] = True
         ev["ocr_cloud"]["applied"] = True
         summary["applied"] = int(summary["applied"]) + 1
@@ -1147,11 +1147,8 @@ def enrich_events_with_cloud_text(
                 ev["confidence"] = round(max(local_conf, rep_conf), 3)
                 ev["type"] = classify_text(rep_text, "slide")
                 prev_ocr_input = str(ev.get("ocr_input", "")).strip()
-                ev["ocr_input"] = (
-                    f"{prev_ocr_input}+gcv_text_detection:group_propagation"
-                    if prev_ocr_input
-                    else "gcv_text_detection:group_propagation"
-                )
+                source_tag = f"{cloud_backend}:group_propagation"
+                ev["ocr_input"] = f"{prev_ocr_input}+{source_tag}" if prev_ocr_input else source_tag
                 ev["ocr_cloud"] = {
                     **rep_meta,
                     "applied": True,

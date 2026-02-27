@@ -69,26 +69,6 @@ function sec(ms: number): number {
     return Number((ms / 1000).toFixed(3));
 }
 
-function resolveOcrEventsPath(workDir: string): string {
-    const rawPipeline = String(process.env.BOUNDARY_OCR_PIPELINE ?? process.env.OCR_PIPELINE ?? 'v1')
-        .trim()
-        .toLowerCase();
-    const preferV2 = rawPipeline === 'v2' || rawPipeline === '2' || rawPipeline === 'ocr_v2';
-    const preferV3 = rawPipeline === 'v3' || rawPipeline === '3' || rawPipeline === 'ocr_v3';
-    const v1 = path.join(workDir, 'ocr.events.json');
-    const v2 = path.join(workDir, 'ocr.events.v2.json');
-    const v3 = path.join(workDir, 'ocr.events.v3.json');
-    if (preferV3) {
-        if (fs.existsSync(v3)) return v3;
-        if (fs.existsSync(v2)) return v2;
-        return v1;
-    }
-    if (preferV2) return fs.existsSync(v2) ? v2 : v1;
-    if (fs.existsSync(v1)) return v1;
-    if (fs.existsSync(v2)) return v2;
-    return v3;
-}
-
 async function main() {
     const sourceDirArg = process.argv[2] || 'apps/test_data/e2e_live_wbkSOmlo1fw_light';
     const sourceDir = path.resolve(process.cwd(), sourceDirArg);
@@ -137,12 +117,10 @@ async function main() {
 
     const targetedPath = path.join(outDir, 'sermon.boundaries.targeted-diarization.json');
     const analysisDocPath = path.join(outDir, 'analysis.doc.json');
-    const ocrEventsPath = resolveOcrEventsPath(outDir);
     const audioEventsPath = path.join(outDir, 'audio.events.json');
 
     const targeted = fs.existsSync(targetedPath) ? readJson<any>(targetedPath) : null;
     const analysisDoc = fs.existsSync(analysisDocPath) ? readJson<any>(analysisDocPath) : null;
-    const ocrEvents = fs.existsSync(ocrEventsPath) ? readJson<any>(ocrEventsPath) : null;
     const audioEvents = fs.existsSync(audioEventsPath) ? readJson<any>(audioEventsPath) : null;
 
     const summary = {
@@ -157,16 +135,11 @@ async function main() {
         },
         extracted_signals: {
             ocr: {
-                source: ocrEvents?.source ?? null,
-                segments: Array.isArray(ocrEvents?.segments) ? ocrEvents.segments.length : 0,
-                scene_cuts: Array.isArray(ocrEvents?.scene_cuts_sec) ? ocrEvents.scene_cuts_sec.length : 0,
-                by_type: Array.isArray(ocrEvents?.segments)
-                    ? ocrEvents.segments.reduce((acc: Record<string, number>, s: any) => {
-                          const k = String(s?.type ?? 'unknown');
-                          acc[k] = (acc[k] ?? 0) + 1;
-                          return acc;
-                      }, {})
-                    : {}
+                deprecated: true,
+                source: null,
+                segments: 0,
+                scene_cuts: 0,
+                by_type: {}
             },
             audio: {
                 source: audioEvents?.source ?? null,
@@ -195,7 +168,6 @@ async function main() {
         outputs: {
             targeted_boundaries: targetedPath,
             analysis_doc: analysisDocPath,
-            ocr_events: ocrEventsPath,
             audio_events: audioEventsPath,
             polished_multimodal: path.join(outDir, 'transcript.polished.multimodal.md')
         }
@@ -218,10 +190,8 @@ async function main() {
         `- Total: ${summary.timings_sec.total}`,
         '',
         '## OCR Signals',
+        `- Deprecated: ${summary.extracted_signals.ocr.deprecated}`,
         `- Source: ${summary.extracted_signals.ocr.source ?? 'n/a'}`,
-        `- Segments: ${summary.extracted_signals.ocr.segments}`,
-        `- Scene cuts: ${summary.extracted_signals.ocr.scene_cuts}`,
-        `- By type: \`${JSON.stringify(summary.extracted_signals.ocr.by_type)}\``,
         '',
         '## Audio Signals',
         `- Source: ${summary.extracted_signals.audio.source ?? 'n/a'}`,
@@ -237,7 +207,6 @@ async function main() {
         '## Output Files',
         `- ${summary.outputs.targeted_boundaries}`,
         `- ${summary.outputs.analysis_doc}`,
-        `- ${summary.outputs.ocr_events}`,
         `- ${summary.outputs.audio_events}`,
         `- ${summary.outputs.polished_multimodal}`,
         ''

@@ -706,6 +706,20 @@ def _run_openai_text_detection(engine: Any, img, lang_hint: str) -> tuple[str, f
     return clean_text(text), float(confidence), meta
 
 
+def _record_ocr_runtime_error(
+    backend: str,
+    exc: Exception,
+    *,
+    error_sink: list[str] | None = None,
+) -> str:
+    msg = f"{backend} runtime error: {str(exc)[:400]}"
+    if error_sink is not None:
+        if msg not in error_sink:
+            error_sink.append(msg)
+    print(f"[ocr-events] {msg}", file=sys.stderr)
+    return msg
+
+
 def run_ocr(
     backend: str,
     engine: Any,
@@ -715,6 +729,7 @@ def run_ocr(
     psm: int | None = None,
     upscale: float = 1.0,
     return_meta: bool = False,
+    error_sink: list[str] | None = None,
 ) -> tuple[str, float] | tuple[str, float, dict[str, Any]]:
     if roi_img is None or roi_img.size == 0:
         return ("", 0.0, {}) if return_meta else ("", 0.0)
@@ -734,15 +749,19 @@ def run_ocr(
         try:
             text, conf, meta = _run_gcv_text_detection(engine, img, lang_hint)
             return (text, conf, meta) if return_meta else (text, conf)
-        except Exception:
-            return ("", 0.0, {}) if return_meta else ("", 0.0)
+        except Exception as exc:
+            err = _record_ocr_runtime_error(backend, exc, error_sink=error_sink)
+            meta = {"provider": "google_vision", "method": "TEXT_DETECTION", "error": err}
+            return ("", 0.0, meta) if return_meta else ("", 0.0)
 
     if backend == "openai_text_detection":
         try:
             text, conf, meta = _run_openai_text_detection(engine, img, lang_hint)
             return (text, conf, meta) if return_meta else (text, conf)
-        except Exception:
-            return ("", 0.0, {}) if return_meta else ("", 0.0)
+        except Exception as exc:
+            err = _record_ocr_runtime_error(backend, exc, error_sink=error_sink)
+            meta = {"provider": "openai", "method": "chat_completions_vision", "error": err}
+            return ("", 0.0, meta) if return_meta else ("", 0.0)
 
     if backend == "easyocr":
         # EasyOCR output shape varies by mode:
@@ -1003,6 +1022,7 @@ def main() -> None:
     observations: list[dict[str, Any]] = []
     presence_observations: list[dict[str, Any]] = []
     scene_cuts: list[float] = []
+    runtime_errors: list[str] = []
     prev_frame = None
     prev_selected_regions: set[str] = set()
     # Sampling is endpoint-inclusive (t=0 and t=max_sec when aligned), so expected
@@ -1149,7 +1169,7 @@ def main() -> None:
                 else:
                     targeting_stats["ocr_calls_preproc"] += 1
 
-                cand_text, cand_conf = run_ocr(backend, engine, input_img, args.lang)
+                cand_text, cand_conf = run_ocr(backend, engine, input_img, args.lang, error_sink=runtime_errors)
                 cand_text = clean_text(cand_text)
                 if len(cand_text) < 4:
                     continue
@@ -1285,7 +1305,7 @@ def main() -> None:
         },
         "segments": merged,
         "detected_text_windows": detected_text_windows,
-        "errors": engine_errors,
+        "errors": [*engine_errors, *runtime_errors],
     }
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as f:

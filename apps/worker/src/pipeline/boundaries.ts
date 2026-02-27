@@ -1422,7 +1422,10 @@ function pythonHasOcrModule(pythonBin: string): boolean {
     try {
         const probe = spawnSync(
             pythonBin,
-            ['-c', 'import importlib.util as u; print(int(bool(u.find_spec("easyocr") or u.find_spec("pytesseract"))))'],
+            [
+                '-c',
+                'import importlib.util as u; print(int(bool(u.find_spec("easyocr") or u.find_spec("pytesseract") or u.find_spec("google.cloud.vision"))))'
+            ],
             { encoding: 'utf8' }
         );
         if (probe.status !== 0) return false;
@@ -1671,9 +1674,13 @@ async function runSlideOcrPass(
         const summary = ((raw as any)?.summary ?? {}) as Record<string, unknown>;
         const cloudEnabled = Boolean(summary.cloud_text_enrich_enabled);
         const cloudAttempted = Number(summary.cloud_text_attempted ?? 0);
-        if (!cloudEnabled || cloudAttempted <= 0) {
+        const cloudAccepted = Number(summary.cloud_text_accepted ?? 0);
+        const cloudApplied = Number(summary.cloud_text_applied ?? 0);
+        const cloudPropagated = Number(summary.cloud_text_propagated ?? 0);
+        const cloudUseful = cloudApplied + cloudPropagated;
+        if (!cloudEnabled || cloudAttempted <= 0 || cloudAccepted <= 0 || cloudUseful <= 0) {
             throw new Error(
-                `Slide OCR cloud text enrichment required but unavailable/empty (enabled=${cloudEnabled}, attempted=${cloudAttempted}).`
+                `Slide OCR cloud text enrichment required but unavailable/empty (enabled=${cloudEnabled}, attempted=${cloudAttempted}, accepted=${cloudAccepted}, applied=${cloudApplied}, propagated=${cloudPropagated}).`
             );
         }
     }
