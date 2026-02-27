@@ -383,7 +383,7 @@ def main() -> None:
                     stats["tracks_skipped_unstable"] += 1
                     continue
                 proc = preprocess_roi(crop)
-                if backend == "easyocr":
+                if backend in ("easyocr", "gcv_text_detection"):
                     attempts = [("raw", crop), ("preproc", proc)] if parse_bool(args.ocr_preproc_fallback, default=True) else [("raw", crop)]
                 else:
                     attempts = [("preproc", proc), ("raw", crop)] if parse_bool(args.ocr_preproc_fallback, default=True) else [("preproc", proc)]

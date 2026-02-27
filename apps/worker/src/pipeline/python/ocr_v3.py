@@ -316,9 +316,10 @@ def pick_best_ocr_attempt(
     max_symbol_ratio: float,
     allow_preproc_fallback: bool,
 ) -> tuple[str, float]:
-    attempts = [("raw", raw_img)] if backend == "easyocr" else [("preproc", preproc_img)]
+    raw_first = backend in ("easyocr", "gcv_text_detection")
+    attempts = [("raw", raw_img)] if raw_first else [("preproc", preproc_img)]
     if allow_preproc_fallback:
-        attempts = [("raw", raw_img), ("preproc", preproc_img)] if backend == "easyocr" else [("preproc", preproc_img), ("raw", raw_img)]
+        attempts = [("raw", raw_img), ("preproc", preproc_img)] if raw_first else [("preproc", preproc_img), ("raw", raw_img)]
 
     best_text = ""
     best_conf = 0.0

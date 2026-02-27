@@ -30,6 +30,20 @@ interface ChapterLite {
     confidence?: number;
 }
 
+interface SlideCueEventLite {
+    start: number;
+    end: number;
+    type?: string;
+    text?: string;
+    confidence?: number;
+    ocr_cloud?: {
+        confidence?: number;
+        quality?: number;
+        accepted?: boolean;
+        applied?: boolean;
+    } | null;
+}
+
 interface ClosingArbiterDecision {
     end_sec: number;
     include_until_reason?: string;
@@ -163,6 +177,62 @@ function excerptParagraphsNearBounds(
         'Near end:',
         ...nearEnd.map(fmt)
     ].join('\n');
+}
+
+function summarizeSlideCues(
+    slideEvents: SlideCueEventLite[],
+    centerSec: number,
+    windowSec = 240,
+    limit = 12
+): string {
+    if (!Array.isArray(slideEvents) || slideEvents.length === 0) return '[none]';
+    const near = slideEvents
+        .filter((e) => Number.isFinite(e.start) && Number.isFinite(e.end))
+        .filter((e) => e.end >= centerSec - windowSec && e.start <= centerSec + windowSec)
+        .sort((a, b) => a.start - b.start)
+        .slice(0, Math.max(1, limit));
+    if (near.length === 0) return '[none]';
+    return near
+        .map((e) => {
+            const text = cleanText(String(e.text ?? '')).slice(0, 180);
+            const type = cleanText(String(e.type ?? 'on_screen_text')) || 'on_screen_text';
+            const conf = Number.isFinite(Number(e.confidence)) ? Number(e.confidence).toFixed(2) : '0.00';
+            const cloudApplied = Boolean((e as any)?.ocr_cloud_applied ?? e.ocr_cloud?.applied);
+            const cloudAccepted = Boolean(e.ocr_cloud?.accepted);
+            const cloudQ = Number.isFinite(Number(e.ocr_cloud?.quality)) ? Number(e.ocr_cloud?.quality).toFixed(2) : 'n/a';
+            return `[${e.start.toFixed(2)}-${e.end.toFixed(2)}] type=${type} conf=${conf} cloud_applied=${cloudApplied} cloud_ok=${cloudAccepted} cloud_q=${cloudQ} text="${text}"`;
+        })
+        .join('\n');
+}
+
+function buildSlideCueSummary(workDir: string, bounds: Boundaries): { summary: string; startWindow: string; endWindow: string } {
+    const slidePath = path.join(workDir, 'slide.events.json');
+    if (!fs.existsSync(slidePath)) {
+        return { summary: '[missing slide.events.json]', startWindow: '[none]', endWindow: '[none]' };
+    }
+    const raw = safeParse<any>(fs.readFileSync(slidePath, 'utf8'), {});
+    const events = (Array.isArray(raw?.events) ? raw.events : []) as SlideCueEventLite[];
+    const counts = events.reduce((acc: Record<string, number>, ev) => {
+        const key = cleanText(String(ev?.type ?? 'on_screen_text')) || 'on_screen_text';
+        acc[key] = (acc[key] ?? 0) + 1;
+        return acc;
+    }, {});
+    const rootSummary = (raw?.summary ?? {}) as Record<string, unknown>;
+    const cloudEnabled = Boolean(rootSummary.cloud_text_enrich_enabled);
+    const cloudAttempted = Number(rootSummary.cloud_text_attempted ?? 0);
+    const cloudApplied = Number(rootSummary.cloud_text_applied ?? 0);
+    const summary = [
+        `events_total=${events.length}`,
+        `by_type=${JSON.stringify(counts)}`,
+        `cloud_enabled=${cloudEnabled}`,
+        `cloud_attempted=${cloudAttempted}`,
+        `cloud_applied=${cloudApplied}`
+    ].join(' | ');
+    return {
+        summary,
+        startWindow: summarizeSlideCues(events, bounds.start),
+        endWindow: summarizeSlideCues(events, bounds.end)
+    };
 }
 
 function deriveChapterSermonHint(
@@ -397,7 +467,7 @@ export async function adjudicateBoundariesWithSingleLlm(
     const openai = getOpenAIClient();
     if (!openai) return null;
     const workDir = options.workDir;
-    const model = process.env.BOUNDARY_LLM_MODEL || process.env.ANALYZE_OPENAI_MODEL || 'gpt-4o-mini';
+    const model = process.env.BOUNDARY_LLM_MODEL || process.env.ANALYZE_OPENAI_MODEL || 'gpt-5-mini';
     const maxStartDrift = Number(process.env.BOUNDARY_ADJ_MAX_START_DRIFT_SEC ?? 600);
     const maxEndDrift = Number(process.env.BOUNDARY_ADJ_MAX_END_DRIFT_SEC ?? 240);
     const maxDrift = Number(process.env.BOUNDARY_ADJ_MAX_DRIFT_SEC ?? Math.max(240, maxStartDrift + maxEndDrift));
@@ -438,6 +508,7 @@ export async function adjudicateBoundariesWithSingleLlm(
         .join('\n');
 
     const paragraphExcerpt = excerptParagraphsNearBounds(paragraphs, local);
+    const slideCue = buildSlideCueSummary(workDir, local);
     const prompt = [
         'You are the FINAL boundary adjudicator for sermon clipping.',
         'Decide final sermon bounds using ALL provided evidence.',
@@ -450,6 +521,7 @@ export async function adjudicateBoundariesWithSingleLlm(
         '- Include response song(s) when they are part of that call/closing flow.',
         '- Exclude post-service social/farewell chatter.',
         '- Prefer chapter-labeled sermon spans over local scoring when they are coherent, especially for START.',
+        '- Use slide OCR text cues as high-value evidence (especially speaker-name + phrase overlays near sermon transitions).',
         '- Prefer local evidence only when chapter evidence is weak or contradictory.',
         `- Start drift soft limit: ${maxStartDrift}s, end drift soft limit: ${maxEndDrift}s, total drift cap: ${maxDrift}s.`,
         '',
@@ -465,6 +537,15 @@ export async function adjudicateBoundariesWithSingleLlm(
         JSON.stringify(scoredStart, null, 2),
         'Candidate scoring (end):',
         JSON.stringify(scoredEnd, null, 2),
+        '',
+        'Slide OCR cues summary:',
+        slideCue.summary,
+        '',
+        'Slide OCR cues near start:',
+        slideCue.startWindow,
+        '',
+        'Slide OCR cues near end:',
+        slideCue.endWindow,
         '',
         'Chapters:',
         chapterSummary || '[none]',

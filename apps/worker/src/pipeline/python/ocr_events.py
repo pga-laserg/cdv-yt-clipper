@@ -1,4 +1,5 @@
 import argparse
+import base64
 import json
 import math
 import os
@@ -7,6 +8,8 @@ import shutil
 import sys
 import time
 from typing import Any, Literal
+import urllib.error
+import urllib.request
 
 import cv2
 import numpy as np
@@ -90,18 +93,20 @@ def classify_text(text: str, region: OcrRegion) -> OcrType:
     if verse_rx.search(t):
         return "bible_verse"
 
-    sermon_title_rx = re.compile(
-        r"\b(tema|t[ií]tulo|serie|mensaje|predicaci[oó]n|serm[oó]n)\b",
-        re.IGNORECASE,
-    )
-    if sermon_title_rx.search(t):
-        return "sermon_title"
-
     lower_name_rx = re.compile(
         r"\b(pr\.?|pastor|anciano|hno\.?|hna\.?|elder)\b",
         re.IGNORECASE,
     )
     words = [w for w in re.split(r"\s+", t) if w]
+    sermon_title_rx = re.compile(
+        r"\b(tema|t[ií]tulo|serie|mensaje|predicaci[oó]n|serm[oó]n)\b",
+        re.IGNORECASE,
+    )
+    # Keep title keyword routing for non-slide regions only. Slide title semantics are delegated
+    # to downstream LLM/context steps to avoid brittle keyword-only tagging.
+    if region != "slide" and sermon_title_rx.search(t):
+        return "sermon_title"
+
     if region == "lower_third":
         looks_name = (
             len(words) >= 2
@@ -110,6 +115,14 @@ def classify_text(text: str, region: OcrRegion) -> OcrType:
             and sum(1 for w in words if w[:1].isupper()) >= 1
         )
         if lower_name_rx.search(t) or looks_name:
+            return "speaker_name"
+    if region == "slide" and lower_name_rx.search(t):
+        tokens = re.findall(r"[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+", t)
+        has_name_shape = bool(
+            re.search(r"\b[A-ZÁÉÍÓÚÑ][a-záéíóúñü]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñü]+){1,3}\b", t)
+        )
+        has_phrase = len(tokens) >= 6
+        if has_name_shape or has_phrase:
             return "speaker_name"
 
     lyric_rx = re.compile(
@@ -308,13 +321,102 @@ def merge_presence_observations(
     return sorted(out, key=lambda x: (float(x["start"]), str(x["region"])))
 
 
+def _parse_lang_hints(lang_hint: str) -> list[str]:
+    hints: list[str] = []
+    for raw in str(lang_hint or "").split(","):
+        code = str(raw).strip().lower().replace("_", "-")
+        if not code:
+            continue
+        hints.append(code)
+    seen = set()
+    out: list[str] = []
+    for code in hints:
+        if code in seen:
+            continue
+        seen.add(code)
+        out.append(code)
+    return out
+
+
 def init_ocr_engine(prefer_backend: str, lang_hint: str):
     backend = "none"
     engine: Any = None
     errors: list[str] = []
 
-    wants_easyocr = prefer_backend in ("auto", "easyocr")
-    wants_tesseract = prefer_backend in ("auto", "tesseract")
+    normalized = str(prefer_backend or "auto").strip().lower()
+    gcv_aliases = {
+        "gcv",
+        "google_vision",
+        "google-vision",
+        "vision",
+        "gcv_text_detection",
+        "google_vision_text_detection",
+    }
+    openai_aliases = {
+        "openai",
+        "openai_text_detection",
+        "openai_vision",
+        "openai_vision_text",
+    }
+    auto_include_gcv = parse_bool(os.getenv("OCR_AUTO_INCLUDE_GCV"), default=False)
+    gcv_fallback_enabled = parse_bool(os.getenv("OCR_GCV_FALLBACK"), default=True)
+    openai_fallback_enabled = parse_bool(os.getenv("OCR_OPENAI_FALLBACK"), default=True)
+    disable_gcv = parse_bool(os.getenv("OCR_DISABLE_GCV"), default=False)
+
+    wants_gcv = (normalized in gcv_aliases) or (normalized == "auto" and auto_include_gcv)
+    wants_openai = normalized in openai_aliases
+    wants_easyocr = normalized in ("auto", "easyocr")
+    wants_tesseract = normalized in ("auto", "tesseract")
+    if normalized in gcv_aliases and gcv_fallback_enabled:
+        if openai_fallback_enabled:
+            wants_openai = True
+        wants_easyocr = True
+        wants_tesseract = True
+
+    if wants_gcv:
+        if disable_gcv:
+            errors.append("google-cloud-vision unavailable: disabled via OCR_DISABLE_GCV=true")
+        else:
+            try:
+                from google.cloud import vision  # type: ignore
+
+                endpoint = str(os.getenv("OCR_GCV_ENDPOINT", "")).strip()
+                if endpoint:
+                    client = vision.ImageAnnotatorClient(client_options={"api_endpoint": endpoint})
+                else:
+                    client = vision.ImageAnnotatorClient()
+                engine = {
+                    "client": client,
+                    "vision": vision,
+                    "lang_hints": _parse_lang_hints(lang_hint),
+                }
+                backend = "gcv_text_detection"
+                return backend, engine, errors
+            except Exception as exc:  # pragma: no cover
+                errors.append(f"google-cloud-vision unavailable: {exc}")
+
+    if wants_openai:
+        api_key = str(os.getenv("OPENAI_API_KEY", "")).strip()
+        if not api_key:
+            errors.append("openai vision unavailable: OPENAI_API_KEY missing")
+        else:
+            model = str(
+                os.getenv("OCR_OPENAI_VISION_MODEL")
+                or os.getenv("BOUNDARY_LLM_MODEL")
+                or os.getenv("ANALYZE_OPENAI_MODEL")
+                or "gpt-5-mini"
+            ).strip()
+            if not model:
+                model = "gpt-5-mini"
+            engine = {
+                "api_key": api_key,
+                "base_url": str(os.getenv("OCR_OPENAI_BASE_URL", "https://api.openai.com/v1")).strip().rstrip("/"),
+                "model": model,
+                "timeout_sec": float(os.getenv("OCR_OPENAI_TIMEOUT_SEC", "45")),
+                "image_detail": str(os.getenv("OCR_OPENAI_IMAGE_DETAIL", "high")).strip().lower() or "high",
+            }
+            backend = "openai_text_detection"
+            return backend, engine, errors
 
     if wants_easyocr:
         try:
@@ -366,6 +468,244 @@ def init_ocr_engine(prefer_backend: str, lang_hint: str):
     return backend, engine, errors
 
 
+def _extract_gcv_confidence_and_lang(response: Any) -> tuple[float, list[str]]:
+    confs: list[float] = []
+    langs: list[str] = []
+    full = getattr(response, "full_text_annotation", None)
+    pages = getattr(full, "pages", None) if full is not None else None
+    if pages:
+        for page in pages:
+            # language hints are available in properties across levels.
+            prop = getattr(page, "property", None)
+            det_langs = getattr(prop, "detected_languages", None) if prop is not None else None
+            if det_langs:
+                for dl in det_langs:
+                    code = str(getattr(dl, "language_code", "") or "").strip()
+                    if code:
+                        langs.append(code)
+            blocks = getattr(page, "blocks", None) or []
+            for block in blocks:
+                paragraphs = getattr(block, "paragraphs", None) or []
+                for para in paragraphs:
+                    words = getattr(para, "words", None) or []
+                    for word in words:
+                        w_conf = getattr(word, "confidence", None)
+                        if isinstance(w_conf, (int, float)):
+                            confs.append(float(w_conf))
+                        symbols = getattr(word, "symbols", None) or []
+                        for sym in symbols:
+                            s_conf = getattr(sym, "confidence", None)
+                            if isinstance(s_conf, (int, float)):
+                                confs.append(float(s_conf))
+                            sprop = getattr(sym, "property", None)
+                            det_langs = getattr(sprop, "detected_languages", None) if sprop is not None else None
+                            if det_langs:
+                                for dl in det_langs:
+                                    code = str(getattr(dl, "language_code", "") or "").strip()
+                                    if code:
+                                        langs.append(code)
+    avg_conf = float(sum(confs) / len(confs)) if confs else 0.0
+    # De-dup lang codes preserving order.
+    seen = set()
+    uniq_langs: list[str] = []
+    for code in langs:
+        if code in seen:
+            continue
+        seen.add(code)
+        uniq_langs.append(code)
+    return avg_conf, uniq_langs
+
+
+def _run_gcv_text_detection(engine: Any, img, lang_hint: str) -> tuple[str, float, dict[str, Any]]:
+    if not isinstance(engine, dict):
+        return "", 0.0, {}
+    client = engine.get("client")
+    vision = engine.get("vision")
+    if client is None or vision is None:
+        return "", 0.0, {}
+
+    ok, enc = cv2.imencode(".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
+    if not ok:
+        return "", 0.0, {}
+    image = vision.Image(content=enc.tobytes())
+    lang_hints = engine.get("lang_hints")
+    if not isinstance(lang_hints, list):
+        lang_hints = _parse_lang_hints(lang_hint)
+    image_context = {"language_hints": lang_hints} if lang_hints else None
+
+    response = client.text_detection(image=image, image_context=image_context)
+    err = getattr(getattr(response, "error", None), "message", "")
+    if err:
+        raise RuntimeError(f"google vision text_detection failed: {err}")
+
+    text = ""
+    full = getattr(response, "full_text_annotation", None)
+    full_text = str(getattr(full, "text", "") or "").strip() if full is not None else ""
+    if full_text:
+        text = full_text
+    else:
+        annotations = getattr(response, "text_annotations", None) or []
+        if annotations:
+            text = str(getattr(annotations[0], "description", "") or "").strip()
+    text = clean_text(text)
+    if not text:
+        return "", 0.0, {
+            "provider": "google_vision",
+            "method": "TEXT_DETECTION",
+            "detected_languages": [],
+            "word_confidence_mean": 0.0,
+        }
+
+    mean_conf, langs = _extract_gcv_confidence_and_lang(response)
+    # Some videos/models may not expose word-level confidence for TEXT_DETECTION.
+    conf = mean_conf if mean_conf > 0 else 0.80
+    conf = float(max(0.0, min(1.0, conf)))
+    meta = {
+        "provider": "google_vision",
+        "method": "TEXT_DETECTION",
+        "detected_languages": langs,
+        "word_confidence_mean": float(round(mean_conf, 6)),
+    }
+    return text, conf, meta
+
+
+def _parse_openai_ocr_content(raw_content: Any) -> str:
+    if isinstance(raw_content, list):
+        parts: list[str] = []
+        for item in raw_content:
+            if isinstance(item, dict):
+                tx = str(item.get("text", "")).strip()
+                if tx:
+                    parts.append(tx)
+        return clean_text(" ".join(parts))
+    if not isinstance(raw_content, str):
+        return ""
+    content = raw_content.strip()
+    if not content:
+        return ""
+
+    # Strip fenced markdown blocks when present.
+    fence = re.search(r"```(?:json)?\s*(\{[\s\S]*\})\s*```", content, flags=re.IGNORECASE)
+    if fence:
+        content = fence.group(1).strip()
+
+    parsed_obj: dict[str, Any] | None = None
+    try:
+        maybe = json.loads(content)
+        if isinstance(maybe, dict):
+            parsed_obj = maybe
+    except Exception:
+        left = content.find("{")
+        right = content.rfind("}")
+        if left >= 0 and right > left:
+            try:
+                maybe = json.loads(content[left : right + 1])
+                if isinstance(maybe, dict):
+                    parsed_obj = maybe
+            except Exception:
+                parsed_obj = None
+
+    if isinstance(parsed_obj, dict):
+        for key in ("text", "transcript", "ocr_text", "content"):
+            val = parsed_obj.get(key)
+            if isinstance(val, str) and clean_text(val):
+                return clean_text(val)
+        return ""
+    return clean_text(content)
+
+
+def _run_openai_text_detection(engine: Any, img, lang_hint: str) -> tuple[str, float, dict[str, Any]]:
+    if not isinstance(engine, dict):
+        return "", 0.0, {}
+    api_key = str(engine.get("api_key", "")).strip()
+    if not api_key:
+        return "", 0.0, {}
+    model = str(engine.get("model", "gpt-5-mini")).strip() or "gpt-5-mini"
+    base_url = str(engine.get("base_url", "https://api.openai.com/v1")).strip().rstrip("/")
+    timeout_sec = float(engine.get("timeout_sec", 45))
+    image_detail = str(engine.get("image_detail", "high")).strip().lower() or "high"
+    if image_detail not in ("low", "high", "auto"):
+        image_detail = "high"
+
+    ok, enc = cv2.imencode(".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
+    if not ok:
+        return "", 0.0, {}
+    b64 = base64.b64encode(enc.tobytes()).decode("ascii")
+    prompt = (
+        "Extract all visible text from this image exactly as seen. "
+        "Return strict JSON only: {\"text\":\"...\"}. "
+        "Use '\\n' for line breaks. If no text is visible, return {\"text\":\"\"}."
+    )
+
+    payload = {
+        "model": model,
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{b64}",
+                            "detail": image_detail,
+                        },
+                    },
+                ],
+            }
+        ],
+    }
+
+    request = urllib.request.Request(
+        f"{base_url}/chat/completions",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=max(5.0, timeout_sec)) as response:
+            body = response.read().decode("utf-8", errors="replace")
+    except urllib.error.HTTPError as exc:
+        detail = ""
+        try:
+            detail = exc.read().decode("utf-8", errors="replace")
+        except Exception:
+            detail = str(exc)
+        raise RuntimeError(f"openai vision request failed: HTTP {exc.code} {detail[:400]}") from exc
+
+    data = json.loads(body) if body else {}
+    if isinstance(data, dict) and isinstance(data.get("error"), dict):
+        raise RuntimeError(f"openai vision request failed: {data['error'].get('message', 'unknown error')}")
+
+    choices = data.get("choices") if isinstance(data, dict) else None
+    message = choices[0].get("message", {}) if isinstance(choices, list) and choices else {}
+    raw_content = message.get("content")
+    text = _parse_openai_ocr_content(raw_content)
+    if not text:
+        return "", 0.0, {
+            "provider": "openai",
+            "method": "chat_completions_vision",
+            "model": model,
+        }
+
+    alnum_chars = sum(1 for ch in text if ch.isalnum())
+    alnum_ratio = float(alnum_chars) / float(max(1, len(text)))
+    length_norm = clamp(len(text) / 420.0, 0.0, 1.0)
+    confidence = clamp(0.55 + 0.30 * length_norm + 0.15 * alnum_ratio, 0.0, 0.95)
+    usage = data.get("usage") if isinstance(data, dict) else None
+    meta = {
+        "provider": "openai",
+        "method": "chat_completions_vision",
+        "model": model,
+        "word_confidence_mean": round(confidence, 6),
+        "usage": usage if isinstance(usage, dict) else {},
+    }
+    return clean_text(text), float(confidence), meta
+
+
 def run_ocr(
     backend: str,
     engine: Any,
@@ -374,9 +714,10 @@ def run_ocr(
     *,
     psm: int | None = None,
     upscale: float = 1.0,
-) -> tuple[str, float]:
+    return_meta: bool = False,
+) -> tuple[str, float] | tuple[str, float, dict[str, Any]]:
     if roi_img is None or roi_img.size == 0:
-        return "", 0.0
+        return ("", 0.0, {}) if return_meta else ("", 0.0)
     img = roi_img
     if isinstance(upscale, (int, float)) and float(upscale) > 1.01:
         try:
@@ -388,6 +729,20 @@ def run_ocr(
             )
         except Exception:
             img = roi_img
+
+    if backend == "gcv_text_detection":
+        try:
+            text, conf, meta = _run_gcv_text_detection(engine, img, lang_hint)
+            return (text, conf, meta) if return_meta else (text, conf)
+        except Exception:
+            return ("", 0.0, {}) if return_meta else ("", 0.0)
+
+    if backend == "openai_text_detection":
+        try:
+            text, conf, meta = _run_openai_text_detection(engine, img, lang_hint)
+            return (text, conf, meta) if return_meta else (text, conf)
+        except Exception:
+            return ("", 0.0, {}) if return_meta else ("", 0.0)
 
     if backend == "easyocr":
         # EasyOCR output shape varies by mode:
@@ -417,8 +772,10 @@ def run_ocr(
             if all_texts:
                 break
         if not all_texts:
-            return "", 0.0
-        return clean_text(" ".join(all_texts)), float(sum(all_confs) / max(1, len(all_confs)))
+            return ("", 0.0, {}) if return_meta else ("", 0.0)
+        text = clean_text(" ".join(all_texts))
+        conf = float(sum(all_confs) / max(1, len(all_confs)))
+        return (text, conf, {"provider": "easyocr"}) if return_meta else (text, conf)
 
     if backend == "tesseract":
         pytesseract = engine
@@ -449,11 +806,13 @@ def run_ocr(
                     continue
                 texts.append(tx)
                 confs.append(c / 100.0)
-            return clean_text(" ".join(texts)), float(sum(confs) / max(1, len(confs)))
+            text = clean_text(" ".join(texts))
+            conf = float(sum(confs) / max(1, len(confs)))
+            return (text, conf, {"provider": "tesseract"}) if return_meta else (text, conf)
         except Exception:
-            return "", 0.0
+            return ("", 0.0, {}) if return_meta else ("", 0.0)
 
-    return "", 0.0
+    return ("", 0.0, {}) if return_meta else ("", 0.0)
 
 
 def merge_observations(
@@ -774,7 +1133,7 @@ def main() -> None:
             roi = candidate["roi"]
             proc = preprocess_roi(roi)
             attempts: list[tuple[str, Any]]
-            if backend == "easyocr":
+            if backend in ("easyocr", "gcv_text_detection"):
                 attempts = [("raw", roi), ("preproc", proc)] if ocr_preproc_fallback else [("raw", roi)]
             else:
                 attempts = [("preproc", proc), ("raw", roi)] if ocr_preproc_fallback else [("preproc", proc)]

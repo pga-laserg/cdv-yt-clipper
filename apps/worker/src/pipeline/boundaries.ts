@@ -67,6 +67,33 @@ interface SlideOcrEvent {
     type: 'speaker_name' | 'bible_verse' | 'sermon_title' | 'song_lyric' | 'on_screen_text';
     confidence: number;
     slide_id?: string;
+    sample_time_sec?: number;
+    appearances?: number[];
+    samples?: number;
+    presentation_group_id?: string;
+    presentation_is_representative?: boolean;
+    presentation_duplicate_of?: string | null;
+    presentation_match?: Record<string, any> | null;
+    extract_for_package?: boolean;
+    ocr_cloud_applied?: boolean;
+    ocr_cloud_quality?: number;
+    ocr_cloud?: Record<string, any> | null;
+}
+
+interface SlideOcrPresentationGroup {
+    group_id: string;
+    representative_slide_id: string;
+    member_slide_ids: string[];
+    member_count: number;
+}
+
+interface SlideOcrPresentationSummary {
+    enabled: boolean;
+    groups_total: number;
+    representatives_total: number;
+    duplicates_total: number;
+    extract_slide_ids: string[];
+    groups: SlideOcrPresentationGroup[];
 }
 
 interface SlideOcrPassResult {
@@ -76,6 +103,7 @@ interface SlideOcrPassResult {
     shot_boundaries_sec?: number[];
     events: SlideOcrEvent[];
     summary?: Record<string, any>;
+    presentation?: SlideOcrPresentationSummary;
 }
 
 type OcrPipeline = 'v1' | 'v2' | 'v3';
@@ -129,11 +157,15 @@ interface LlmEndStyleDecision {
     reason?: string;
 }
 
-type BoundaryPipelineProfile = 'default' | 'light';
+let warnedLegacyBoundaryOcrDisabled = false;
+
+type BoundaryPipelineProfile = 'standard' | 'light';
 
 function getBoundaryPipelineProfile(): BoundaryPipelineProfile {
-    const raw = String(process.env.BOUNDARY_PIPELINE_PROFILE ?? 'default').trim().toLowerCase();
-    return raw === 'light' ? 'light' : 'default';
+    const raw = String(process.env.BOUNDARY_PIPELINE_PROFILE ?? 'light').trim().toLowerCase();
+    if (raw === 'standard' || raw === 'default') return 'standard';
+    if (raw === 'light') return 'light';
+    return 'light';
 }
 
 function normalizeOcrPipeline(raw: string | undefined | null): OcrPipeline {
@@ -156,21 +188,21 @@ function getOcrEventsFilename(pipeline: OcrPipeline): string {
 function profileNumber(
     profile: BoundaryPipelineProfile,
     envKey: string,
-    defaults: { default: number; light: number }
+    defaults: { standard: number; light: number }
 ): number {
     const raw = process.env[envKey];
     if (raw != null && raw !== '') return Number(raw);
-    return profile === 'light' ? defaults.light : defaults.default;
+    return profile === 'light' ? defaults.light : defaults.standard;
 }
 
 function profileString(
     profile: BoundaryPipelineProfile,
     envKey: string,
-    defaults: { default: string; light: string }
+    defaults: { standard: string; light: string }
 ): string {
     const raw = process.env[envKey];
     if (raw != null && raw !== '') return raw;
-    return profile === 'light' ? defaults.light : defaults.default;
+    return profile === 'light' ? defaults.light : defaults.standard;
 }
 
 function getOpenAIClient(): OpenAI | null {
@@ -843,6 +875,31 @@ function getSlideWindowDurations(events: SlideOcrEvent[], start: number, end: nu
     return durations;
 }
 
+function getSlideTextCueDurations(events: SlideOcrEvent[], start: number, end: number): {
+    speakerCueDur: number;
+    speakerPhraseCueDur: number;
+} {
+    const speakerCueRx = /\b(pr\.?|pastor|anciano|hno\.?|hna\.?|elder)\b/i;
+    const speakerPhraseRx = /\b(pr\.?|pastor|anciano|hno\.?|hna\.?|elder)\b.*(:|["“”''])/i;
+    let speakerCueDur = 0;
+    let speakerPhraseCueDur = 0;
+    for (const e of events) {
+        const ol = overlap(e.start, e.end, start, end);
+        if (ol <= 0) continue;
+        const text = cleanText(String(e.text ?? ''));
+        if (!text) continue;
+        const words = text.split(/\s+/).filter(Boolean).length;
+        if (speakerCueRx.test(text)) {
+            speakerCueDur += ol;
+            // Stronger cue: named speaker plus phrase/header in same frame.
+            if (speakerPhraseRx.test(text) || words >= 7) {
+                speakerPhraseCueDur += ol;
+            }
+        }
+    }
+    return { speakerCueDur, speakerPhraseCueDur };
+}
+
 function boundarySlideSignal(slide: SlideOcrPassResult, t: number, windowSec = 18) {
     const events = Array.isArray(slide?.events) ? slide.events : [];
     if (events.length === 0) return null;
@@ -852,6 +909,8 @@ function boundarySlideSignal(slide: SlideOcrPassResult, t: number, windowSec = 1
     const afterEnd = t + windowSec;
     const before = getSlideWindowDurations(events, beforeStart, beforeEnd);
     const after = getSlideWindowDurations(events, afterStart, afterEnd);
+    const beforeTextCue = getSlideTextCueDurations(events, beforeStart, beforeEnd);
+    const afterTextCue = getSlideTextCueDurations(events, afterStart, afterEnd);
     const beforeTotal = Math.max(0.001, beforeEnd - beforeStart);
     const afterTotal = Math.max(0.001, afterEnd - afterStart);
 
@@ -861,24 +920,45 @@ function boundarySlideSignal(slide: SlideOcrPassResult, t: number, windowSec = 1
         ((after.get('sermon_title') ?? 0) + (after.get('bible_verse') ?? 0)) / afterTotal;
     const beforeLyricRatio = (before.get('song_lyric') ?? 0) / beforeTotal;
     const afterLyricRatio = (after.get('song_lyric') ?? 0) / afterTotal;
+    const beforeSpeakerNameRatio = (before.get('speaker_name') ?? 0) / beforeTotal;
+    const afterSpeakerNameRatio = (after.get('speaker_name') ?? 0) / afterTotal;
+    const beforeSpeakerKeywordRatio = beforeTextCue.speakerCueDur / beforeTotal;
+    const afterSpeakerKeywordRatio = afterTextCue.speakerCueDur / afterTotal;
+    const beforeSpeakerPhraseRatio = beforeTextCue.speakerPhraseCueDur / beforeTotal;
+    const afterSpeakerPhraseRatio = afterTextCue.speakerPhraseCueDur / afterTotal;
     const lyricToSermon = beforeLyricRatio >= 0.12 && afterSermonCueRatio >= 0.08;
     const sermonToLyric = beforeSermonCueRatio >= 0.08 && afterLyricRatio >= 0.12;
     const lyricDominantNear = (beforeLyricRatio + afterLyricRatio) / 2 >= 0.2;
     const hasSermonCueNear = beforeSermonCueRatio >= 0.08 || afterSermonCueRatio >= 0.08;
     const hasSermonTitleNear = events.some((e) => e.type === 'sermon_title' && overlap(e.start, e.end, t - 15, t + 15) > 0);
     const hasBibleVerseNear = events.some((e) => e.type === 'bible_verse' && overlap(e.start, e.end, t - 15, t + 15) > 0);
+    const hasSpeakerNameNear =
+        events.some((e) => e.type === 'speaker_name' && overlap(e.start, e.end, t - 15, t + 15) > 0) ||
+        beforeSpeakerNameRatio >= 0.08 ||
+        afterSpeakerNameRatio >= 0.08 ||
+        beforeSpeakerKeywordRatio >= 0.08 ||
+        afterSpeakerKeywordRatio >= 0.08;
+    const hasSpeakerPhraseNear = beforeSpeakerPhraseRatio >= 0.1 || afterSpeakerPhraseRatio >= 0.1;
 
     return {
         beforeSermonCueRatio,
         afterSermonCueRatio,
         beforeLyricRatio,
         afterLyricRatio,
+        beforeSpeakerNameRatio,
+        afterSpeakerNameRatio,
+        beforeSpeakerKeywordRatio,
+        afterSpeakerKeywordRatio,
+        beforeSpeakerPhraseRatio,
+        afterSpeakerPhraseRatio,
         lyricToSermon,
         sermonToLyric,
         lyricDominantNear,
         hasSermonCueNear,
         hasSermonTitleNear,
         hasBibleVerseNear,
+        hasSpeakerNameNear,
+        hasSpeakerPhraseNear,
     };
 }
 
@@ -1273,7 +1353,7 @@ async function runDiarize(chunkPath: string): Promise<SpeakerTurn[]> {
 async function runFacePass(
     videoPath: string,
     outPath: string,
-    profile: BoundaryPipelineProfile = 'default'
+    profile: BoundaryPipelineProfile = 'light'
 ): Promise<FaceBoundaryResult> {
     const pythonScriptCandidates = [
         path.resolve(__dirname, 'python/face_sermon_bounds.py'),
@@ -1286,11 +1366,11 @@ async function runFacePass(
         ? path.resolve(process.env.FACE_PYTHON_BIN)
         : (fs.existsSync(venv311) ? venv311 : workerVenv);
 
-    const stepSec = profileString(profile, 'FACE_SCAN_STEP_SEC', { default: '4.0', light: '8.0' });
-    const fineStepSec = profileString(profile, 'FACE_SCAN_FINE_STEP_SEC', { default: '0.75', light: '1.0' });
-    const detSize = profileString(profile, 'FACE_DET_SIZE', { default: '320', light: '256' });
-    const maxFacesPerFrame = profileString(profile, 'FACE_MAX_FACES_PER_FRAME', { default: '1', light: '1' });
-    const denseWindowSec = profileString(profile, 'FACE_DENSE_WINDOW_SEC', { default: '30', light: '20' });
+    const stepSec = profileString(profile, 'FACE_SCAN_STEP_SEC', { standard: '4.0', light: '8.0' });
+    const fineStepSec = profileString(profile, 'FACE_SCAN_FINE_STEP_SEC', { standard: '0.75', light: '1.0' });
+    const detSize = profileString(profile, 'FACE_DET_SIZE', { standard: '320', light: '256' });
+    const maxFacesPerFrame = profileString(profile, 'FACE_MAX_FACES_PER_FRAME', { standard: '1', light: '1' });
+    const denseWindowSec = profileString(profile, 'FACE_DENSE_WINDOW_SEC', { standard: '30', light: '20' });
     console.log(
         `[face-pass] profile=${profile} step=${stepSec}s fine_step=${fineStepSec}s det_size=${detSize} dense_window=${denseWindowSec}s`
     );
@@ -1390,6 +1470,49 @@ function resolvePreferredOcrVideoPath(videoPath: string, outPath: string): strin
     return fallback ?? videoPath;
 }
 
+function resolveOriginalSourceVideoPath(videoPath: string, outPath: string): string {
+    const workDir = path.dirname(outPath);
+    const candidates = [
+        path.join(workDir, 'source.original.mp4'),
+        path.join(workDir, 'source.original.mkv'),
+        path.join(workDir, 'source.original.webm'),
+        path.join(workDir, 'source.original.mov'),
+        path.join(workDir, 'source.mp4'),
+    ];
+    const providedLooksOriginal = /source\.original\./i.test(path.basename(videoPath));
+    if (providedLooksOriginal && fs.existsSync(videoPath)) return videoPath;
+    const preferred = candidates.find((p) => fs.existsSync(p));
+    return preferred ?? videoPath;
+}
+
+function probeDurationSec(videoPath: string): number | null {
+    if (!videoPath || !fs.existsSync(videoPath)) return null;
+    const ffprobeBins = ['/opt/homebrew/bin/ffprobe', '/usr/local/bin/ffprobe', 'ffprobe'];
+    for (const ffprobeBin of ffprobeBins) {
+        try {
+            const probe = spawnSync(
+                ffprobeBin,
+                [
+                    '-v',
+                    'error',
+                    '-show_entries',
+                    'format=duration',
+                    '-of',
+                    'default=noprint_wrappers=1:nokey=1',
+                    videoPath
+                ],
+                { encoding: 'utf8' }
+            );
+            if (probe.status !== 0) continue;
+            const value = Number(String(probe.stdout ?? '').trim());
+            if (Number.isFinite(value) && value > 0) return value;
+        } catch {
+            continue;
+        }
+    }
+    return null;
+}
+
 async function runOcrEventPass(
     videoPath: string,
     outPath: string,
@@ -1476,8 +1599,29 @@ async function runSlideOcrPass(
         videoPath,
         path.join(workDir, 'source.mp4'),
     ];
-    const lowVideoPath = lowCandidates.find((p) => fs.existsSync(p)) ?? videoPath;
+    let lowVideoPath = lowCandidates.find((p) => fs.existsSync(p)) ?? videoPath;
     const hqVideoPath = resolvePreferredOcrVideoPath(videoPath, outPath);
+    const originalVideoPath = resolveOriginalSourceVideoPath(videoPath, outPath);
+    const forceHqSampling = String(process.env.SLIDE_OCR_FORCE_HQ_SAMPLING ?? 'false').toLowerCase() === 'true';
+    const minLightToHqRatio = Number(process.env.SLIDE_OCR_LIGHT_DURATION_MIN_RATIO ?? 0.98);
+    if (forceHqSampling && fs.existsSync(hqVideoPath)) {
+        lowVideoPath = hqVideoPath;
+    } else if (fs.existsSync(lowVideoPath) && fs.existsSync(hqVideoPath) && lowVideoPath !== hqVideoPath) {
+        const lowDur = probeDurationSec(lowVideoPath);
+        const hqDur = probeDurationSec(hqVideoPath);
+        if (
+            lowDur != null &&
+            hqDur != null &&
+            hqDur > 0 &&
+            lowDur < hqDur * Math.max(0.5, minLightToHqRatio)
+        ) {
+            const fallbackSamplePath = fs.existsSync(originalVideoPath) ? originalVideoPath : hqVideoPath;
+            console.warn(
+                `[slide-ocr] light source appears truncated (${lowDur.toFixed(1)}s vs HQ ${hqDur.toFixed(1)}s); sampling from ${path.basename(fallbackSamplePath)}`
+            );
+            lowVideoPath = fallbackSamplePath;
+        }
+    }
     const sampleSec = process.env.BOUNDARY_SLIDE_OCR_SAMPLE_SEC ?? process.env.SLIDE_OCR_SAMPLE_SEC ?? '1.0';
     const configuredMaxSec = Number(
         process.env.BOUNDARY_SLIDE_OCR_MAX_DURATION_SEC ??
@@ -1487,6 +1631,20 @@ async function runSlideOcrPass(
         0
     );
     const maxSec = configuredMaxSec > 0 ? Math.min(configuredMaxSec, durationSec) : durationSec;
+    const cloudTextEnrich =
+        process.env.BOUNDARY_SLIDE_OCR_CLOUD_TEXT_ENRICH ??
+        process.env.SLIDE_OCR_CLOUD_TEXT_ENRICH ??
+        'true';
+    const cloudTextRequired =
+        String(
+            process.env.BOUNDARY_SLIDE_OCR_REQUIRE_CLOUD_TEXT ??
+            process.env.SLIDE_OCR_REQUIRE_CLOUD_TEXT ??
+            'true'
+        ).toLowerCase() === 'true';
+    const cloudTextMaxImages =
+        process.env.BOUNDARY_SLIDE_OCR_CLOUD_TEXT_MAX_IMAGES ??
+        process.env.SLIDE_OCR_CLOUD_TEXT_MAX_IMAGES ??
+        '0';
     const args = [
         pythonScript,
         lowVideoPath,
@@ -1498,6 +1656,10 @@ async function runSlideOcrPass(
         String(sampleSec),
         '--max-sec',
         String(maxSec),
+        '--cloud-text-enrich',
+        String(cloudTextEnrich),
+        '--cloud-text-max-images',
+        String(cloudTextMaxImages),
     ];
     console.log(
         `[slide-ocr] low=${path.basename(lowVideoPath)} hq=${path.basename(hqVideoPath)} sample=${sampleSec}s max_sec=${maxSec.toFixed(1)}`
@@ -1505,7 +1667,50 @@ async function runSlideOcrPass(
     await runProcess(pythonBin, args, { streamStderr: true, logPrefix: '[slide-ocr]' });
     const raw = JSON.parse(fs.readFileSync(outPath, 'utf8')) as SlideOcrPassResult;
     if (!Array.isArray(raw?.events)) throw new Error('Invalid slide-ocr output');
+    if (cloudTextRequired) {
+        const summary = ((raw as any)?.summary ?? {}) as Record<string, unknown>;
+        const cloudEnabled = Boolean(summary.cloud_text_enrich_enabled);
+        const cloudAttempted = Number(summary.cloud_text_attempted ?? 0);
+        if (!cloudEnabled || cloudAttempted <= 0) {
+            throw new Error(
+                `Slide OCR cloud text enrichment required but unavailable/empty (enabled=${cloudEnabled}, attempted=${cloudAttempted}).`
+            );
+        }
+    }
     return raw;
+}
+
+function writeSlidePresentationPackage(slide: SlideOcrPassResult, outPath: string): void {
+    const events = Array.isArray(slide?.events) ? slide.events : [];
+    const hasExtractFlags = events.some((e) => typeof e?.extract_for_package === 'boolean');
+    const extractEvents = hasExtractFlags
+        ? events.filter((e) => e.extract_for_package === true)
+        : events;
+
+    const presentation = slide.presentation ?? null;
+    const packageObj = {
+        source: 'slide-ocr-presentation-package-v1',
+        generated_at: new Date().toISOString(),
+        summary: {
+            total_events: events.length,
+            extract_events: extractEvents.length,
+            duplicates_for_extract: Math.max(0, events.length - extractEvents.length),
+            groups_total:
+                typeof presentation?.groups_total === 'number'
+                    ? presentation.groups_total
+                    : extractEvents.length
+        },
+        strategy: {
+            global_duplicate_pass_enabled: Boolean(presentation?.enabled),
+            extraction_driven_by_event_flag: hasExtractFlags
+        },
+        groups: Array.isArray(presentation?.groups) ? presentation?.groups : [],
+        extract_slide_ids: Array.isArray(presentation?.extract_slide_ids) ? presentation.extract_slide_ids : [],
+        events_extract: extractEvents,
+        events_all: events
+    };
+
+    fs.writeFileSync(outPath, JSON.stringify(packageObj, null, 2));
 }
 
 function absoluteTurns(turns: SpeakerTurn[], offsetSec: number, speakerPrefix?: string): SpeakerTurn[] {
@@ -1733,10 +1938,10 @@ export async function findSermonBoundaries(
 
     try {
         const audioEnd = normalized.length > 0 ? normalized[normalized.length - 1].end : guess.end + 1;
-        const preScanSec = profileNumber(profile, 'TARGET_DIAR_PRE_SCAN_SEC', { default: 120, light: 60 });
-        const postScanSec = profileNumber(profile, 'TARGET_DIAR_POST_SCAN_SEC', { default: 120, light: 60 });
-        const anchorSec = profileNumber(profile, 'TARGET_DIAR_ANCHOR_SEC', { default: 30, light: 20 });
-        const maxConfirmGapSec = profileNumber(profile, 'TARGET_DIAR_MAX_CONFIRM_GAP_SEC', { default: 30, light: 20 });
+        const preScanSec = profileNumber(profile, 'TARGET_DIAR_PRE_SCAN_SEC', { standard: 120, light: 60 });
+        const postScanSec = profileNumber(profile, 'TARGET_DIAR_POST_SCAN_SEC', { standard: 120, light: 60 });
+        const anchorSec = profileNumber(profile, 'TARGET_DIAR_ANCHOR_SEC', { standard: 30, light: 20 });
+        const maxConfirmGapSec = profileNumber(profile, 'TARGET_DIAR_MAX_CONFIRM_GAP_SEC', { standard: 30, light: 20 });
         console.log(
             `[targeted-diarization] profile=${profile} pre_scan=${preScanSec}s post_scan=${postScanSec}s anchor=${anchorSec}s confirm_gap=${maxConfirmGapSec}s`
         );
@@ -1796,22 +2001,17 @@ export async function findSermonBoundaries(
             console.warn('Audio-event pass unavailable, continuing without it:', error);
         }
         let ocrEvents: OcrEventPassResult | null = null;
-        const ocrEnabled =
-            String(process.env.BOUNDARY_ENABLE_OCR_SIGNALS ?? process.env.ANALYSIS_ENABLE_OCR_SIGNALS ?? 'true').toLowerCase() ===
+        const legacyOcrRequested =
+            String(process.env.BOUNDARY_ENABLE_OCR_SIGNALS ?? process.env.ANALYSIS_ENABLE_OCR_SIGNALS ?? 'false').toLowerCase() ===
             'true';
-        const ocrPipeline = getBoundaryOcrPipeline();
-        const ocrEventsPath = path.join(workDir, getOcrEventsFilename(ocrPipeline));
-        if (ocrEnabled && options.videoPath) {
-            try {
-                ocrEvents = fs.existsSync(ocrEventsPath)
-                    ? (JSON.parse(fs.readFileSync(ocrEventsPath, 'utf8')) as OcrEventPassResult)
-                    : await runOcrEventPass(options.videoPath, ocrEventsPath, audioEnd, ocrPipeline);
-                if (!Array.isArray(ocrEvents?.segments)) ocrEvents = null;
-            } catch (error) {
-                console.warn('OCR-event pass unavailable, continuing without it:', error);
-            }
+        if (legacyOcrRequested && !warnedLegacyBoundaryOcrDisabled) {
+            warnedLegacyBoundaryOcrDisabled = true;
+            console.warn(
+                '[ocr-events] Legacy ocr.events* boundary signals are deprecated and disabled. Use Slide OCR v2 (slide.events.json) instead.'
+            );
         }
         let slideOcrEvents: SlideOcrPassResult | null = null;
+        let slidePresentationPackagePath: string | null = null;
         const slideOcrEnabled =
             String(process.env.BOUNDARY_ENABLE_SLIDE_OCR_SIGNALS ?? process.env.SLIDE_OCR_ENABLED ?? 'false').toLowerCase() ===
             'true';
@@ -1822,6 +2022,15 @@ export async function findSermonBoundaries(
                     ? (JSON.parse(fs.readFileSync(slideOcrEventsPath, 'utf8')) as SlideOcrPassResult)
                     : await runSlideOcrPass(options.videoPath, slideOcrEventsPath, audioEnd);
                 if (!Array.isArray(slideOcrEvents?.events)) slideOcrEvents = null;
+                if (slideOcrEvents) {
+                    slidePresentationPackagePath = path.join(workDir, 'slide.presentation.package.json');
+                    try {
+                        writeSlidePresentationPackage(slideOcrEvents, slidePresentationPackagePath);
+                    } catch (pkgErr) {
+                        slidePresentationPackagePath = null;
+                        console.warn('Slide presentation package generation failed:', pkgErr);
+                    }
+                }
             } catch (error) {
                 console.warn('Slide-OCR pass unavailable, continuing without it:', error);
             }
@@ -1869,23 +2078,28 @@ export async function findSermonBoundaries(
             const prev = previousTurnBefore(preTurnsAbs, candidateStart);
             const diarChange = Boolean(prev && prev.speaker !== startSpeaker && candidateStart - prev.end <= maxConfirmGapSec);
             const audio = audioEvents ? boundaryAudioSignal(audioEvents.segments, candidateStart) : null;
-            const ocr = ocrEvents ? boundaryOcrSignal(ocrEvents, candidateStart, ocrWindowSec) : null;
+            const ocr: ReturnType<typeof boundaryOcrSignal> | null = null;
             const slide = slideOcrEvents ? boundarySlideSignal(slideOcrEvents, candidateStart, ocrWindowSec) : null;
+            const speakerCueContext = Boolean(
+                transcriptSignal.sermonLikely ||
+                    transcriptSignal.hasFelizSabado ||
+                    audio?.musicToSpeech ||
+                    audio?.pauseToSpeech ||
+                    slide?.lyricToSermon
+            );
+            const speakerNameStartBoost = slide?.hasSpeakerNameNear && speakerCueContext ? 0.45 : 0;
+            const speakerPhraseStartBoost = slide?.hasSpeakerPhraseNear && speakerCueContext ? 0.85 : 0;
             const score =
                 (diarChange ? 3 : 0) +
                 ((audio?.genderChange && (audio.musicToSpeech || audio.pauseToSpeech)) ? 1.8 : 0) +
                 (audio?.musicToSpeech ? 1.25 : 0) +
                 (audio?.pauseToSpeech ? 1.5 : 0) +
-                (ocr?.lyricToSermon ? 1.6 : 0) +
                 (slide?.lyricToSermon ? 1.6 : 0) +
-                ((ocr?.afterSermonCueRatio ?? 0) >= 0.1 ? 1.1 : 0) +
                 ((slide?.afterSermonCueRatio ?? 0) >= 0.1 ? 1.1 : 0) +
                 (slide?.hasSermonTitleNear ? 0.8 : 0) +
                 (slide?.hasBibleVerseNear ? 0.55 : 0) +
-                (ocr?.hasSpeakerNameNear ? 0.4 : 0) +
-                (ocr?.nearSceneCut ? 0.25 : 0) -
-                ((ocr && !ocr.lyricToSermon && ocr.afterLyricRatio >= 0.18) ? 1.2 : 0) -
-                ((ocr && !ocr.lyricToSermon && ocr.lyricDominantNear) ? 0.6 : 0) -
+                speakerNameStartBoost +
+                speakerPhraseStartBoost +
                 ((slide && !slide.lyricToSermon && slide.afterLyricRatio >= 0.18) ? 1.2 : 0) -
                 ((slide && !slide.lyricToSermon && slide.lyricDominantNear) ? 0.6 : 0) -
                 transcriptSignal.prayerCueScore * 0.45 -
@@ -1907,7 +2121,11 @@ export async function findSermonBoundaries(
         const startCandidateStrong =
             Boolean(scoredStart[0]?.diarChange) ||
             Boolean(scoredStart[0]?.audio && (scoredStart[0].audio.musicToSpeech || scoredStart[0].audio.pauseToSpeech)) ||
-            Boolean(scoredStart[0]?.transcriptSignal?.sermonLikely);
+            Boolean(scoredStart[0]?.transcriptSignal?.sermonLikely) ||
+            Boolean(
+                scoredStart[0]?.slide?.hasSpeakerPhraseNear &&
+                    (scoredStart[0]?.transcriptSignal?.sermonLikely || scoredStart[0]?.transcriptSignal?.hasFelizSabado)
+            );
         if (!startCandidateStrong) {
             const fallbackStart = findLatestOtherToTargetStartTransition(preTurnsAbs, startSpeaker, refinedStart);
             if (fallbackStart != null) {
@@ -1934,7 +2152,7 @@ export async function findSermonBoundaries(
             const next = nextTurnAfter(postTurnsAbs, candidateEnd);
             const diarChange = Boolean(next && next.speaker !== endSpeaker && next.start - candidateEnd <= maxConfirmGapSec);
             const audio = audioEvents ? boundaryAudioSignal(audioEvents.segments, candidateEnd) : null;
-            const ocr = ocrEvents ? boundaryOcrSignal(ocrEvents, candidateEnd, ocrWindowSec) : null;
+            const ocr: ReturnType<typeof boundaryOcrSignal> | null = null;
             const slide = slideOcrEvents ? boundarySlideSignal(slideOcrEvents, candidateEnd, ocrWindowSec) : null;
             const transcriptSignal = boundaryTranscriptSignal(normalized, candidateEnd, 'end');
             const handoffCue = hasSermonHandoffCue(normalized, candidateEnd, 110);
@@ -1944,15 +2162,11 @@ export async function findSermonBoundaries(
                 (audio?.speechToMusic ? 1.25 : 0) +
                 (audio?.speechToPause ? 1.0 : 0) +
                 (handoffCue ? 1.8 : 0) +
-                (ocr?.sermonToLyric ? 1.7 : 0) +
                 (slide?.sermonToLyric ? 1.7 : 0) +
-                ((ocr?.afterLyricRatio ?? 0) >= 0.16 ? 0.9 : 0) +
                 ((slide?.afterLyricRatio ?? 0) >= 0.16 ? 0.9 : 0) +
-                ((ocr?.afterSpeakerNameRatio ?? 0) >= 0.08 ? 0.45 : 0) +
-                (ocr?.nearSceneCut ? 0.25 : 0) -
-                ((ocr?.beforeLyricRatio ?? 0) >= 0.2 ? 1.2 : 0) -
+                ((slide?.afterSpeakerNameRatio ?? 0) >= 0.08 ? 0.35 : 0) +
+                (slide?.hasSpeakerNameNear ? 0.25 : 0) +
                 ((slide?.beforeLyricRatio ?? 0) >= 0.2 ? 1.2 : 0) -
-                ((ocr?.afterSermonCueRatio ?? 0) >= 0.16 ? 0.8 : 0) -
                 ((slide?.afterSermonCueRatio ?? 0) >= 0.16 ? 0.8 : 0) -
                 transcriptSignal.closingCueScore * 0.9 +
                 transcriptSignal.handoffCueScore * 1.0 -
@@ -1993,8 +2207,8 @@ export async function findSermonBoundaries(
         const nextAtEnd = nextTurnAfter(postTurnsAbs, refinedEnd);
         const startAudioSignal = audioEvents ? boundaryAudioSignal(audioEvents.segments, refinedStart) : null;
         const endAudioSignal = audioEvents ? boundaryAudioSignal(audioEvents.segments, refinedEnd) : null;
-        const startOcrSignal = ocrEvents ? boundaryOcrSignal(ocrEvents, refinedStart, ocrWindowSec) : null;
-        const endOcrSignal = ocrEvents ? boundaryOcrSignal(ocrEvents, refinedEnd, ocrWindowSec) : null;
+        const startOcrSignal: ReturnType<typeof boundaryOcrSignal> | null = null;
+        const endOcrSignal: ReturnType<typeof boundaryOcrSignal> | null = null;
         const startSlideSignal = slideOcrEvents ? boundarySlideSignal(slideOcrEvents, refinedStart, ocrWindowSec) : null;
         const endSlideSignal = slideOcrEvents ? boundarySlideSignal(slideOcrEvents, refinedEnd, ocrWindowSec) : null;
         const startTranscriptSignal = boundaryTranscriptSignal(normalized, refinedStart, 'start');
@@ -2003,16 +2217,15 @@ export async function findSermonBoundaries(
         const startDiarChange = Boolean(prevAtStart && prevAtStart.speaker !== startSpeaker && refinedStart - prevAtStart.end <= maxConfirmGapSec);
         const startAudioStrong = Boolean(startAudioSignal && (startAudioSignal.musicToSpeech || startAudioSignal.pauseToSpeech));
         const startGenderSupported = Boolean(
-            startAudioSignal?.genderChange && (startAudioStrong || startTranscriptSignal.sermonLikely || startOcrSignal?.lyricToSermon)
+            startAudioSignal?.genderChange && (startAudioStrong || startTranscriptSignal.sermonLikely)
         );
-        const startOcrStrong = Boolean(
-            startOcrSignal?.lyricToSermon ||
-                (((startOcrSignal?.afterSermonCueRatio ?? 0) >= 0.12) && (startOcrSignal?.afterLyricRatio ?? 0) < 0.2)
-        );
+        const startOcrStrong = false;
         const startSlideStrong = Boolean(
             startSlideSignal?.lyricToSermon ||
                 (((startSlideSignal?.afterSermonCueRatio ?? 0) >= 0.12) && (startSlideSignal?.afterLyricRatio ?? 0) < 0.2) ||
-                startSlideSignal?.hasSermonTitleNear
+                startSlideSignal?.hasSermonTitleNear ||
+                (startSlideSignal?.hasSpeakerPhraseNear &&
+                    (startTranscriptSignal.sermonLikely || startTranscriptSignal.hasFelizSabado || startAudioStrong))
         );
         const startTranscriptStrong = Boolean(
             startTranscriptSignal.sermonLikely ||
@@ -2032,10 +2245,7 @@ export async function findSermonBoundaries(
         const endGenderSupported = Boolean(
             endAudioSignal?.genderChange && (endAudioStrong || endTranscriptSignal.closingLikely || endTranscriptSignal.handoffLikely)
         );
-        const endOcrStrong = Boolean(
-            endOcrSignal?.sermonToLyric ||
-                (((endOcrSignal?.afterLyricRatio ?? 0) >= 0.14) && ((endOcrSignal?.beforeLyricRatio ?? 0) < 0.2))
-        );
+        const endOcrStrong = false;
         const endSlideStrong = Boolean(
             endSlideSignal?.sermonToLyric ||
                 (((endSlideSignal?.afterLyricRatio ?? 0) >= 0.14) && ((endSlideSignal?.beforeLyricRatio ?? 0) < 0.2))
@@ -2045,9 +2255,17 @@ export async function findSermonBoundaries(
 
         let finalClipBounds: any = padded;
         let llmFallback: any = null;
-        const singleAdjEnabled = String(process.env.BOUNDARY_ENABLE_SINGLE_LLM_ADJUDICATOR ?? 'true').toLowerCase() === 'true';
-        const forceLlm = !singleAdjEnabled && String(process.env.BOUNDARY_FORCE_LLM_FALLBACK ?? 'false').toLowerCase() === 'true';
-        const llmEnabled = !singleAdjEnabled && String(process.env.BOUNDARY_ENABLE_LLM_FALLBACK ?? 'true').toLowerCase() === 'true';
+        // Boundary LLM fallback is legacy. We keep local multimodal scoring here and rely on
+        // the single adjudicator pass later in analyze() as the authoritative LLM step.
+        const legacyFallbackAllowed =
+            String(process.env.BOUNDARY_ALLOW_LEGACY_FALLBACK ?? 'false').toLowerCase() === 'true';
+        const singleAdjEnabled = true;
+        const forceLlm =
+            legacyFallbackAllowed &&
+            String(process.env.BOUNDARY_FORCE_LLM_FALLBACK ?? 'false').toLowerCase() === 'true';
+        const llmEnabled =
+            legacyFallbackAllowed &&
+            String(process.env.BOUNDARY_ENABLE_LLM_FALLBACK ?? 'true').toLowerCase() === 'true';
         const shouldUseLlmFallback = llmEnabled && (forceLlm || !startConfirmed || !endConfirmed);
 
         if (shouldUseLlmFallback) {
@@ -2117,7 +2335,10 @@ export async function findSermonBoundaries(
                 llmFallback = { invoked: false, reason: 'missing_openai_api_key' };
             }
         } else {
-            llmFallback = { invoked: false, reason: 'local_confidence_ok' };
+            llmFallback = {
+                invoked: false,
+                reason: legacyFallbackAllowed ? 'local_confidence_ok' : 'disabled_use_single_adjudicator'
+            };
         }
 
         let llmEndStyle: any = null;
@@ -2215,21 +2436,25 @@ export async function findSermonBoundaries(
                       total_segments: audioEvents.segments.length
                   }
                 : null,
-            ocr_events: ocrEvents
-                ? {
-                      source: ocrEvents.source,
-                      duration_sec: ocrEvents.duration_sec,
-                      sample_sec: ocrEvents.sample_sec,
-                      total_segments: ocrEvents.segments.length,
-                      scene_cuts: Array.isArray(ocrEvents.scene_cuts_sec) ? ocrEvents.scene_cuts_sec.length : 0
-                  }
-                : null,
+            ocr_events: null,
             slide_ocr_events: slideOcrEvents
                 ? {
                       source: slideOcrEvents.source,
                       duration_sec: slideOcrEvents.duration_sec,
                       sample_sec: slideOcrEvents.sample_sec,
                       total_events: slideOcrEvents.events.length,
+                      unique_extract_events:
+                          Number(slideOcrEvents.summary?.extract_unique_events ?? slideOcrEvents.presentation?.representatives_total) ||
+                          slideOcrEvents.events.length,
+                      duplicates_for_extract:
+                          Number(slideOcrEvents.summary?.extract_duplicates ?? slideOcrEvents.presentation?.duplicates_total) || 0,
+                      presentation_groups:
+                          Number(slideOcrEvents.presentation?.groups_total ?? 0) || undefined,
+                      cloud_text_attempted:
+                          Number((slideOcrEvents as any)?.summary?.cloud_text_attempted ?? 0) || undefined,
+                      cloud_text_applied:
+                          Number((slideOcrEvents as any)?.summary?.cloud_text_applied ?? 0) || undefined,
+                      package_path: slidePresentationPackagePath ?? undefined,
                       shot_boundaries: Array.isArray(slideOcrEvents.shot_boundaries_sec)
                           ? slideOcrEvents.shot_boundaries_sec.length
                           : 0

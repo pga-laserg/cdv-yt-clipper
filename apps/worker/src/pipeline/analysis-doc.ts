@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import { spawn } from 'child_process';
 import { OpenAI } from 'openai';
 import type { SermonBoundaries } from './boundaries';
 import { emitLlmCueEvents } from './llm-cue-telemetry';
@@ -40,8 +39,6 @@ interface OcrEventPassResult {
     scene_cuts_sec: number[];
     segments: OcrEvent[];
 }
-
-type OcrPipeline = 'v1' | 'v2' | 'v3';
 
 type ChapterType =
     | 'pre_service'
@@ -138,6 +135,8 @@ interface AnalysisDoc {
     };
 }
 
+let warnedLegacyAnalysisOcrDisabled = false;
+
 function cleanText(text: string): string {
     return String(text ?? '')
         .replace(/\s+/g, ' ')
@@ -199,44 +198,6 @@ function clamp(n: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, n));
 }
 
-function normalizeOcrPipeline(raw: string | undefined | null): OcrPipeline {
-    const v = String(raw ?? 'v1').trim().toLowerCase();
-    if (v === 'v2' || v === '2' || v === 'ocr_v2') return 'v2';
-    if (v === 'v3' || v === '3' || v === 'ocr_v3') return 'v3';
-    return 'v1';
-}
-
-function getAnalysisOcrPipeline(): OcrPipeline {
-    return normalizeOcrPipeline(process.env.ANALYSIS_OCR_PIPELINE ?? process.env.OCR_PIPELINE ?? 'v1');
-}
-
-function getOcrEventsFilename(pipeline: OcrPipeline): string {
-    if (pipeline === 'v2') return 'ocr.events.v2.json';
-    if (pipeline === 'v3') return 'ocr.events.v3.json';
-    return 'ocr.events.json';
-}
-
-function resolvePreferredOcrVideoPath(workDir: string, videoPath?: string): string {
-    const preferHq = String(process.env.OCR_PREFER_HQ_SOURCE ?? 'true').toLowerCase() === 'true';
-    const candidatePaths = [
-        path.join(workDir, 'source.mp4'),
-        path.join(workDir, 'source.original.mp4'),
-        path.join(workDir, 'source.original.mkv'),
-        path.join(workDir, 'source.original.webm'),
-        path.join(workDir, 'source.original.mov'),
-    ];
-    if (!preferHq) {
-        if (videoPath && fs.existsSync(videoPath)) return videoPath;
-        return candidatePaths.find((p) => fs.existsSync(p)) ?? path.join(workDir, 'source.mp4');
-    }
-    const providedLooksLight = videoPath ? /source\.light\./i.test(path.basename(videoPath)) : false;
-    if (providedLooksLight) {
-        const better = candidatePaths.find((p) => fs.existsSync(p));
-        if (better) return better;
-    }
-    if (videoPath && fs.existsSync(videoPath)) return videoPath;
-    return candidatePaths.find((p) => fs.existsSync(p)) ?? path.join(workDir, 'source.mp4');
-}
 
 function safeJsonParse<T>(raw: string, fallback: T): T {
     try {
@@ -246,137 +207,22 @@ function safeJsonParse<T>(raw: string, fallback: T): T {
     }
 }
 
-function runProcess(
-    cmd: string,
-    args: string[],
-    options: { streamStdout?: boolean; streamStderr?: boolean; logPrefix?: string } = {}
-): Promise<{ stdout: string; stderr: string }> {
-    return new Promise((resolve, reject) => {
-        const proc = spawn(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] });
-        let stdout = '';
-        let stderr = '';
-        const prefix = options.logPrefix ? `${options.logPrefix} ` : '';
-
-        proc.stdout.on('data', (d) => {
-            const chunk = d.toString();
-            stdout += chunk;
-            if (options.streamStdout) process.stdout.write(`${prefix}${chunk}`);
-        });
-        proc.stderr.on('data', (d) => {
-            const chunk = d.toString();
-            stderr += chunk;
-            if (options.streamStderr) process.stderr.write(`${prefix}${chunk}`);
-        });
-        proc.on('error', (err) => reject(err));
-        proc.on('close', (code) => {
-            if (code !== 0) {
-                return reject(new Error(`${cmd} exited with code ${code}. stderr tail: ${stderr.slice(-1200)}`));
-            }
-            resolve({ stdout, stderr });
-        });
-    });
-}
-
 async function ensureOcrEvents(
     workDir: string,
     durationSec: number,
     videoPath?: string
 ): Promise<OcrEventPassResult | null> {
-    const enabled = String(process.env.ANALYSIS_ENABLE_OCR_SIGNALS ?? 'true').toLowerCase() === 'true';
-    if (!enabled) return null;
-
-    const ocrPipeline = getAnalysisOcrPipeline();
-    const ocrPath = path.join(workDir, getOcrEventsFilename(ocrPipeline));
-    if (fs.existsSync(ocrPath)) {
-        const cached = safeJsonParse<OcrEventPassResult | null>(fs.readFileSync(ocrPath, 'utf8'), null);
-        if (cached && Array.isArray(cached.segments)) return cached;
+    void workDir;
+    void durationSec;
+    void videoPath;
+    const legacyRequested = String(process.env.ANALYSIS_ENABLE_OCR_SIGNALS ?? 'false').toLowerCase() === 'true';
+    if (legacyRequested && !warnedLegacyAnalysisOcrDisabled) {
+        warnedLegacyAnalysisOcrDisabled = true;
+        console.warn(
+            '[analysis-doc] Legacy ocr.events* analysis pass is deprecated and disabled. Use slide.events.json cues instead.'
+        );
     }
-
-    const resolvedVideoPath = resolvePreferredOcrVideoPath(workDir, videoPath);
-    if (!fs.existsSync(resolvedVideoPath)) return null;
-
-    const scriptCandidates =
-        ocrPipeline === 'v2'
-            ? [
-                  path.resolve(__dirname, 'python/ocr_v2.py'),
-                  path.resolve(__dirname, '../../src/pipeline/python/ocr_v2.py'),
-                  path.resolve(process.cwd(), 'apps/worker/src/pipeline/python/ocr_v2.py'),
-                  path.resolve(process.cwd(), 'src/pipeline/python/ocr_v2.py')
-              ]
-            : ocrPipeline === 'v3'
-              ? [
-                    path.resolve(__dirname, 'python/ocr_v3.py'),
-                    path.resolve(__dirname, '../../src/pipeline/python/ocr_v3.py'),
-                    path.resolve(process.cwd(), 'apps/worker/src/pipeline/python/ocr_v3.py'),
-                    path.resolve(process.cwd(), 'src/pipeline/python/ocr_v3.py')
-                ]
-              : [
-                    path.resolve(__dirname, 'python/ocr_events.py'),
-                    path.resolve(__dirname, '../../src/pipeline/python/ocr_events.py'),
-                    path.resolve(process.cwd(), 'apps/worker/src/pipeline/python/ocr_events.py'),
-                    path.resolve(process.cwd(), 'src/pipeline/python/ocr_events.py')
-                ];
-    const scriptPath = scriptCandidates.find((p) => fs.existsSync(p));
-    if (!scriptPath) return null;
-
-    const explicitPython = process.env.OCR_PYTHON_BIN || process.env.DIARIZATION_PYTHON_BIN;
-    const pythonCandidates = [
-        explicitPython ? path.resolve(explicitPython) : '',
-        path.resolve(__dirname, '../../venv311/bin/python3'),
-        path.resolve(__dirname, '../../venv/bin/python3'),
-        path.resolve(process.cwd(), 'apps/worker/venv311/bin/python3'),
-        path.resolve(process.cwd(), 'apps/worker/venv/bin/python3'),
-        'python3'
-    ].filter(Boolean);
-    const pythonBin =
-        pythonCandidates.find((candidate) => candidate === 'python3' || fs.existsSync(candidate)) ?? 'python3';
-    const sampleSec = Math.max(
-        0.5,
-        Number(
-            ocrPipeline === 'v2'
-                ? process.env.ANALYSIS_OCR_V2_SAMPLE_SEC ?? process.env.OCR_V2_SAMPLE_SEC ?? process.env.OCR_SAMPLE_SEC ?? 1.0
-                : ocrPipeline === 'v3'
-                  ? process.env.ANALYSIS_OCR_V3_SAMPLE_SEC ?? process.env.OCR_V3_SAMPLE_SEC ?? process.env.OCR_SAMPLE_SEC ?? 1.0
-                  : process.env.ANALYSIS_OCR_SAMPLE_SEC ?? process.env.OCR_SAMPLE_SEC ?? 2.5
-        )
-    );
-    const maxSec = Number(
-        ocrPipeline === 'v2'
-            ? process.env.ANALYSIS_OCR_V2_MAX_DURATION_SEC ?? process.env.OCR_V2_MAX_DURATION_SEC ?? process.env.OCR_MAX_DURATION_SEC ?? 0
-            : ocrPipeline === 'v3'
-              ? process.env.ANALYSIS_OCR_V3_MAX_DURATION_SEC ?? process.env.OCR_V3_MAX_DURATION_SEC ?? process.env.OCR_MAX_DURATION_SEC ?? 0
-              : process.env.ANALYSIS_OCR_MAX_DURATION_SEC ?? process.env.OCR_MAX_DURATION_SEC ?? 0
-    );
-    const effectiveMaxSec = maxSec > 0 ? Math.min(maxSec, durationSec) : durationSec;
-
-    const args = [
-        scriptPath,
-        resolvedVideoPath,
-        '--out',
-        ocrPath,
-        '--sample-sec',
-        String(sampleSec),
-        '--max-sec',
-        String(effectiveMaxSec)
-    ];
-
-    console.log(
-        `[analysis-doc] OCR pass started pipeline=${ocrPipeline} sample=${sampleSec}s max_sec=${effectiveMaxSec.toFixed(1)} video=${path.basename(resolvedVideoPath)}`
-    );
-    try {
-        const ocrLogPrefix = ocrPipeline === 'v2' ? '[ocr-v2]' : ocrPipeline === 'v3' ? '[ocr-v3]' : '[ocr-events]';
-        await runProcess(pythonBin, args, { streamStderr: true, logPrefix: ocrLogPrefix });
-    } catch (error) {
-        console.warn('[analysis-doc] OCR pass failed; continuing without OCR cues:', error);
-        return null;
-    }
-    const parsed = safeJsonParse<OcrEventPassResult | null>(
-        fs.existsSync(ocrPath) ? fs.readFileSync(ocrPath, 'utf8') : '',
-        null
-    );
-    if (!parsed || !Array.isArray(parsed.segments)) return null;
-    console.log(`[analysis-doc] OCR pass wrote ${parsed.segments.length} segments -> ${ocrPath}`);
-    return parsed;
+    return null;
 }
 
 function getOpenAIClient(): OpenAI | null {

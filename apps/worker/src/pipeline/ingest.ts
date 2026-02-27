@@ -21,6 +21,16 @@ interface VideoResolution {
     height: number;
 }
 
+interface DurationIntegrityStatus {
+    ffprobeAvailable: boolean;
+    originalDurationSec: number | null;
+    hqDurationSec: number | null;
+    lightDurationSec: number | null;
+    hqValid: boolean;
+    lightValid: boolean;
+    issues: string[];
+}
+
 export async function ingest(source: string, outputDir: string): Promise<IngestResult> {
     console.log(`Ingesting source: ${source}`);
 
@@ -60,6 +70,8 @@ export async function ingest(source: string, outputDir: string): Promise<IngestR
     } else {
         console.log(`Reusing existing lightweight video at ${videoPathLight}`);
     }
+
+    await ensureDerivedVideoIntegrity(videoPathOriginal, videoPath, videoPathLight);
 
     if (!fs.existsSync(audioPath)) {
         // Extract from HQ normalized source.
@@ -278,6 +290,59 @@ function createLightweightVideo(inputPath: string, outputPath: string): Promise<
     });
 }
 
+async function ensureDerivedVideoIntegrity(
+    videoPathOriginal: string,
+    videoPathHQ: string,
+    videoPathLight: string
+): Promise<void> {
+    const requireDurationCheck = readBoolEnv('INGEST_REQUIRE_DURATION_CHECK', true);
+    const initial = inspectDerivedVideoIntegrity(videoPathOriginal, videoPathHQ, videoPathLight);
+    if (!initial.ffprobeAvailable) {
+        const message = '[ingest] ffprobe unavailable; cannot run derived-video duration integrity checks.';
+        if (requireDurationCheck) throw new Error(message);
+        console.warn(`${message} Continuing because INGEST_REQUIRE_DURATION_CHECK=false.`);
+        return;
+    }
+    if (initial.issues.length === 0) {
+        console.log(
+            `[ingest] duration integrity ok original=${formatDuration(initial.originalDurationSec)} ` +
+                `hq=${formatDuration(initial.hqDurationSec)} light=${formatDuration(initial.lightDurationSec)}`
+        );
+        return;
+    }
+
+    console.warn('[ingest] detected derived-video duration integrity issues:');
+    for (const issue of initial.issues) console.warn(`  - ${issue}`);
+
+    if (!initial.hqValid) {
+        console.warn('[ingest] regenerating HQ + light videos from original source...');
+        safeUnlink(videoPathHQ);
+        await normalizeHighQualityMp4(videoPathOriginal, videoPathHQ);
+        safeUnlink(videoPathLight);
+        await createLightweightVideo(videoPathHQ, videoPathLight);
+    } else if (!initial.lightValid) {
+        console.warn('[ingest] regenerating lightweight video from HQ source...');
+        safeUnlink(videoPathLight);
+        await createLightweightVideo(videoPathHQ, videoPathLight);
+    }
+
+    const repaired = inspectDerivedVideoIntegrity(videoPathOriginal, videoPathHQ, videoPathLight);
+    if (!repaired.ffprobeAvailable) {
+        console.warn('[ingest] ffprobe unavailable after regeneration; cannot verify duration integrity.');
+        return;
+    }
+    if (repaired.issues.length > 0) {
+        throw new Error(
+            '[ingest] derived-video duration integrity failed after regeneration:\n' +
+                repaired.issues.map((issue) => `- ${issue}`).join('\n')
+        );
+    }
+    console.log(
+        `[ingest] duration integrity repaired original=${formatDuration(repaired.originalDurationSec)} ` +
+            `hq=${formatDuration(repaired.hqDurationSec)} light=${formatDuration(repaired.lightDurationSec)}`
+    );
+}
+
 function extractAudio(videoPath: string, audioPath: string): Promise<void> {
     return new Promise((resolve, reject) => {
         console.log(`Extracting audio to ${audioPath}...`);
@@ -326,11 +391,33 @@ function readIntEnv(name: string, defaultValue: number): number {
     return parsed;
 }
 
+function readFloatEnv(name: string, defaultValue: number): number {
+    const raw = (process.env[name] ?? '').trim();
+    if (!raw) return defaultValue;
+    const parsed = Number.parseFloat(raw);
+    if (!Number.isFinite(parsed)) return defaultValue;
+    return parsed;
+}
+
 function buildSpawnEnv(): NodeJS.ProcessEnv {
     const existingPath = process.env.PATH ?? '';
     const preferred = ['/opt/homebrew/bin', '/usr/local/bin'];
     const mergedPath = [...preferred, existingPath].filter(Boolean).join(':');
     return { ...process.env, PATH: mergedPath };
+}
+
+function formatDuration(value: number | null): string {
+    if (!Number.isFinite(value as number)) return 'n/a';
+    return `${(value as number).toFixed(2)}s`;
+}
+
+function safeUnlink(filePath: string): void {
+    if (!fs.existsSync(filePath)) return;
+    try {
+        fs.unlinkSync(filePath);
+    } catch (error) {
+        throw new Error(`Unable to remove file ${filePath}: ${String(error)}`);
+    }
 }
 
 function probeVideoResolution(videoPath: string, ffprobeBin: string | null): VideoResolution | null {
@@ -362,6 +449,106 @@ function probeVideoResolution(videoPath: string, ffprobeBin: string | null): Vid
     } catch {
         return null;
     }
+}
+
+function probeVideoDuration(videoPath: string, ffprobeBin: string | null): number | null {
+    if (!ffprobeBin) return null;
+    try {
+        const result = spawnSync(
+            ffprobeBin,
+            [
+                '-v',
+                'error',
+                '-show_entries',
+                'format=duration',
+                '-of',
+                'default=noprint_wrappers=1:nokey=1',
+                videoPath
+            ],
+            { encoding: 'utf8' }
+        );
+        if (result.status !== 0) return null;
+        const raw = (result.stdout ?? '').trim();
+        const duration = Number.parseFloat(raw);
+        if (!Number.isFinite(duration) || duration <= 0) return null;
+        return duration;
+    } catch {
+        return null;
+    }
+}
+
+function inspectDerivedVideoIntegrity(
+    videoPathOriginal: string,
+    videoPathHQ: string,
+    videoPathLight: string
+): DurationIntegrityStatus {
+    const ffprobeBin = resolveBinary(['/opt/homebrew/bin/ffprobe', '/usr/local/bin/ffprobe', 'ffprobe']);
+    if (!ffprobeBin) {
+        return {
+            ffprobeAvailable: false,
+            originalDurationSec: null,
+            hqDurationSec: null,
+            lightDurationSec: null,
+            hqValid: true,
+            lightValid: true,
+            issues: ['ffprobe binary not found']
+        };
+    }
+
+    const minHqRatio = Math.min(1.0, Math.max(0.5, readFloatEnv('INGEST_HQ_DURATION_MIN_RATIO', 0.98)));
+    const minLightRatio = Math.min(1.0, Math.max(0.5, readFloatEnv('INGEST_LIGHT_DURATION_MIN_RATIO', 0.98)));
+
+    const originalDurationSec = probeVideoDuration(videoPathOriginal, ffprobeBin);
+    const hqDurationSec = probeVideoDuration(videoPathHQ, ffprobeBin);
+    const lightDurationSec = probeVideoDuration(videoPathLight, ffprobeBin);
+
+    const issues: string[] = [];
+    let hqValid = true;
+    let lightValid = true;
+
+    if (originalDurationSec == null) {
+        issues.push(`cannot probe original duration: ${videoPathOriginal}`);
+    }
+    if (hqDurationSec == null) {
+        issues.push(`cannot probe HQ duration: ${videoPathHQ}`);
+        hqValid = false;
+    }
+    if (lightDurationSec == null) {
+        issues.push(`cannot probe light duration: ${videoPathLight}`);
+        lightValid = false;
+    }
+
+    if (originalDurationSec != null && hqDurationSec != null) {
+        const hqRatio = hqDurationSec / originalDurationSec;
+        if (hqRatio < minHqRatio) {
+            issues.push(
+                `hq duration too short (${hqDurationSec.toFixed(2)}s < ${(originalDurationSec * minHqRatio).toFixed(2)}s ` +
+                    `ratio=${hqRatio.toFixed(4)} threshold=${minHqRatio.toFixed(4)})`
+            );
+            hqValid = false;
+        }
+    }
+
+    if (hqDurationSec != null && lightDurationSec != null) {
+        const lightRatio = lightDurationSec / hqDurationSec;
+        if (lightRatio < minLightRatio) {
+            issues.push(
+                `light duration too short (${lightDurationSec.toFixed(2)}s < ${(hqDurationSec * minLightRatio).toFixed(2)}s ` +
+                    `ratio=${lightRatio.toFixed(4)} threshold=${minLightRatio.toFixed(4)})`
+            );
+            lightValid = false;
+        }
+    }
+
+    return {
+        ffprobeAvailable: true,
+        originalDurationSec,
+        hqDurationSec,
+        lightDurationSec,
+        hqValid,
+        lightValid,
+        issues
+    };
 }
 
 function preserveLowQualityCandidate(sourcePath: string, outputDir: string): string {

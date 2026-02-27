@@ -35,7 +35,15 @@ export async function analyze(
         console.warn('Analysis artifact generation failed:', error);
     }
 
-    const singleAdjEnabled = String(process.env.BOUNDARY_ENABLE_SINGLE_LLM_ADJUDICATOR ?? 'true').toLowerCase() === 'true';
+    // Single adjudicator is the authoritative LLM boundary step.
+    // Legacy fallback paths are disabled in findSermonBoundaries().
+    const envSingleAdjRaw = String(process.env.BOUNDARY_ENABLE_SINGLE_LLM_ADJUDICATOR ?? 'true').toLowerCase();
+    const singleAdjEnabled = true;
+    if (envSingleAdjRaw === 'false') {
+        console.warn(
+            'BOUNDARY_ENABLE_SINGLE_LLM_ADJUDICATOR=false is ignored; single adjudicator remains enabled by pipeline policy.'
+        );
+    }
     if (singleAdjEnabled && options.workDir) {
         try {
             const adjudicated = await adjudicateBoundariesWithSingleLlm(

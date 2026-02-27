@@ -6,6 +6,7 @@ opencv-contrib-python-headless
 pyannote.audio>=3.1,<4
 pytesseract
 easyocr==1.7.2
+google-cloud-vision>=3.7,<4
 rapidfuzz
 torch==2.8.0
 torchaudio==2.8.0
