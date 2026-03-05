@@ -1,18 +1,12 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { Play, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import type { JobListResponse, JobRecord } from '@/lib/api-types';
 
-interface Job {
-  id: string;
-  title: string;
-  status: string;
-  created_at: string;
-  youtube_url: string;
-  video_url?: string;
-}
+type Job = JobRecord;
 
 function formatClock(totalSeconds: number): string {
   const seconds = Math.max(0, Math.floor(totalSeconds));
@@ -56,6 +50,14 @@ function getProgressState(status: string): { determinate: boolean; value: number
     };
   }
 
+  if (status.startsWith('processing:blog:publish')) {
+    return { determinate: false, value: 96, text: 'Publishing blog destinations...' };
+  }
+
+  if (status.startsWith('processing:blog')) {
+    return { determinate: false, value: 92, text: 'Generating blog artifact...' };
+  }
+
   if (status.startsWith('processing')) {
     return { determinate: false, value: 45, text: 'In progress...' };
   }
@@ -77,6 +79,11 @@ function getStageLabel(status: string): string {
     if (match) return `Saving clips (${match[1]}/${match[2]})`;
     return 'Saving outputs';
   }
+  if (status.startsWith('processing:blog:generate')) return 'Generating blog draft';
+  if (status.startsWith('processing:blog:persist')) return 'Saving blog draft';
+  if (status.startsWith('processing:blog:sync')) return 'Syncing blog draft';
+  if (status.startsWith('processing:blog:publish')) return 'Publishing blog destinations';
+  if (status.startsWith('processing:blog')) return 'Generating blog artifact';
   return status;
 }
 
@@ -85,20 +92,56 @@ function getThumbnailUrl(job: Job): string | null {
   return job.video_url.replace(/\/sermon_horizontal\.mp4(\?.*)?$/, '/thumbnail.jpg');
 }
 
+async function buildAuthHeaders(includeJson = false): Promise<HeadersInit> {
+  const headers: Record<string, string> = {};
+  if (includeJson) headers['content-type'] = 'application/json';
+
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  return headers;
+}
+
 export default function Home() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState<string>('');
 
   const fetchJobs = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
-    const { data, error } = await supabase
-      .from('jobs')
-      .select('*')
-      .order('created_at', { ascending: false });
 
-    if (error) console.error('Error fetching jobs:', error);
-    else setJobs(data || []);
-    setLoading(false);
+    try {
+      const headers = await buildAuthHeaders();
+      const response = await fetch('/api/v1/jobs?limit=100', {
+        headers,
+        cache: 'no-store'
+      });
+
+      if (response.status === 401) {
+        setApiError('Authentication required. Sign in to view and create jobs.');
+        setJobs([]);
+        setLoading(false);
+        return;
+      }
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({ error: 'Unknown API error' }));
+        setApiError(body.error || 'Failed to load jobs.');
+        setJobs([]);
+        setLoading(false);
+        return;
+      }
+
+      const data = (await response.json()) as JobListResponse;
+      setJobs(data.items || []);
+      setApiError('');
+      setLoading(false);
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : 'Failed to load jobs.');
+      setJobs([]);
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -134,18 +177,25 @@ export default function Home() {
                 if (!url) return;
 
                 setLoading(true);
-                const { error } = await supabase.from('jobs').insert({
-                  youtube_url: url,
-                  status: 'pending',
-                  title: 'New Sermon Job'
-                });
 
-                if (error) alert(error.message);
-                else {
-                  input.value = '';
-                  fetchJobs(true);
+                try {
+                  const headers = await buildAuthHeaders(true);
+                  const response = await fetch('/api/v1/jobs', {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ youtube_url: url, title: 'New Sermon Job' })
+                  });
+
+                  if (!response.ok) {
+                    const body = await response.json().catch(() => ({ error: 'Failed to create job' }));
+                    alert(body.error || 'Failed to create job');
+                  } else {
+                    input.value = '';
+                    await fetchJobs(true);
+                  }
+                } finally {
+                  setLoading(false);
                 }
-                setLoading(false);
               }}
               className="bg-black text-white px-6 py-2 rounded-full font-medium hover:bg-gray-800 transition-colors shadow-lg w-full sm:w-auto"
             >
@@ -153,6 +203,12 @@ export default function Home() {
             </button>
           </div>
         </header>
+
+        {apiError && (
+          <div className="mb-6 p-4 rounded-xl border border-red-200 bg-red-50 text-red-700 text-sm">
+            {apiError}
+          </div>
+        )}
 
         <section>
           <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
@@ -224,7 +280,7 @@ export default function Home() {
             ))}
 
             {loading && <div className="p-12 text-center text-gray-400">Loading jobs...</div>}
-            {!loading && jobs.length === 0 && (
+            {!loading && jobs.length === 0 && !apiError && (
               <div className="p-8 sm:p-12 text-center text-gray-400 border-2 border-dashed rounded-2xl">
                 No jobs found. Start by creating a new one.
               </div>

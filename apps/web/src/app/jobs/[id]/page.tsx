@@ -2,27 +2,12 @@
 
 import { useCallback, useEffect, useState, use } from 'react';
 import { supabase } from '@/lib/supabase';
+import type { ClipRecord, JobDetailResponse, JobRecord } from '@/lib/api-types';
 import { ChevronLeft, Play, CheckCircle, XCircle, Download } from 'lucide-react';
 import Link from 'next/link';
 
-interface Clip {
-    id: string;
-    title: string;
-    start_seconds: number;
-    end_seconds: number;
-    transcript_excerpt: string;
-    status: string;
-    video_url?: string;
-}
-
-interface Job {
-    id: string;
-    title: string;
-    youtube_url: string;
-    video_url?: string;
-    srt_url?: string;
-    status: string;
-}
+type Clip = ClipRecord;
+type Job = JobRecord;
 
 function formatClock(totalSeconds: number): string {
     const seconds = Math.max(0, Math.floor(totalSeconds));
@@ -66,6 +51,14 @@ function getProgressState(status: string): { determinate: boolean; value: number
         };
     }
 
+    if (status.startsWith('processing:blog:publish')) {
+        return { determinate: false, value: 96, text: 'Publishing blog destinations...' };
+    }
+
+    if (status.startsWith('processing:blog')) {
+        return { determinate: false, value: 92, text: 'Generating blog artifact...' };
+    }
+
     if (status.startsWith('processing')) {
         return { determinate: false, value: 45, text: 'In progress...' };
     }
@@ -87,7 +80,30 @@ function getStageLabel(status: string): string {
         if (match) return `Saving clips (${match[1]}/${match[2]})`;
         return 'Saving outputs';
     }
+    if (status.startsWith('processing:blog:generate')) return 'Generating blog draft';
+    if (status.startsWith('processing:blog:persist')) return 'Saving blog draft';
+    if (status.startsWith('processing:blog:sync')) return 'Syncing blog draft';
+    if (status.startsWith('processing:blog:publish')) return 'Publishing blog destinations';
+    if (status.startsWith('processing:blog')) return 'Generating blog artifact';
     return status;
+}
+
+async function buildAuthHeaders(includeJson = false): Promise<HeadersInit> {
+    const headers: Record<string, string> = {};
+    if (includeJson) headers['content-type'] = 'application/json';
+
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (token) headers.Authorization = `Bearer ${token}`;
+
+    return headers;
+}
+
+function parseFilenameFromDisposition(disposition: string | null): string | null {
+    if (!disposition) return null;
+    const match = disposition.match(/filename="([^"]+)"/i) || disposition.match(/filename=([^;]+)/i);
+    if (!match?.[1]) return null;
+    return match[1].trim();
 }
 
 export default function JobDetails({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
@@ -95,15 +111,46 @@ export default function JobDetails({ params: paramsPromise }: { params: Promise<
     const [job, setJob] = useState<Job | null>(null);
     const [clips, setClips] = useState<Clip[]>([]);
     const [loading, setLoading] = useState(true);
+    const [apiError, setApiError] = useState('');
+    const [downloading, setDownloading] = useState(false);
 
     const fetchJobAndClips = useCallback(async (silent = false) => {
         if (!silent) setLoading(true);
-        const { data: jobData } = await supabase.from('jobs').select('*').eq('id', params.id).single();
-        const { data: clipsData } = await supabase.from('clips').select('*').eq('job_id', params.id);
+        try {
+            const headers = await buildAuthHeaders();
+            const response = await fetch(`/api/v1/jobs/${params.id}`, {
+                headers,
+                cache: 'no-store'
+            });
 
-        if (jobData) setJob(jobData);
-        if (clipsData) setClips(clipsData);
-        setLoading(false);
+            if (response.status === 401) {
+                setApiError('Authentication required. Sign in to view this job.');
+                setJob(null);
+                setClips([]);
+                setLoading(false);
+                return;
+            }
+
+            if (!response.ok) {
+                const body = await response.json().catch(() => ({ error: 'Failed to fetch job.' }));
+                setApiError(body.error || 'Failed to fetch job.');
+                setJob(null);
+                setClips([]);
+                setLoading(false);
+                return;
+            }
+
+            const data = (await response.json()) as JobDetailResponse;
+            setJob(data.job);
+            setClips(data.clips || []);
+            setApiError('');
+        } catch (error) {
+            setApiError(error instanceof Error ? error.message : 'Failed to fetch job.');
+            setJob(null);
+            setClips([]);
+        } finally {
+            setLoading(false);
+        }
     }, [params.id]);
 
     useEffect(() => {
@@ -116,6 +163,39 @@ export default function JobDetails({ params: paramsPromise }: { params: Promise<
             clearInterval(interval);
         };
     }, [fetchJobAndClips]);
+
+    const downloadFullRes = useCallback(async () => {
+        if (!job || downloading) return;
+        setDownloading(true);
+
+        try {
+            const headers = await buildAuthHeaders();
+            const response = await fetch(`/api/jobs/${job.id}/download`, { headers });
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || 'Download failed.');
+            }
+
+            const blob = await response.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            const filename =
+                parseFilenameFromDisposition(response.headers.get('content-disposition')) ||
+                `job-${job.id}-fullres.mp4`;
+
+            const anchor = document.createElement('a');
+            anchor.href = objectUrl;
+            anchor.download = filename;
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+            setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Download failed.';
+            alert(message);
+        } finally {
+            setDownloading(false);
+        }
+    }, [downloading, job]);
 
     return (
         <div className="min-h-screen bg-gray-50 p-4 sm:p-8" suppressHydrationWarning>
@@ -130,7 +210,9 @@ export default function JobDetails({ params: paramsPromise }: { params: Promise<
                 {job?.srt_url && (
                     <button
                         className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm w-full sm:w-auto"
-                        onClick={() => window.open(job.srt_url)}
+                        onClick={() => {
+                            if (job.srt_url) window.open(job.srt_url);
+                        }}
                     >
                         <Download size={18} />
                         Download SRT
@@ -138,14 +220,21 @@ export default function JobDetails({ params: paramsPromise }: { params: Promise<
                 )}
                 {job && (
                     <button
-                        className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-black transition-colors shadow-sm w-full sm:w-auto"
-                        onClick={() => window.open(`/api/jobs/${job.id}/download`)}
+                        className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-black transition-colors shadow-sm w-full sm:w-auto disabled:opacity-60"
+                        disabled={downloading}
+                        onClick={() => void downloadFullRes()}
                     >
                         <Download size={18} />
-                        Download Full Resolution
+                        {downloading ? 'Downloading...' : 'Download Full Resolution'}
                     </button>
                 )}
             </header>
+
+            {apiError && (
+                <div className="mb-6 p-4 rounded-xl border border-red-200 bg-red-50 text-red-700 text-sm">
+                    {apiError}
+                </div>
+            )}
 
             {job && (
                 <section className="mb-8 bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">

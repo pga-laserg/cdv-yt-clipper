@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { Readable } from 'stream';
-import { NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { NextRequest, NextResponse } from 'next/server';
+import { orgContextErrorResponse, requireOrgContext } from '@/lib/require-org-context';
+import { getSupabaseServer } from '@/lib/supabase-server';
 
 export const runtime = 'nodejs';
 
@@ -40,10 +41,32 @@ function pickFullResPath(jobId: string, storedPath: unknown): string | null {
   return null;
 }
 
+function pickFullResRemoteUrl(storedUrl: unknown): string | null {
+  if (typeof storedUrl !== 'string') return null;
+  const candidate = storedUrl.trim();
+  if (!candidate) return null;
+  try {
+    const url = new URL(candidate);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
 export async function GET(
-  _request: Request,
+  request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
+  const supabaseServer = getSupabaseServer();
+  let orgId = '';
+  try {
+    const org = await requireOrgContext(request);
+    orgId = org.organization_id;
+  } catch (error) {
+    return orgContextErrorResponse(error);
+  }
+
   const { id } = await context.params;
   if (!UUID_RE.test(id)) {
     return NextResponse.json({ error: 'Invalid job id' }, { status: 400 });
@@ -51,12 +74,18 @@ export async function GET(
 
   const { data: job, error } = await supabaseServer
     .from('jobs')
-    .select('id, original_filename, metadata')
+    .select('id, organization_id, original_filename, metadata')
     .eq('id', id)
+    .eq('organization_id', orgId)
     .single();
 
   if (error || !job) {
     return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+  }
+
+  const remoteUrl = pickFullResRemoteUrl(job.metadata?.full_res_video_url);
+  if (remoteUrl) {
+    return NextResponse.redirect(remoteUrl, { status: 307 });
   }
 
   const fullResPath = pickFullResPath(id, job.metadata?.full_res_video_path);

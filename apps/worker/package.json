@@ -32,6 +32,10 @@
         "test:boundaries-ocr-bench": "ts-node-dev src/test-boundaries-ocr-bench.ts",
         "test:highlights-llm-isolated": "ts-node-dev src/test-highlights-llm-isolated.ts",
         "test:llm-cue-telemetry-health": "ts-node-dev src/test-llm-cue-telemetry-health.ts",
+        "test:blog-artifact-unit": "ts-node-dev src/test-blog-artifact-unit.ts",
+        "test:blog-publish-unit": "ts-node-dev src/test-blog-publish-unit.ts",
+        "test:blog-artifact-integration": "ts-node-dev src/test-blog-artifact-integration.ts",
+        "test:blog-artifact-health": "ts-node-dev src/test-blog-artifact-health.ts",
         "init-storage": "ts-node-dev src/init-storage.ts",
         "seed": "ts-node-dev src/seed.ts"
     },

@@ -1,7 +1,8 @@
 .env
+.env.local
+apps/*/.env.local
 .DS_Store
-# Exception: .env.defaults contains non-sensitive config and should be tracked
-!.env.defaults
+!.env.example
 node_modules/
 .run-logs/
 .turbo/

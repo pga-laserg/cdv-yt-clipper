@@ -3,7 +3,19 @@ import { supabase } from './lib/supabase';
 async function seed() {
     console.log('Seeding demo data...');
 
+    const { data: orgRow, error: orgError } = await supabase
+        .from('organizations')
+        .select('id')
+        .eq('slug', 'default-org')
+        .maybeSingle();
+    if (orgError || !orgRow?.id) {
+        console.error('Could not resolve default organization:', orgError?.message || 'missing default-org row');
+        return;
+    }
+    const organizationId = orgRow.id as string;
+
     const { data: job, error: jobError } = await supabase.from('jobs').insert({
+        organization_id: organizationId,
         youtube_url: 'https://www.youtube.com/watch?v=Jg51MCpDf0w',
         status: 'completed',
         sermon_start_seconds: 300,
@@ -18,6 +30,7 @@ async function seed() {
 
     const clips = [
         {
+            organization_id: organizationId,
             job_id: job.id,
             title: 'Finding Peace',
             start_seconds: 400,
@@ -27,6 +40,7 @@ async function seed() {
             confidence_score: 0.95
         },
         {
+            organization_id: organizationId,
             job_id: job.id,
             title: 'Community Strength',
             start_seconds: 1200,
@@ -36,6 +50,7 @@ async function seed() {
             confidence_score: 0.88
         },
         {
+            organization_id: organizationId,
             job_id: job.id,
             title: 'A Call to Action',
             start_seconds: 3500,

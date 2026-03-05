@@ -1,8 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
-import path from 'path';
+import { loadWorkerEnv } from './load-env';
 
-dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
+loadWorkerEnv();
 
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';

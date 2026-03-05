@@ -1,8 +1,7 @@
 import { OpenAI } from 'openai';
-import dotenv from 'dotenv';
-import path from 'path';
+import { loadWorkerEnv } from '../lib/load-env';
 
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+loadWorkerEnv();
 
 const getOpenAIClient = () => {
     const apiKey = process.env.OPENAI_API_KEY;
