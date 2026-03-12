@@ -17,21 +17,30 @@ function resolveWorkerRootCandidates() {
   ];
 }
 
-function isInside(parent: string, target: string) {
+function isInsideOrEqual(parent: string, target: string) {
   const rel = path.relative(parent, target);
-  return rel.length > 0 && !rel.startsWith('..') && !path.isAbsolute(rel);
+  return !rel.startsWith('..') && !path.isAbsolute(rel);
+}
+
+function resolveJobRoots(jobId: string): string[] {
+  return resolveWorkerRootCandidates().map((root) => path.resolve(root, jobId));
 }
 
 function pickFullResPath(jobId: string, storedPath: unknown): string | null {
-  const roots = resolveWorkerRootCandidates();
-  const defaultCandidates = roots.map((root) =>
-    path.resolve(root, jobId, 'processed', 'sermon_horizontal.mp4')
-  );
+  const jobRoots = resolveJobRoots(jobId);
+  const defaultCandidates = jobRoots.map((jobRoot) => path.resolve(jobRoot, 'processed', 'sermon_horizontal.mp4'));
 
   if (typeof storedPath === 'string' && storedPath.trim()) {
-    const absolute = path.resolve(storedPath);
-    if (roots.some((root) => isInside(root, absolute) || absolute === path.resolve(root, jobId, 'processed', 'sermon_horizontal.mp4'))) {
-      return absolute;
+    const raw = storedPath.trim();
+    const candidates = path.isAbsolute(raw)
+      ? [path.resolve(raw)]
+      : jobRoots.map((jobRoot) => path.resolve(jobRoot, raw));
+
+    for (const candidate of candidates) {
+      const isJobScoped = jobRoots.some((jobRoot) => isInsideOrEqual(jobRoot, candidate));
+      if (isJobScoped && fs.existsSync(candidate)) {
+        return candidate;
+      }
     }
   }
 

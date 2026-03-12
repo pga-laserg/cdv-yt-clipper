@@ -140,7 +140,12 @@ function normalizeHighlights(input: unknown, transcript: { start: number; end: n
         const scoreBreakdownRaw = obj.score_breakdown;
         const score_breakdown =
             scoreBreakdownRaw && typeof scoreBreakdownRaw === 'object'
-                ? (scoreBreakdownRaw as { model_confidence: number; duration_preference: number; ending_completeness: number })
+                ? (scoreBreakdownRaw as {
+                      model_virality?: number;
+                      model_confidence: number;
+                      duration_preference: number;
+                      ending_completeness: number;
+                  })
                 : undefined;
 
         results.push({ start, end, title, excerpt, hook, confidence, score, score_breakdown } as HighlightClip);

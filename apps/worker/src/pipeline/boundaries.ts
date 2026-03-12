@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { spawn, spawnSync } from 'child_process';
+import crypto from 'crypto';
 import { OpenAI } from 'openai';
 import { v2 as speechV2 } from '@google-cloud/speech';
 import { Storage } from '@google-cloud/storage';
@@ -41,6 +42,8 @@ interface AudioEventPassResult {
     duration_sec: number;
     segments: AudioEvent[];
 }
+
+type AudioEventBackend = 'auto' | 'local' | 'elevenlabs_scribe_v2';
 
 interface OcrEvent {
     start: number;
@@ -216,6 +219,60 @@ function cleanText(text: string): string {
         .replace(/\s+/g, ' ')
         .replace(/^\s*\[[^\]]+\]\s*$/g, '')
         .trim();
+}
+
+const TARGETED_DIAR_CACHE_VERSION = 1;
+
+interface TargetedDiarizationCacheSignature {
+    cacheKey: string;
+    transcriptSha256: string;
+    audioFingerprint: string | null;
+    videoFingerprint: string | null;
+    pipelineProfile: BoundaryPipelineProfile;
+}
+
+function sha256(input: string): string {
+    return crypto.createHash('sha256').update(input).digest('hex');
+}
+
+function fileFingerprint(filePath?: string): string | null {
+    if (!filePath) return null;
+    try {
+        const stat = fs.statSync(filePath);
+        if (!stat.isFile()) return null;
+        const mtimeSec = Math.floor(stat.mtimeMs / 1000);
+        return `${path.basename(filePath)}:${stat.size}:${mtimeSec}`;
+    } catch {
+        return null;
+    }
+}
+
+function buildTargetedDiarizationCacheSignature(
+    transcript: Segment[],
+    options: FindBoundariesOptions,
+    pipelineProfile: BoundaryPipelineProfile
+): TargetedDiarizationCacheSignature {
+    const transcriptFingerprint = transcript
+        .map((segment) => `${segment.start.toFixed(2)}|${segment.end.toFixed(2)}|${segment.text}`)
+        .join('\n');
+    const transcriptSha256 = sha256(transcriptFingerprint);
+    const audioFingerprint = fileFingerprint(options.audioPath);
+    const videoFingerprint = fileFingerprint(options.videoPath);
+    const keyPayload = JSON.stringify({
+        version: TARGETED_DIAR_CACHE_VERSION,
+        transcript_sha256: transcriptSha256,
+        audio_fingerprint: audioFingerprint,
+        video_fingerprint: videoFingerprint,
+        pipeline_profile: pipelineProfile
+    });
+
+    return {
+        cacheKey: sha256(keyPayload),
+        transcriptSha256,
+        audioFingerprint,
+        videoFingerprint,
+        pipelineProfile
+    };
 }
 
 function chunkArray<T>(input: T[], size: number): T[][] {
@@ -805,6 +862,68 @@ function boundaryAudioSignal(events: AudioEvent[], t: number, windowSec = 12) {
         speechToMusic,
         pauseToSpeech,
         speechToPause
+    };
+}
+
+function startAudioScoreBoost(audio: ReturnType<typeof boundaryAudioSignal> | null): number {
+    if (!audio) return 0;
+    return (
+        ((audio.genderChange && (audio.musicToSpeech || audio.pauseToSpeech)) ? 1.8 : 0) +
+        (audio.musicToSpeech ? 1.25 : 0) +
+        (audio.pauseToSpeech ? 1.5 : 0)
+    );
+}
+
+function endAudioScoreBoost(audio: ReturnType<typeof boundaryAudioSignal> | null): number {
+    if (!audio) return 0;
+    return (
+        ((audio.genderChange && (audio.speechToMusic || audio.speechToPause)) ? 1.8 : 0) +
+        (audio.speechToMusic ? 1.25 : 0) +
+        (audio.speechToPause ? 1.0 : 0)
+    );
+}
+
+function summarizeAudioCandidateImpact(
+    candidates: Array<{ score?: number; seed?: number; candidateStart?: number; candidateEnd?: number; audio?: ReturnType<typeof boundaryAudioSignal> | null }>,
+    side: 'start' | 'end'
+) {
+    const withScore = candidates
+        .map((c) => {
+            const totalScore = Number(c.score ?? 0);
+            const boost = side === 'start' ? startAudioScoreBoost(c.audio ?? null) : endAudioScoreBoost(c.audio ?? null);
+            return { ...c, totalScore, boost, scoreWithoutAudio: totalScore - boost };
+        })
+        .sort((a, b) => b.totalScore - a.totalScore);
+
+    const winner = withScore[0] ?? null;
+    const counterfactual = [...withScore].sort((a, b) => b.scoreWithoutAudio - a.scoreWithoutAudio)[0] ?? null;
+    const winnerSeed = winner?.seed ?? null;
+    const winnerCandidate = side === 'start' ? winner?.candidateStart ?? null : winner?.candidateEnd ?? null;
+    const counterfactualSeed = counterfactual?.seed ?? null;
+    const counterfactualCandidate = side === 'start'
+        ? counterfactual?.candidateStart ?? null
+        : counterfactual?.candidateEnd ?? null;
+
+    return {
+        evaluated_candidates: withScore.length,
+        candidates_with_nonzero_audio_boost: withScore.filter((c) => c.boost > 0).length,
+        max_audio_boost: withScore.reduce((m, c) => Math.max(m, c.boost), 0),
+        winner: {
+            seed: winnerSeed,
+            candidate_sec: winnerCandidate,
+            score_total: winner ? Number(winner.totalScore.toFixed(6)) : null,
+            audio_boost: winner ? Number(winner.boost.toFixed(6)) : null,
+            score_without_audio: winner ? Number(winner.scoreWithoutAudio.toFixed(6)) : null
+        },
+        counterfactual_without_audio: {
+            seed: counterfactualSeed,
+            candidate_sec: counterfactualCandidate,
+            score_without_audio: counterfactual ? Number(counterfactual.scoreWithoutAudio.toFixed(6)) : null
+        },
+        winner_changes_without_audio:
+            Boolean(winner) &&
+            Boolean(counterfactual) &&
+            (winnerSeed !== counterfactualSeed || winnerCandidate !== counterfactualCandidate)
     };
 }
 
@@ -1400,6 +1519,21 @@ async function runFacePass(
 }
 
 async function runAudioEventPass(audioPath: string, outPath: string): Promise<AudioEventPassResult> {
+    const backend = resolveAudioEventBackend(process.env.AUDIO_EVENT_BACKEND);
+    if (backend === 'auto' || backend === 'elevenlabs_scribe_v2') {
+        const elevenLabs = loadElevenLabsAudioEventsFromWorkDir(audioPath);
+        if (elevenLabs) {
+            fs.writeFileSync(outPath, JSON.stringify(elevenLabs, null, 2));
+            console.log(`[audio-events] using ElevenLabs-derived events source=${elevenLabs.source}`);
+            return elevenLabs;
+        }
+        if (backend === 'elevenlabs_scribe_v2') {
+            throw new Error(
+                'AUDIO_EVENT_BACKEND=elevenlabs_scribe_v2 requested but audio.events.elevenlabs.json is missing.'
+            );
+        }
+    }
+
     const pythonScriptCandidates = [
         path.resolve(__dirname, 'python/audio_events.py'),
         path.resolve(__dirname, '../../src/pipeline/python/audio_events.py')
@@ -1416,6 +1550,54 @@ async function runAudioEventPass(audioPath: string, outPath: string): Promise<Au
     const raw = JSON.parse(fs.readFileSync(outPath, 'utf8')) as AudioEventPassResult;
     if (!Array.isArray(raw?.segments)) throw new Error('Invalid audio-events output');
     return raw;
+}
+
+function resolveAudioEventBackend(raw: string | undefined): AudioEventBackend {
+    const value = String(raw ?? 'auto').trim().toLowerCase();
+    if (value === 'local' || value === 'local_dsp') return 'local';
+    if (value === 'elevenlabs_scribe_v2' || value === 'elevenlabs' || value === 'scribe_v2') {
+        return 'elevenlabs_scribe_v2';
+    }
+    return 'auto';
+}
+
+function loadElevenLabsAudioEventsFromWorkDir(audioPath: string): AudioEventPassResult | null {
+    const workDir = path.dirname(audioPath);
+    const candidatePath = path.join(workDir, 'audio.events.elevenlabs.json');
+    if (!fs.existsSync(candidatePath)) return null;
+
+    try {
+        const raw = JSON.parse(fs.readFileSync(candidatePath, 'utf8')) as Partial<AudioEventPassResult>;
+        if (!Array.isArray(raw?.segments)) return null;
+        const segments = raw.segments
+            .filter((s): s is AudioEvent => {
+                return (
+                    s != null &&
+                    typeof s.label === 'string' &&
+                    Number.isFinite(s.start) &&
+                    Number.isFinite(s.end) &&
+                    Number(s.end) > Number(s.start)
+                );
+            })
+            .map((s) => ({
+                label: String(s.label).toLowerCase(),
+                start: Number(s.start),
+                end: Number(s.end)
+            }));
+        if (segments.length === 0) return null;
+
+        const duration = Number.isFinite(raw.duration_sec)
+            ? Number(raw.duration_sec)
+            : segments.reduce((m, e) => Math.max(m, e.end), 0);
+        return {
+            source: String(raw.source ?? 'elevenlabs-scribe-v2-derived-v1'),
+            duration_sec: duration,
+            segments
+        };
+    } catch (error) {
+        console.warn('[audio-events] failed to parse audio.events.elevenlabs.json, ignoring:', error);
+        return null;
+    }
 }
 
 function pythonHasOcrModule(pythonBin: string): boolean {
@@ -1907,13 +2089,21 @@ export async function findSermonBoundaries(
     if (normalized.length === 0) return { start: 0, end: 0 };
 
     const workDir = options.workDir;
+    const targetedCacheSignature = buildTargetedDiarizationCacheSignature(normalized, options, profile);
     const targetedPath = workDir ? path.join(workDir, 'sermon.boundaries.targeted-diarization.json') : '';
     if (targetedPath && fs.existsSync(targetedPath)) {
         try {
             const raw = JSON.parse(fs.readFileSync(targetedPath, 'utf8')) as any;
-            const start = Number(raw?.final_clip_bounds?.clip_start_sec);
-            const end = Number(raw?.final_clip_bounds?.clip_end_sec);
-            if (Number.isFinite(start) && Number.isFinite(end) && end > start) return { start, end };
+            const cachedKey = String(raw?.cache_provenance?.cache_key ?? '').trim();
+            const allowLegacyStaleCache = String(process.env.BOUNDARY_ALLOW_STALE_TARGETED_CACHE ?? 'false').toLowerCase() === 'true';
+            const cacheMatches = cachedKey && cachedKey === targetedCacheSignature.cacheKey;
+            if (cacheMatches || allowLegacyStaleCache) {
+                const start = Number(raw?.final_clip_bounds?.clip_start_sec);
+                const end = Number(raw?.final_clip_bounds?.clip_end_sec);
+                if (Number.isFinite(start) && Number.isFinite(end) && end > start) return { start, end };
+            } else {
+                console.log(`[targeted-diarization] ignoring stale cache for ${path.basename(targetedPath)}`);
+            }
         } catch {
             // Ignore invalid cache.
         }
@@ -1999,14 +2189,38 @@ export async function findSermonBoundaries(
         const tmpDir = path.join(workDir, 'processed');
         fs.mkdirSync(tmpDir, { recursive: true });
         let audioEvents: AudioEventPassResult | null = null;
+        let audioEventsLoadedFromCache = false;
+        let audioEventsPassRuntimeMs: number | null = null;
+        let audioEventsPassError: string | null = null;
+        const audioSignalsEnabled =
+            String(process.env.BOUNDARY_ENABLE_AUDIO_SIGNALS ?? 'true').toLowerCase() === 'true';
         const audioEventsPath = path.join(workDir, 'audio.events.json');
-        try {
-            audioEvents = fs.existsSync(audioEventsPath)
-                ? (JSON.parse(fs.readFileSync(audioEventsPath, 'utf8')) as AudioEventPassResult)
-                : await runAudioEventPass(options.audioPath, audioEventsPath);
-        } catch (error) {
-            console.warn('Audio-event pass unavailable, continuing without it:', error);
+        if (audioSignalsEnabled) {
+            try {
+                if (fs.existsSync(audioEventsPath)) {
+                    audioEvents = JSON.parse(fs.readFileSync(audioEventsPath, 'utf8')) as AudioEventPassResult;
+                    audioEventsLoadedFromCache = true;
+                } else {
+                    const t0 = Date.now();
+                    audioEvents = await runAudioEventPass(options.audioPath, audioEventsPath);
+                    audioEventsPassRuntimeMs = Date.now() - t0;
+                }
+            } catch (error) {
+                audioEventsPassError = String(error);
+                console.warn('Audio-event pass unavailable, continuing without it:', error);
+            }
+        } else {
+            if (fs.existsSync(audioEventsPath)) {
+                try {
+                    audioEvents = JSON.parse(fs.readFileSync(audioEventsPath, 'utf8')) as AudioEventPassResult;
+                    audioEventsLoadedFromCache = true;
+                } catch {
+                    audioEvents = null;
+                }
+            }
+            console.log('Audio signals disabled by BOUNDARY_ENABLE_AUDIO_SIGNALS=false (audio event pass skipped).');
         }
+        const audioSignalEvents = audioSignalsEnabled ? audioEvents : null;
         let ocrEvents: OcrEventPassResult | null = null;
         const legacyOcrRequested =
             String(process.env.BOUNDARY_ENABLE_OCR_SIGNALS ?? process.env.ANALYSIS_ENABLE_OCR_SIGNALS ?? 'false').toLowerCase() ===
@@ -2084,7 +2298,7 @@ export async function findSermonBoundaries(
             }
             const prev = previousTurnBefore(preTurnsAbs, candidateStart);
             const diarChange = Boolean(prev && prev.speaker !== startSpeaker && candidateStart - prev.end <= maxConfirmGapSec);
-            const audio = audioEvents ? boundaryAudioSignal(audioEvents.segments, candidateStart) : null;
+            const audio = audioSignalEvents ? boundaryAudioSignal(audioSignalEvents.segments, candidateStart) : null;
             const ocr: ReturnType<typeof boundaryOcrSignal> | null = null;
             const slide = slideOcrEvents ? boundarySlideSignal(slideOcrEvents, candidateStart, ocrWindowSec) : null;
             const speakerCueContext = Boolean(
@@ -2158,7 +2372,7 @@ export async function findSermonBoundaries(
             const candidateEnd = refineEnd(postTurnsAbs, endSpeaker, seed);
             const next = nextTurnAfter(postTurnsAbs, candidateEnd);
             const diarChange = Boolean(next && next.speaker !== endSpeaker && next.start - candidateEnd <= maxConfirmGapSec);
-            const audio = audioEvents ? boundaryAudioSignal(audioEvents.segments, candidateEnd) : null;
+            const audio = audioSignalEvents ? boundaryAudioSignal(audioSignalEvents.segments, candidateEnd) : null;
             const ocr: ReturnType<typeof boundaryOcrSignal> | null = null;
             const slide = slideOcrEvents ? boundarySlideSignal(slideOcrEvents, candidateEnd, ocrWindowSec) : null;
             const transcriptSignal = boundaryTranscriptSignal(normalized, candidateEnd, 'end');
@@ -2212,8 +2426,8 @@ export async function findSermonBoundaries(
         const padded = applyPadding(refinedStart, refinedEnd, normalized, allTurns, startSpeaker, endSpeaker);
         const prevAtStart = previousTurnBefore(preTurnsAbs, refinedStart);
         const nextAtEnd = nextTurnAfter(postTurnsAbs, refinedEnd);
-        const startAudioSignal = audioEvents ? boundaryAudioSignal(audioEvents.segments, refinedStart) : null;
-        const endAudioSignal = audioEvents ? boundaryAudioSignal(audioEvents.segments, refinedEnd) : null;
+        const startAudioSignal = audioSignalEvents ? boundaryAudioSignal(audioSignalEvents.segments, refinedStart) : null;
+        const endAudioSignal = audioSignalEvents ? boundaryAudioSignal(audioSignalEvents.segments, refinedEnd) : null;
         const startOcrSignal: ReturnType<typeof boundaryOcrSignal> | null = null;
         const endOcrSignal: ReturnType<typeof boundaryOcrSignal> | null = null;
         const startSlideSignal = slideOcrEvents ? boundarySlideSignal(slideOcrEvents, refinedStart, ocrWindowSec) : null;
@@ -2286,7 +2500,7 @@ export async function findSermonBoundaries(
                     const binSec = Number(process.env.BOUNDARY_LLM_INDEX_BIN_SEC ?? 45);
                     const binsAll = buildTranscriptBins(
                         boundaryTranscript,
-                        audioEvents?.segments ?? null,
+                        audioSignalEvents?.segments ?? null,
                         audioEnd,
                         Math.max(20, binSec)
                     );
@@ -2404,6 +2618,15 @@ export async function findSermonBoundaries(
         }
 
         const output = {
+            cache_provenance: {
+                version: TARGETED_DIAR_CACHE_VERSION,
+                cache_key: targetedCacheSignature.cacheKey,
+                transcript_sha256: targetedCacheSignature.transcriptSha256,
+                audio_fingerprint: targetedCacheSignature.audioFingerprint,
+                video_fingerprint: targetedCacheSignature.videoFingerprint,
+                pipeline_profile: targetedCacheSignature.pipelineProfile,
+                generated_at: new Date().toISOString()
+            },
             guess: {
                 start_sec: guess.start,
                 end_sec: guess.end,
@@ -2443,6 +2666,19 @@ export async function findSermonBoundaries(
                       total_segments: audioEvents.segments.length
                   }
                 : null,
+            audio_signal_telemetry: {
+                enabled: audioSignalsEnabled,
+                events_available: Boolean(audioEvents && Array.isArray(audioEvents.segments) && audioEvents.segments.length > 0),
+                source: audioEvents?.source ?? null,
+                cache_hit: audioEventsLoadedFromCache,
+                generated_this_run: Boolean(audioSignalsEnabled && audioEvents && !audioEventsLoadedFromCache),
+                pass_runtime_ms: audioEventsPassRuntimeMs,
+                pass_error: audioEventsPassError,
+                scoring: {
+                    start: summarizeAudioCandidateImpact(scoredStart, 'start'),
+                    end: summarizeAudioCandidateImpact(scoredEnd, 'end')
+                }
+            },
             ocr_events: null,
             slide_ocr_events: slideOcrEvents
                 ? {

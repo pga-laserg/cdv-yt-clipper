@@ -71,10 +71,18 @@ function isWorshipLikeText(text: string): boolean {
     );
 }
 
+function isCallToWorshipLikeText(text: string): boolean {
+    const t = cleanText(text).toLowerCase();
+    if (!t) return false;
+    return /(lleg[oó]\s+el\s+momento\s+de\s+alabar|pong[aá]monos\s+de\s+pie.*(?:alabar|adorar)|les\s+invitamos\s+a\s+alabar|vamos\s+a\s+alabar)/i.test(
+        t
+    );
+}
+
 function isLikelySermonKickoffText(text: string): boolean {
     const t = cleanText(text).toLowerCase();
     if (!t) return false;
-    return /(buenos d[ií]as[, ]+feliz s[áa]bado|feliz s[áa]bado(?:\s+nuevamente|\s+familia|\s+iglesia|\s+hermanos?)?|abran? (sus )?biblias|mensaje de hoy|tema de hoy|hoy quiero|quiero compartir|la biblia|vers[íi]culo|cap[íi]tulo|quiero preguntar)/i.test(
+    return /(abran? (sus )?biblias|mensaje de hoy|tema de hoy|hoy quiero (?:decirte|compartir)|quiero comenzar dici[eé]ndote|vamos a estudiar la palabra|quiero preguntar|predicaci[oó]n|serm[oó]n principal)/i.test(
         t
     );
 }
@@ -239,7 +247,7 @@ function deriveChapterSermonHint(
     chapters: ChapterLite[],
     transcript: Segment[]
 ): { start: number; end: number; confidence: number } | null {
-    const sermonStartPool = chapters
+    const sermonStartPoolRaw = chapters
         .filter((c) => Number.isFinite(c.start) && Number.isFinite(c.end) && c.end > c.start)
         .filter((c) => {
             const t = cleanText(c.type ?? '').toLowerCase();
@@ -251,20 +259,45 @@ function deriveChapterSermonHint(
                 title.includes('sermón')
             );
         });
+    const sermonStartPool = sermonStartPoolRaw.filter((c) => {
+        const start = Number(c.start);
+        const end = Number(c.end);
+        const windowEnd = Math.min(end, start + Number(process.env.BOUNDARY_ADJ_CHAPTER_START_SCAN_SEC ?? 240));
+        const inRange = transcript.filter((s) => s.end >= start && s.start <= windowEnd);
+        if (inRange.length === 0) return true;
+        const texts = inRange.map((s) => cleanText(s.text));
+        const sermonCueCount = texts.filter((t) => isLikelySermonKickoffText(t)).length;
+        const prayerCueCount = texts.filter((t) => isPrayerLikeText(t)).length;
+        const worshipCueCount = texts.filter((t) => isWorshipLikeText(t)).length;
+        const callToWorshipCount = texts.filter((t) => isCallToWorshipLikeText(t)).length;
+        const liturgicalDominant =
+            callToWorshipCount > 0 || prayerCueCount + worshipCueCount > sermonCueCount + 2;
+        return !liturgicalDominant;
+    });
+    const effectiveStartPool = sermonStartPool.length > 0 ? sermonStartPool : sermonStartPoolRaw;
     const sermonEndPool = chapters
         .filter((c) => Number.isFinite(c.start) && Number.isFinite(c.end) && c.end > c.start)
         .filter((c) => {
             const t = cleanText(c.type ?? '').toLowerCase();
             const title = cleanText(c.title ?? '').toLowerCase();
-            return t === 'sermon' || t === 'post_sermon_response' || title.includes('sermón');
+            return (
+                t === 'sermon' ||
+                t === 'post_sermon_response' ||
+                t === 'closing' ||
+                t === 'benediction' ||
+                title.includes('sermón') ||
+                title.includes('benediction') ||
+                title.includes('bendición') ||
+                title.includes('bendicion')
+            );
         });
-    if (sermonStartPool.length === 0 || sermonEndPool.length === 0) return null;
-    const earliestStartChapter = sermonStartPool.reduce((best, cur) => (Number(cur.start) < Number(best.start) ? cur : best));
+    if (effectiveStartPool.length === 0 || sermonEndPool.length === 0) return null;
+    const earliestStartChapter = effectiveStartPool.reduce((best, cur) => (Number(cur.start) < Number(best.start) ? cur : best));
     const rawStart = Number(earliestStartChapter.start);
     const refinedStart = refineChapterStartFromTranscript(earliestStartChapter, transcript);
     const start = Math.max(rawStart, refinedStart);
     const end = Math.max(...sermonEndPool.map((c) => Number(c.end)));
-    const confItems = [...sermonStartPool, ...sermonEndPool];
+    const confItems = [...effectiveStartPool, ...sermonEndPool];
     let conf = confItems.reduce((a, c) => a + Number(c.confidence ?? 0.75), 0) / confItems.length;
     if (start - rawStart > 45) conf = Math.min(1, conf + 0.03);
     return { start, end, confidence: clamp(conf, 0, 1) };
@@ -326,6 +359,7 @@ async function llmRefineClosingEnd(
         'Task: detect the service-state transition from sermon-response flow to non-sermon flow.',
         'Do NOT rely on chapter names only. Use semantic cues in text (altar call, invitation to sing, prayer close, benediction, social chatter, announcements/logistics).',
         'Prefer including: altar/decision call, closing prayer, benediction, response song if still tied to sermon response.',
+        'Include short farewell/blessing lines immediately after final prayer/amen when they are part of benediction flow.',
         'Exclude: post-service social chatter, unrelated announcements, host logistics not tied to sermon response.',
         `Current bounds: start=${currentStart.toFixed(2)} end=${currentEnd.toFixed(2)}`,
         `Allowed output end range: ${minEnd.toFixed(2)}-${maxEnd.toFixed(2)}`,
@@ -520,6 +554,7 @@ export async function adjudicateBoundariesWithSingleLlm(
         '- Include post-sermon altar/decision call when it is contiguous and thematically tied to the sermon.',
         '- Include response song(s) when they are part of that call/closing flow.',
         '- Exclude post-service social/farewell chatter.',
+        '- Treat repeated "feliz sábado" as weak context only; never use it alone to mark sermon start.',
         '- Prefer chapter-labeled sermon spans over local scoring when they are coherent, especially for START.',
         '- Use slide OCR text cues as high-value evidence (especially speaker-name + phrase overlays near sermon transitions).',
         '- Prefer local evidence only when chapter evidence is weak or contradictory.',

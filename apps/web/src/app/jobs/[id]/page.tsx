@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, use } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { ClipRecord, JobDetailResponse, JobRecord } from '@/lib/api-types';
-import { ChevronLeft, Play, CheckCircle, XCircle, Download } from 'lucide-react';
+import { ChevronLeft, Play, CheckCircle, XCircle, Download, Scissors } from 'lucide-react';
 import Link from 'next/link';
 
 type Clip = ClipRecord;
@@ -291,12 +291,19 @@ export default function JobDetails({ params: paramsPromise }: { params: Promise<
                                 &quot;{clip.transcript_excerpt}&quot;
                             </p>
 
-                            <div className="flex flex-col sm:flex-row gap-3">
-                                <button className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors">
+                            <div className="flex flex-col sm:flex-row gap-2">
+                                <Link
+                                    href={`/clips/${clip.id}`}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-blue-50 text-blue-600 rounded-xl font-medium hover:bg-blue-100 transition-colors"
+                                >
+                                    <Scissors size={18} />
+                                    Trim
+                                </Link>
+                                <button className="flex-1 flex items-center justify-center gap-2 py-2 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors">
                                     <CheckCircle size={18} />
                                     Approve
                                 </button>
-                                <button className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 text-red-600 rounded-xl font-medium hover:bg-red-100 transition-colors">
+                                <button className="flex-1 flex items-center justify-center gap-2 py-2 bg-red-50 text-red-600 rounded-xl font-medium hover:bg-red-100 transition-colors">
                                     <XCircle size={18} />
                                     Reject
                                 </button>

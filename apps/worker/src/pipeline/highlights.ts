@@ -18,11 +18,21 @@ export interface HighlightClip {
     confidence: number;
     score: number;
     score_breakdown?: {
+        model_virality: number;
         model_confidence: number;
         duration_preference: number;
         ending_completeness: number;
     };
 }
+
+export type HighlightSelectionProfile = 'standard' | 'dense' | 'arc';
+type HighlightSelectionProfileInput =
+    | HighlightSelectionProfile
+    | 'dynamic'
+    | 'chopped'
+    | 'skimmed'
+    | 'structured'
+    | 'narrative';
 
 interface ParagraphLite {
     chapter_index?: number;
@@ -45,6 +55,7 @@ interface HighlightContext {
     sermonEnd: number;
     paragraphs?: ParagraphLite[] | null;
     chapters?: ChapterLite[] | null;
+    profile?: HighlightSelectionProfileInput | null;
 }
 
 interface HighlightRequest {
@@ -54,12 +65,26 @@ interface HighlightRequest {
     usedRanges: Array<{ start: number; end: number }>;
 }
 
+interface HighlightSelectionConfig {
+    profile: HighlightSelectionProfile;
+    minDurationSec: number;
+    maxDurationSec: number;
+    preferredDurationSec: number;
+    targetCount: number;
+    scoreWeights: {
+        modelVirality: number;
+        modelConfidence: number;
+        durationPreference: number;
+        endingCompleteness: number;
+    };
+    promptGuidance: string[];
+}
+
 export async function findHighlights(
     transcript: { start: number; end: number; text: string }[],
     strategy: 'openai' | 'deepseek' | 'cohere' = 'openai',
     context?: Partial<HighlightContext>
 ): Promise<HighlightClip[]> {
-    console.log(`Finding highlights using strategy: ${strategy}`);
     if (strategy !== 'openai') {
         throw new Error(`Highlight strategy "${strategy}" is disabled. Use "openai".`);
     }
@@ -146,10 +171,68 @@ function parseHighlights(content: string): any[] {
     }
 }
 
+function resolveHighlightProfile(raw: unknown): HighlightSelectionProfile {
+    const value = String(raw ?? process.env.HIGHLIGHTS_PROFILE ?? 'standard').trim().toLowerCase();
+    if (!value || value === 'standard') return 'standard';
+    if (value === 'dense' || value === 'dynamic' || value === 'chopped') return 'dense';
+    if (value === 'arc' || value === 'skimmed' || value === 'structured' || value === 'narrative') return 'arc';
+    console.warn(`Unknown highlight profile "${value}", defaulting to "standard".`);
+    return 'standard';
+}
+
+function getHighlightSelectionConfig(context?: Partial<HighlightContext>): HighlightSelectionConfig {
+    const profile = resolveHighlightProfile(context?.profile);
+    const minDurationSec = Number(process.env.HIGHLIGHTS_MIN_DURATION_SEC ?? 30);
+    const maxDurationSec = Number(process.env.HIGHLIGHTS_MAX_DURATION_SEC ?? 180);
+    const preferredDurationSec = Number(process.env.HIGHLIGHTS_PREFERRED_DURATION_SEC ?? 90);
+    const targetCount = Number(process.env.HIGHLIGHTS_TARGET_COUNT ?? 10);
+
+    const base: HighlightSelectionConfig = {
+        profile,
+        minDurationSec,
+        maxDurationSec,
+        preferredDurationSec,
+        targetCount,
+        scoreWeights: {
+            modelVirality: 0.5,
+            modelConfidence: 0.1,
+            durationPreference: 0.05,
+            endingCompleteness: 0.35
+        },
+        promptGuidance: []
+    };
+
+    switch (profile) {
+        case 'dense':
+            base.promptGuidance = [
+                '- prefer clips with high idea density and minimal runway before the core point lands',
+                '- use spoken seconds efficiently; avoid long setup, repetition, and obvious filler when a denser window is available',
+                '- until word-level trims exist, choose naturally dense windows that still sound clean without micro-cuts'
+            ];
+            break;
+        case 'arc':
+            base.promptGuidance = [
+                '- prefer clips with a clear internal arc: intro, development, and conclusion',
+                '- for sermons, prefer endings that land in reflection, invitation, conviction, or practical action',
+                '- if forced to choose, pick structural completeness over raw punchiness'
+            ];
+            break;
+        case 'standard':
+        default:
+            base.promptGuidance = [
+                '- prefer clips that are complete, strong, and easy to understand without surrounding context'
+            ];
+            break;
+    }
+
+    return base;
+}
+
 async function askHighlights(
     openai: OpenAI,
     model: string,
     payload: {
+        profile: HighlightSelectionProfile;
         sermonStart: number;
         sermonEnd: number;
         minDurationSec: number;
@@ -160,6 +243,7 @@ async function askHighlights(
         transcriptLines: string;
         chapterLines: string;
         usedRanges: Array<{ start: number; end: number }>;
+        promptGuidance: string[];
     }
 ): Promise<any[]> {
     const used = payload.usedRanges
@@ -171,15 +255,23 @@ async function askHighlights(
         '{"highlights":[{"start":number,"end":number,"title":string,"excerpt":string,"hook":string,"confidence":number,"score":number,"why_end_complete":"short"}]}',
         `Constraints:`,
         `- return exactly ${payload.count} highlight(s)`,
+        '- select the best overall ideas, not the best ideas that merely happen to be near the preferred duration',
+        '- prioritize clips whose central idea is strong, memorable, emotionally resonant, and likely to hold attention',
+        '- prioritize complete ideas over compact runtimes; a stronger 120s clip can beat a weaker 60s clip',
         `- each duration must be between ${payload.minDurationSec}s and ${payload.maxDurationSec}s`,
-        `- prefer durations close to ${payload.preferredDurationSec}s`,
+        `- duration near ${payload.preferredDurationSec}s is only a weak preference, not a hard target`,
+        '- do not sacrifice a complete idea just to land near the preferred duration',
         '- each clip must be catchy and complete thought (prioritize complete endings over intros)',
         '- avoid clipping before the core idea lands; ending completeness is critical',
         '- avoid overlap with already selected ranges',
         '- spread clips across different sermon moments',
         '- clips must stay within sermon bounds',
+        `- selection profile: ${payload.profile}`,
+        '- "score" must mean viral potential of the idea itself on a 0..1 scale',
+        '- "confidence" must mean your confidence that the selected clip is coherent, complete, and correctly bounded',
         `Sermon bounds: ${payload.sermonStart.toFixed(2)}-${payload.sermonEnd.toFixed(2)}`,
         used ? `Already selected ranges (avoid overlap):\n${used}` : 'Already selected ranges: none',
+        payload.promptGuidance.length ? `Profile guidance:\n${payload.promptGuidance.join('\n')}` : '',
         '',
         'Chapter hints (within sermon):',
         payload.chapterLines || '[none]',
@@ -219,27 +311,48 @@ function endingCompletenessScore(
 
 function durationPreferenceScore(duration: number, preferred: number, min: number, max: number): number {
     if (duration < min || duration > max) return 0;
-    const span = Math.max(1, max - min);
-    const d = Math.abs(duration - preferred);
-    return clamp(1 - d / (span / 2), 0, 1);
+    const edgeFloor = 0.65;
+    if (duration === preferred) return 1;
+    if (duration < preferred) {
+        const leftSpan = Math.max(1, preferred - min);
+        const distance = preferred - duration;
+        const normalized = clamp(distance / leftSpan, 0, 1);
+        return clamp(1 - normalized * (1 - edgeFloor), edgeFloor, 1);
+    }
+    const rightSpan = Math.max(1, max - preferred);
+    const distance = duration - preferred;
+    const normalized = clamp(distance / rightSpan, 0, 1);
+    return clamp(1 - normalized * (1 - edgeFloor), edgeFloor, 1);
 }
 
 function scoreClip(
     clip: HighlightClip,
     transcript: { start: number; end: number; text: string }[],
-    minDurationSec: number,
-    maxDurationSec: number,
-    preferredDurationSec: number
+    config: HighlightSelectionConfig
 ): HighlightClip {
     const duration = clip.end - clip.start;
+    const virality = clamp(clip.score, 0, 1);
     const conf = clamp(clip.confidence, 0, 1);
-    const durScore = durationPreferenceScore(duration, preferredDurationSec, minDurationSec, maxDurationSec);
+    const durScore = durationPreferenceScore(
+        duration,
+        config.preferredDurationSec,
+        config.minDurationSec,
+        config.maxDurationSec
+    );
     const endScore = endingCompletenessScore(clip, transcript);
-    const score = clamp(conf * 0.35 + durScore * 0.25 + endScore * 0.4, 0, 1);
+    const score = clamp(
+        virality * config.scoreWeights.modelVirality +
+            conf * config.scoreWeights.modelConfidence +
+            durScore * config.scoreWeights.durationPreference +
+            endScore * config.scoreWeights.endingCompleteness,
+        0,
+        1
+    );
     return {
         ...clip,
         score: Number(score.toFixed(3)),
         score_breakdown: {
+            model_virality: Number(virality.toFixed(3)),
             model_confidence: Number(conf.toFixed(3)),
             duration_preference: Number(durScore.toFixed(3)),
             ending_completeness: Number(endScore.toFixed(3))
@@ -258,13 +371,14 @@ async function findHighlightsOpenAI(
     }
     if (!transcript.length) return [];
 
+    const selection = getHighlightSelectionConfig(context);
     const sermonStart = Number(context?.sermonStart ?? transcript[0].start);
     const sermonEnd = Number(context?.sermonEnd ?? transcript[transcript.length - 1].end);
-    const minDurationSec = Number(process.env.HIGHLIGHTS_MIN_DURATION_SEC ?? 25);
-    const maxDurationSec = Number(process.env.HIGHLIGHTS_MAX_DURATION_SEC ?? 105);
-    const preferredDurationSec = Number(process.env.HIGHLIGHTS_PREFERRED_DURATION_SEC ?? 60);
-    const targetCount = Number(process.env.HIGHLIGHTS_TARGET_COUNT ?? 10);
+    const { minDurationSec, maxDurationSec, preferredDurationSec, targetCount } = selection;
     const model = process.env.HIGHLIGHTS_OPENAI_MODEL || process.env.ANALYZE_OPENAI_MODEL || 'gpt-5-mini';
+    console.log(
+        `Finding highlights using strategy: openai profile=${selection.profile} range=${minDurationSec}-${maxDurationSec}s preferred=${preferredDurationSec}s`
+    );
 
     const paragraphsAll = Array.isArray(context?.paragraphs) ? context!.paragraphs! : [];
     const paragraphs = paragraphsAll
@@ -293,6 +407,7 @@ async function findHighlightsOpenAI(
     let usedRanges: Array<{ start: number; end: number }> = [];
 
     const pass1 = await askHighlights(openai, model, {
+        profile: selection.profile,
         sermonStart,
         sermonEnd,
         minDurationSec,
@@ -302,13 +417,14 @@ async function findHighlightsOpenAI(
         paragraphLines,
         transcriptLines,
         chapterLines,
-        usedRanges
+        usedRanges,
+        promptGuidance: selection.promptGuidance
     });
     for (const raw of pass1) {
         const clip = normalizeClip(raw, sermonStart, sermonEnd, minDurationSec, maxDurationSec);
         if (!clip) continue;
         if (accepted.some((x) => overlaps(x, clip))) continue;
-        accepted.push(scoreClip(clip, transcript, minDurationSec, maxDurationSec, preferredDurationSec));
+        accepted.push(scoreClip(clip, transcript, selection));
         usedRanges.push({ start: clip.start, end: clip.end });
         if (accepted.length >= targetCount) break;
     }
@@ -316,6 +432,7 @@ async function findHighlightsOpenAI(
     const remaining = Math.max(0, targetCount - accepted.length);
     if (remaining > 0) {
         const pass2 = await askHighlights(openai, model, {
+            profile: selection.profile,
             sermonStart,
             sermonEnd,
             minDurationSec,
@@ -325,13 +442,14 @@ async function findHighlightsOpenAI(
             paragraphLines,
             transcriptLines,
             chapterLines,
-            usedRanges
+            usedRanges,
+            promptGuidance: selection.promptGuidance
         });
         for (const raw of pass2) {
             const clip = normalizeClip(raw, sermonStart, sermonEnd, minDurationSec, maxDurationSec);
             if (!clip) continue;
             if (accepted.some((x) => overlaps(x, clip))) continue;
-            accepted.push(scoreClip(clip, transcript, minDurationSec, maxDurationSec, preferredDurationSec));
+            accepted.push(scoreClip(clip, transcript, selection));
             usedRanges.push({ start: clip.start, end: clip.end });
             if (accepted.length >= targetCount) break;
         }

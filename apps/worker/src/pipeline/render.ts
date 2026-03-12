@@ -410,11 +410,14 @@ export async function render(
     videoPath: string,
     boundaries: { start: number; end: number },
     clips: { start: number; end: number; id: string; score?: number; confidence?: number }[],
-    options: { trackingVideoPath?: string } = {}
+    options: { trackingVideoPath?: string; horizontalVideoPath?: string } = {}
 ): Promise<string[]> {
     console.log('Rendering clips...');
     const trackingVideoPath = options.trackingVideoPath && fs.existsSync(options.trackingVideoPath)
         ? options.trackingVideoPath
+        : videoPath;
+    const horizontalVideoPath = options.horizontalVideoPath && fs.existsSync(options.horizontalVideoPath)
+        ? options.horizontalVideoPath
         : videoPath;
 
     const outputDir = path.join(path.dirname(videoPath), 'processed');
@@ -427,6 +430,7 @@ export async function render(
         version: string;
         generated_at: string;
         video_path: string;
+        horizontal_video_path: string;
         tracking_video_path: string;
         center_x: number;
         clips_selected: number;
@@ -444,6 +448,7 @@ export async function render(
         version: 'vertical-clipper-v3',
         generated_at: new Date().toISOString(),
         video_path: videoPath,
+        horizontal_video_path: horizontalVideoPath,
         tracking_video_path: trackingVideoPath,
         center_x: 0.5,
         clips_selected: 0,
@@ -457,8 +462,11 @@ export async function render(
     const horizontalFadeInSec = horizontalFadeEnabled && Number.isFinite(horizontalFadeInSecRaw) ? Math.max(0, horizontalFadeInSecRaw) : 0;
     const horizontalFadeOutSec = horizontalFadeEnabled && Number.isFinite(horizontalFadeOutSecRaw) ? Math.max(0, horizontalFadeOutSecRaw) : 0;
 
+    if (horizontalVideoPath !== videoPath) {
+        console.log(`Using dedicated horizontal source: ${horizontalVideoPath}`);
+    }
     const sermonPath = path.join(outputDir, 'sermon_horizontal.mp4');
-    await cutVideo(videoPath, boundaries.start, boundaries.end, sermonPath, {
+    await cutVideo(horizontalVideoPath, boundaries.start, boundaries.end, sermonPath, {
         fadeInSec: horizontalFadeInSec,
         fadeOutSec: horizontalFadeOutSec,
     });

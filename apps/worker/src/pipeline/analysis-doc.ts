@@ -151,17 +151,26 @@ function isSabbathGreetingCue(text: string): boolean {
     );
 }
 
+function isCallToWorshipCue(text: string): boolean {
+    const t = cleanText(text);
+    if (!t) return false;
+    return /(lleg[oó]\s+el\s+momento\s+de\s+alabar|pong[aá]monos\s+de\s+pie.*(?:alabar|adorar)|les\s+invitamos\s+a\s+alabar|vamos\s+a\s+alabar)/i.test(
+        t
+    );
+}
+
 function inferTypeFromTextHeuristic(text: string, fallback: ChapterType): ChapterType {
     const t = cleanText(text).toLowerCase();
     if (!t) return fallback;
-    if (/(abran? (sus )?biblias|mensaje de hoy|tema de hoy|la biblia|vers[íi]culo|cap[íi]tulo|hoy quiero|quiero compartir|quiero preguntar)/i.test(t)) {
-        return 'sermon';
-    }
+    if (isCallToWorshipCue(t)) return 'congregational_music';
     if (/(oremos|oraci[oó]n|inclinemos|inclinar.*rostro|arrodill|te lo pedimos|en el nombre de (tu hijo )?cristo jes[uú]s|\bam[eé]n\b)/i.test(t)) {
         return 'prayer';
     }
     if (/(vamos a cantar|cantemos|equipo de alabanza|alabemos|worship|himno|coro|reproclamamos|en lo alto est[aá]s)/i.test(t)) {
         return 'congregational_music';
+    }
+    if (/(mensaje de hoy|tema de hoy|hoy quiero (?:decirte|compartir)|quiero comenzar dici[eé]ndote|vamos a estudiar la palabra|abran? (sus )?biblias|quiero preguntar)/i.test(t)) {
+        return 'sermon';
     }
     if (/(diezmo[s]?|ofrenda[s]?|mayordom[ií]a|regresar lo que te pertenece)/i.test(t)) {
         return 'offering';
@@ -346,7 +355,8 @@ async function inferChaptersWithLlm(
     if (!openai) return null;
 
     const cachePath = workDir ? path.join(workDir, 'analysis.chapters.llm.json') : '';
-    if (cachePath && fs.existsSync(cachePath)) {
+    const disableCache = String(process.env.ANALYSIS_CHAPTER_DISABLE_CACHE ?? 'false').toLowerCase() === 'true';
+    if (!disableCache && cachePath && fs.existsSync(cachePath)) {
         const cached = safeJsonParse<{ chapters?: Chapter[] } | null>(fs.readFileSync(cachePath, 'utf8'), null);
         if (cached && Array.isArray(cached.chapters) && cached.chapters.length > 0) {
             const normalizedCached = cached.chapters
@@ -372,8 +382,9 @@ async function inferChaptersWithLlm(
         'Rules:',
         '- Keep chapter count between 4 and 14.',
         '- Use clear transitions: music, prayer, sermon start, sermon end, offering, announcements, child presentation.',
-        '- In Hispanic SDA services, "feliz sábado" greetings are strong section-boundary cues (even if speaker changes).',
+        '- In Hispanic SDA services, "feliz sábado" can be a context cue, but it is NOT determinative for sermon start by itself.',
         '- OCR cues from lower-thirds/slides/lyrics are high-value contextual signals: speaker names, sermon title, Bible verses, worship lyrics.',
+        '- If a section has explicit worship-call language (e.g., "llegó el momento de alabar", "pongámonos de pie", "cantemos"), classify as congregational_music/call_to_worship, not sermon.',
         '- Do not start a sermon chapter inside prayer or worship lyrics.',
         '- If prayer/worship happens before preaching, start sermon at the first sustained preaching statement.',
         '- The sermon chapter should align with these local bounds unless strong evidence says otherwise.',
@@ -415,7 +426,7 @@ async function inferChaptersWithLlm(
         })),
         workDir
     );
-    if (cachePath) fs.writeFileSync(cachePath, JSON.stringify({ chapters }, null, 2));
+    if (!disableCache && cachePath) fs.writeFileSync(cachePath, JSON.stringify({ chapters }, null, 2));
     return chapters;
 }
 
@@ -719,7 +730,9 @@ function relabelChaptersBySignals(
         return cues.reduce((acc, rx) => acc + ((text.match(rx) || []).length > 0 ? 1 : 0), 0);
     };
     const hasPreachingCue = (text: string) =>
-        /(la biblia|cap[íi]tulo|vers[íi]culo|hoy quiero decirte|historia|serm[oó]n|predicar|mensaje de hoy)/i.test(text);
+        /(mensaje de hoy|tema de hoy|hoy quiero decirte|quiero comenzar dici[eé]ndote|vamos a estudiar la palabra|predicar|serm[oó]n principal|abran? (sus )?biblias)/i.test(
+            text
+        );
     const hasOfferingCue = (text: string) =>
         /(diezmo[s]?|ofrenda[s]?|regresar lo que te pertenece|mayordom[ií]a)/i.test(text);
 
@@ -782,7 +795,6 @@ function splitMixedAnnouncementSermonIntro(chapters: Chapter[], transcript: Segm
     const result: Chapter[] = [];
 
     const sermonIntroCue = (text: string) =>
-        isSabbathGreetingCue(text) ||
         /(est[aá]s listo para el mensaje|hoy que vamos a estudiar la palabra|quiero comenzar dici[eé]ndote|abran? sus biblias|mensaje de hoy|tema de hoy)/i.test(
             text
         );
@@ -869,7 +881,6 @@ function enforceSermonIntroType(chapters: Chapter[]): Chapter[] {
 
 function splitPreSermonIntro(chapters: Chapter[], transcript: Segment[], boundaries: SermonBoundaries): Chapter[] {
     const sermonIntroCue = (text: string) =>
-        isSabbathGreetingCue(text) ||
         /(est[aá]s listo para el mensaje|hoy que vamos a estudiar la palabra|quiero comenzar dici[eé]ndote)/i.test(
             text
         );
@@ -895,9 +906,29 @@ function splitPreSermonIntro(chapters: Chapter[], transcript: Segment[], boundar
             continue;
         }
 
-        const splitAt = clamp(splitSeg.start, ch.start, ch.end);
+        // If a repeated sabbath greeting is immediately followed by sermon-intro language,
+        // pull the split back to include that greeting as part of sermon introduction.
+        const backshiftSec = Number(process.env.ANALYSIS_SERMON_INTRO_BACKSHIFT_SEC ?? 90);
+        const preludeSeg = inRange.find(
+            (s) =>
+                isSabbathGreetingCue(cleanText(s.text)) &&
+                s.start >= splitSeg.start - backshiftSec &&
+                s.start <= splitSeg.start
+        );
+        const splitAt = clamp(preludeSeg ? preludeSeg.start : splitSeg.start, ch.start, ch.end);
         const canSplit = splitAt - ch.start >= 20 && ch.end - splitAt >= 20;
         if (!canSplit) {
+            // If sermon cue is essentially at chapter start, retag whole chapter as sermon intro.
+            if (splitAt - ch.start < 20 && ch.end - splitAt >= 120) {
+                out.push({
+                    ...ch,
+                    title: 'Sermon Introduction',
+                    type: 'sermon',
+                    confidence: Number(Math.max(0.75, ch.confidence).toFixed(2)),
+                    reason: `${ch.reason ? `${ch.reason};` : ''}retag_pre_sermon_intro`
+                });
+                continue;
+            }
             out.push(ch);
             continue;
         }
@@ -971,7 +1002,6 @@ function splitBySabbathGreetingCue(chapters: Chapter[], transcript: Segment[]): 
         const afterType = inferTypeFromTextHeuristic(afterText, ch.type);
         const transitionLikely =
             beforeType !== afterType ||
-            afterType === 'sermon' ||
             beforeType === 'prayer' ||
             beforeType === 'congregational_music' ||
             beforeType === 'announcement' ||
@@ -1014,7 +1044,6 @@ function splitBySabbathGreetingCue(chapters: Chapter[], transcript: Segment[]): 
 
 function splitLeadingLiturgicalPreludeFromSermon(chapters: Chapter[], transcript: Segment[]): Chapter[] {
     const sermonIntroCue = (text: string) =>
-        isSabbathGreetingCue(text) ||
         /(abran? (sus )?biblias|mensaje de hoy|tema de hoy|hoy quiero|quiero compartir|la biblia|vers[íi]culo|cap[íi]tulo)/i.test(
             text
         );
@@ -1050,10 +1079,12 @@ function splitLeadingLiturgicalPreludeFromSermon(chapters: Chapter[], transcript
 
         // Important Hispanic SDA cue: if speaker says "feliz sábado" again after already speaking,
         // treat it as a likely section reset (often worship/prayer -> sermon transition).
+        const allowRepeatedGreetingReset =
+            String(process.env.ANALYSIS_REPEAT_SABBATH_CUE_SERMON_RESET ?? 'false').toLowerCase() === 'true';
         const greetingMinGapSec = Number(process.env.ANALYSIS_REPEAT_SABBATH_CUE_MIN_GAP_SEC ?? 90);
         const greetingSegments = inRange.filter((s) => isSabbathGreetingCue(cleanText(s.text)));
         let splitCandidate = firstSermonSeg;
-        if (greetingSegments.length >= 2) {
+        if (allowRepeatedGreetingReset && greetingSegments.length >= 2) {
             const firstGreeting = greetingSegments[0];
             const repeatedGreeting = greetingSegments.find(
                 (s) => s.start > firstGreeting.start + greetingMinGapSec
@@ -1175,6 +1206,7 @@ function toPolishedMultimodalMarkdown(doc: AnalysisDoc): string {
 
         const paras = doc.paragraphs.filter((p) => p.chapter_index === i);
         for (const p of paras) {
+            lines.push(`[${p.start.toFixed(2)}s]`);
             lines.push(`[${formatSec(p.start)} - ${formatSec(p.end)}] ${p.text}`);
             lines.push('');
         }
@@ -1241,7 +1273,11 @@ export async function generateAnalysisArtifacts(
     const splitMixed = splitMixedAnnouncementSermonIntro(renamedChapters, transcript);
     const splitIntro = splitPreSermonIntro(splitMixed, transcript, boundaries);
     const splitGreetingCue = splitBySabbathGreetingCue(splitIntro, transcript);
-    const splitLiturgicalPrelude = splitLeadingLiturgicalPreludeFromSermon(splitGreetingCue, transcript);
+    const splitLiturgicalPreludeEnabled =
+        String(process.env.ANALYSIS_SPLIT_LEADING_LITURGICAL_PRELUDE ?? 'false').toLowerCase() === 'true';
+    const splitLiturgicalPrelude = splitLiturgicalPreludeEnabled
+        ? splitLeadingLiturgicalPreludeFromSermon(splitGreetingCue, transcript)
+        : splitGreetingCue;
     const chapters = enforceSermonIntroType(splitLiturgicalPrelude);
     const chapterSignals = chapters.map((c) => computeChapterSignal(c, audioEvents));
     const paragraphs = buildParagraphs(transcript, chapters);

@@ -19,8 +19,8 @@ async function run() {
     console.log(`E2E source: ${source}`);
     console.log(`E2E outDir: ${outDir}`);
 
-    const { videoPathHQ, videoPathLight, audioPath } = await ingest(source, outDir);
-    console.log('Ingest complete:', { videoPathHQ, videoPathLight, audioPath });
+    const { videoPathOriginal, videoPathHQ, videoPathLight, videoPathPreferredRender, audioPath } = await ingest(source, outDir);
+    console.log('Ingest complete:', { videoPathOriginal, videoPathHQ, videoPathLight, videoPathPreferredRender, audioPath });
 
     const transcript = await transcribe(audioPath);
     console.log(`Transcribe complete. Segments: ${transcript.length}`);
@@ -29,7 +29,10 @@ async function run() {
     console.log('Analyze complete:', { boundaries, clips: clips.length });
 
     const clipData = clips.map((c, i) => ({ ...c, id: `e2e_clip_${i + 1}` }));
-    const rendered = await render(videoPathHQ, boundaries, clipData, { trackingVideoPath: videoPathLight });
+    const rendered = await render(videoPathPreferredRender, boundaries, clipData, {
+        trackingVideoPath: videoPathLight,
+        horizontalVideoPath: videoPathOriginal
+    });
     console.log('Render complete:', rendered);
 }
 

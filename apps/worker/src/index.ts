@@ -1,4 +1,4 @@
-import { ingest } from './pipeline/ingest';
+import { ensureHighQualityRenderSource, ingest } from './pipeline/ingest';
 import { transcribe } from './pipeline/transcribe';
 import { analyze } from './pipeline/analyze';
 import { render } from './pipeline/render';
@@ -9,6 +9,7 @@ import path from 'path';
 import fs from 'fs';
 import ffmpeg from 'fluent-ffmpeg';
 import { execFile } from 'child_process';
+import crypto from 'crypto';
 import os from 'os';
 import { promisify } from 'util';
 
@@ -21,6 +22,8 @@ interface PipelineJob {
 
 type PipelineMode = 'local' | 'cloud_limited' | 'prod';
 type FullResStorageProvider = 'none' | 'proxmox' | 'supabase' | 's3';
+type IngestMode = 'audio_first' | 'eager' | 'hybrid';
+type RenderSourcePolicy = 'original_first' | 'hq_first' | 'force_hq';
 
 const WORKER_ID = (process.env.WORKER_ID || `worker-${process.pid}`).trim();
 const RPC_CLAIM_ENABLED = String(process.env.WORKER_RPC_CLAIM_ENABLED ?? 'true').toLowerCase() === 'true';
@@ -47,7 +50,13 @@ const ENABLE_PROXMOX_FULLRES = readBoolEnv(
         : FULLRES_STORAGE_ENABLED
 );
 const ENABLE_BLOG_ARTIFACT_STAGE = readBoolEnv('ENABLE_BLOG_ARTIFACT_STAGE', true);
+const INGEST_MODE = parseIngestMode(process.env.INGEST_MODE);
+const RENDER_SOURCE_POLICY = parseRenderSourcePolicy(process.env.RENDER_SOURCE_POLICY);
+const DELIVERY_STAGE_ENABLED = readBoolEnv('DELIVERY_STAGE_ENABLED', true);
+const DELIVERY_ENCODE_HORIZONTAL_LOWRES = readBoolEnv('DELIVERY_ENCODE_HORIZONTAL_LOWRES', ENABLE_RAILWAY_HORIZONTAL_LOWRES);
+const DELIVERY_ENCODE_HQ_PACKAGE = readBoolEnv('DELIVERY_ENCODE_HQ_PACKAGE', false);
 const execFileAsync = promisify(execFile);
+let warnedClipSourceKeySchema = false;
 
 async function runPipeline(job: PipelineJob) {
     const jobId = job.id;
@@ -62,14 +71,41 @@ async function runPipeline(job: PipelineJob) {
         // 1. Ingest
         console.log('--- Stage 1: Ingest ---');
         currentStage = 'ingest';
-        await updateJobStatus(jobId, organizationId, 'processing:ingest');
-        const { videoPathHQ, videoPathLight, audioPath } = await ingest(source, workDir);
+        await updateJobStatus(jobId, organizationId, 'processing:ingest', job.claim_token);
+        const {
+            videoPathOriginal,
+            videoPathHQ,
+            videoPathLight,
+            videoPathPreferredRender,
+            audioPath,
+            ingestProfile
+        } = await ingest(source, workDir);
+        await mergeJobMetadata(jobId, organizationId, {
+            pipeline: {
+                ingest: {
+                    mode: ingestProfile.mode,
+                    source_type: ingestProfile.source_type,
+                    download_duration_ms: ingestProfile.download_duration_ms,
+                    light_transcode_duration_ms: ingestProfile.light_transcode_duration_ms,
+                    audio_extract_duration_ms: ingestProfile.audio_extract_duration_ms,
+                    hq_transcode_duration_ms: ingestProfile.hq_transcode_duration_ms,
+                    hq_transcode_performed: ingestProfile.hq_transcode_performed
+                }
+            },
+            artifacts: {
+                sources: {
+                    original: videoPathOriginal,
+                    light: videoPathLight,
+                    preferred_render_source: videoPathPreferredRender
+                }
+            }
+        }, job.claim_token);
         console.log(`Stage ingest completed in ${Math.round((Date.now() - startedAt) / 1000)}s`);
 
         // 2. Transcribe
         console.log('--- Stage 2: Transcribe ---');
         currentStage = 'transcribe';
-        await updateJobStatus(jobId, organizationId, 'processing:transcribe');
+        await updateJobStatus(jobId, organizationId, 'processing:transcribe', job.claim_token);
         const totalDurationSeconds = await getMediaDurationSeconds(audioPath);
         let lastProgressSecond = -1;
         let lastProgressAt = 0;
@@ -83,11 +119,15 @@ async function runPipeline(job: PipelineJob) {
                 if (current <= lastProgressSecond || now - lastProgressAt < 5000) return;
                 lastProgressSecond = current;
                 lastProgressAt = now;
-                void updateJobStatus(jobId, organizationId, `processing:transcribe:${current}/${Math.floor(totalDurationSeconds)}`);
+                void updateJobStatus(jobId, organizationId, `processing:transcribe:${current}/${Math.floor(totalDurationSeconds)}`, job.claim_token).catch((error) => {
+                    console.warn(`Failed to write transcribe progress for job ${jobId}:`, error);
+                });
             },
             onFallback: (reason) => {
                 console.warn(reason);
-                void updateJobStatus(jobId, organizationId, 'processing:transcribe:fallback');
+                void updateJobStatus(jobId, organizationId, 'processing:transcribe:fallback', job.claim_token).catch((error) => {
+                    console.warn(`Failed to write transcribe fallback status for job ${jobId}:`, error);
+                });
             }
         });
         const srtPath = path.join(path.dirname(audioPath), 'source.srt');
@@ -96,22 +136,34 @@ async function runPipeline(job: PipelineJob) {
         // 3. Analyze
         console.log('--- Stage 3: Analyze ---');
         currentStage = 'analyze';
-        await updateJobStatus(jobId, organizationId, 'processing:analyze');
+        await updateJobStatus(jobId, organizationId, 'processing:analyze', job.claim_token);
         const { boundaries, clips } = await analyze(segments, { workDir, audioPath, videoPath: videoPathLight });
         console.log(`Stage analyze completed in ${Math.round((Date.now() - startedAt) / 1000)}s`);
 
         // 4. Render
         console.log('--- Stage 4: Render ---');
         currentStage = 'render';
-        await updateJobStatus(jobId, organizationId, 'processing:render');
-        const clipData = clips.map((c, i) => ({ ...c, id: `clip_${Date.now()}_${i + 1}` }));
-        const renderedFiles = await render(videoPathHQ, boundaries, clipData, { trackingVideoPath: videoPathLight });
+        await updateJobStatus(jobId, organizationId, 'processing:render', job.claim_token);
+        const clipData = clips.map((c) => ({ ...c, id: createDeterministicClipAssetId(jobId, c) }));
+        const renderResult = await renderWithFallback({
+            jobId,
+            organizationId,
+            workDir,
+            boundaries,
+            clipData,
+            videoPathOriginal,
+            videoPathPreferredRender,
+            videoPathLight,
+            videoPathHQ,
+            claimToken: job.claim_token
+        });
+        const renderedFiles = renderResult.renderedFiles;
         console.log(`Stage render completed in ${Math.round((Date.now() - startedAt) / 1000)}s`);
 
         // 5. Store & Metadata
         console.log('--- Stage 5: Store ---');
         currentStage = 'store';
-        await updateJobStatus(jobId, organizationId, 'processing:store');
+        await updateJobStatus(jobId, organizationId, 'processing:store', job.claim_token);
 
         const shouldUploadSharedAssets = ENABLE_RAILWAY_VERTICAL || ENABLE_RAILWAY_HORIZONTAL_LOWRES;
 
@@ -122,13 +174,7 @@ async function runPipeline(job: PipelineJob) {
         }
 
         // Upload Horizontal Sermon
-        let horizontalUrl = '';
         const horizontalLocal = renderedFiles.find(f => f.includes('sermon_horizontal.mp4'));
-        if (ENABLE_RAILWAY_HORIZONTAL_LOWRES && horizontalLocal && fs.existsSync(horizontalLocal)) {
-            horizontalUrl = await uploadAssetWithFallback(horizontalLocal, 'assets', `jobs/${jobId}/sermon_horizontal.mp4`);
-        } else if (horizontalLocal && fs.existsSync(horizontalLocal)) {
-            console.log(`Skipping horizontal low-res upload for job ${jobId} (ENABLE_RAILWAY_HORIZONTAL_LOWRES=false).`);
-        }
 
         // Upload thumbnail frame at 80% of the horizontal sermon duration.
         if (shouldUploadSharedAssets && horizontalLocal && fs.existsSync(horizontalLocal)) {
@@ -144,7 +190,17 @@ async function runPipeline(job: PipelineJob) {
         }
 
         // Upload Clips and save to DB
-        await savePipelineResults(jobId, organizationId, boundaries, clipData, renderedFiles, srtUrl, horizontalUrl, horizontalLocal ?? '');
+        await savePipelineResults(
+            jobId,
+            organizationId,
+            boundaries,
+            clipData,
+            renderedFiles,
+            srtUrl,
+            '',
+            horizontalLocal ?? '',
+            job.claim_token
+        );
 
         // 6. Blog Artifact (non-blocking for final success state)
         if (ENABLE_BLOG_ARTIFACT_STAGE) {
@@ -173,6 +229,27 @@ async function runPipeline(job: PipelineJob) {
             console.log('--- Stage 6: Blog Artifact (disabled) ---');
         }
 
+        // 7. Delivery Encodes (non-blocking for final success state)
+        if (DELIVERY_STAGE_ENABLED) {
+            console.log('--- Stage 7: Delivery ---');
+            currentStage = 'delivery';
+            try {
+                await runDeliveryStage({
+                    jobId,
+                    organizationId,
+                    workDir,
+                    boundaries,
+                    horizontalLocal: horizontalLocal ?? '',
+                    videoPathOriginal,
+                    claimToken: job.claim_token
+                });
+            } catch (deliveryError) {
+                console.error('Delivery stage failed (pipeline will still complete):', deliveryError);
+            }
+        } else {
+            console.log('--- Stage 7: Delivery (disabled) ---');
+        }
+
         console.log(`Pipeline finished successfully in ${Math.round((Date.now() - startedAt) / 1000)}s`);
 
     } catch (error) {
@@ -181,12 +258,305 @@ async function runPipeline(job: PipelineJob) {
     }
 }
 
-async function updateJobStatus(id: string, organizationId: string, status: string) {
-    await supabase
+async function renderWithFallback(args: {
+    jobId: string;
+    organizationId: string;
+    workDir: string;
+    boundaries: { start: number; end: number };
+    clipData: Array<{ start: number; end: number; id: string; score?: number; confidence?: number }>;
+    videoPathOriginal: string;
+    videoPathPreferredRender: string;
+    videoPathLight: string;
+    videoPathHQ?: string;
+    claimToken?: string | null;
+}): Promise<{ renderedFiles: string[]; renderSource: string; hqFallbackUsed: boolean }> {
+    let renderSource = resolveRenderSourcePath(args.videoPathPreferredRender, args.videoPathOriginal, args.workDir, args.videoPathHQ);
+    let hqFallbackUsed = false;
+    if (RENDER_SOURCE_POLICY === 'force_hq' && !fs.existsSync(renderSource)) {
+        renderSource = await ensureHighQualityRenderSource(args.videoPathOriginal, args.workDir);
+        hqFallbackUsed = true;
+    }
+
+    try {
+        const renderedFiles = await render(renderSource, args.boundaries, args.clipData, {
+            trackingVideoPath: args.videoPathLight,
+            horizontalVideoPath: args.videoPathOriginal
+        });
+        await mergeJobMetadata(args.jobId, args.organizationId, {
+            artifacts: {
+                sources: {
+                    preferred_render_source: renderSource
+                }
+            },
+            pipeline: {
+                render: {
+                    source_policy: RENDER_SOURCE_POLICY,
+                    source_used: renderSource,
+                    hq_fallback_used: false
+                }
+            }
+        }, args.claimToken);
+        return { renderedFiles, renderSource, hqFallbackUsed };
+    } catch (error) {
+        if (!shouldRetryRenderWithHq(error) || RENDER_SOURCE_POLICY === 'force_hq') throw error;
+        console.warn(`[render] retrying with HQ fallback source due to compatibility error: ${String(error)}`);
+        renderSource = await ensureHighQualityRenderSource(args.videoPathOriginal, args.workDir);
+        hqFallbackUsed = true;
+        const renderedFiles = await render(renderSource, args.boundaries, args.clipData, {
+            trackingVideoPath: args.videoPathLight,
+            horizontalVideoPath: args.videoPathOriginal
+        });
+        await mergeJobMetadata(args.jobId, args.organizationId, {
+            artifacts: {
+                sources: {
+                    preferred_render_source: renderSource
+                }
+            },
+            pipeline: {
+                render: {
+                    source_policy: RENDER_SOURCE_POLICY,
+                    source_used: renderSource,
+                    hq_fallback_used: true
+                }
+            }
+        }, args.claimToken);
+        return { renderedFiles, renderSource, hqFallbackUsed };
+    }
+}
+
+async function runDeliveryStage(args: {
+    jobId: string;
+    organizationId: string;
+    workDir: string;
+    boundaries: { start: number; end: number };
+    horizontalLocal: string;
+    videoPathOriginal: string;
+    claimToken?: string | null;
+}): Promise<void> {
+    await updateJobStatus(args.jobId, args.organizationId, 'processing:delivery', args.claimToken);
+    const encodes: Array<{
+        variant: string;
+        duration_ms: number;
+        output_path: string;
+        uploaded: boolean;
+        output_url?: string;
+        error?: string;
+    }> = [];
+
+    let horizontalUrl = '';
+    let fullResUrl = '';
+    let fullResPath = '';
+
+    if (DELIVERY_ENCODE_HORIZONTAL_LOWRES && ENABLE_RAILWAY_HORIZONTAL_LOWRES && args.horizontalLocal && fs.existsSync(args.horizontalLocal)) {
+        await updateJobStatus(args.jobId, args.organizationId, 'processing:delivery:encode', args.claimToken);
+        const lowresPath = args.horizontalLocal.replace(/\.mp4$/i, '.delivery.lowres.mp4');
+        const encodeStartedAt = Date.now();
+        try {
+            await transcodeForUpload(args.horizontalLocal, lowresPath);
+            await updateJobStatus(args.jobId, args.organizationId, 'processing:delivery:upload', args.claimToken);
+            horizontalUrl = await uploadAssetWithFallback(lowresPath, 'assets', `jobs/${args.jobId}/sermon_horizontal.mp4`);
+            encodes.push({
+                variant: 'horizontal_lowres',
+                duration_ms: Date.now() - encodeStartedAt,
+                output_path: lowresPath,
+                uploaded: Boolean(horizontalUrl),
+                output_url: horizontalUrl || undefined
+            });
+        } catch (error) {
+            encodes.push({
+                variant: 'horizontal_lowres',
+                duration_ms: Date.now() - encodeStartedAt,
+                output_path: lowresPath,
+                uploaded: false,
+                error: error instanceof Error ? error.message : String(error)
+            });
+        }
+    }
+
+    if (DELIVERY_ENCODE_HQ_PACKAGE) {
+        await updateJobStatus(args.jobId, args.organizationId, 'processing:delivery:encode', args.claimToken);
+        const encodeStartedAt = Date.now();
+        try {
+            const hqPath = await ensureHighQualityRenderSource(args.videoPathOriginal, args.workDir);
+            await updateJobStatus(args.jobId, args.organizationId, 'processing:delivery:upload', args.claimToken);
+            fullResPath = hqPath;
+            fullResUrl = await uploadFullResToConfiguredStorage(hqPath, args.jobId);
+            encodes.push({
+                variant: 'hq_package',
+                duration_ms: Date.now() - encodeStartedAt,
+                output_path: hqPath,
+                uploaded: Boolean(fullResUrl),
+                output_url: fullResUrl || undefined
+            });
+        } catch (error) {
+            encodes.push({
+                variant: 'hq_package',
+                duration_ms: Date.now() - encodeStartedAt,
+                output_path: path.join(args.workDir, 'source.hq.fallback.mp4'),
+                uploaded: false,
+                error: error instanceof Error ? error.message : String(error)
+            });
+        }
+    }
+
+    await mergeJobMetadata(args.jobId, args.organizationId, {
+        pipeline: {
+            delivery: {
+                encodes
+            }
+        },
+        full_res_video_path: fullResPath || null,
+        full_res_video_url: fullResUrl || null
+    }, args.claimToken);
+
+    if (horizontalUrl) {
+        let query = supabase
+            .from('jobs')
+            .update({ video_url: horizontalUrl })
+            .eq('id', args.jobId)
+            .eq('organization_id', args.organizationId);
+        if (args.claimToken) query = query.eq('claim_token', args.claimToken);
+        const { data: rows, error } = await query.select('id');
+        if (error) throw new Error(`Failed to persist delivery horizontal URL for ${args.jobId}: ${error.message}`);
+        if (args.claimToken && (!Array.isArray(rows) || rows.length === 0)) {
+            throw new Error(`Lost claim on job ${args.jobId} while writing delivery horizontal URL.`);
+        }
+    }
+
+    await updateJobStatus(args.jobId, args.organizationId, 'processing:delivery:complete', args.claimToken);
+}
+
+async function mergeJobMetadata(
+    jobId: string,
+    organizationId: string,
+    patch: Record<string, unknown>,
+    claimToken?: string | null
+): Promise<void> {
+    let readQuery = supabase
+        .from('jobs')
+        .select('metadata')
+        .eq('id', jobId)
+        .eq('organization_id', organizationId);
+    if (claimToken) readQuery = readQuery.eq('claim_token', claimToken);
+    const { data: jobRow, error: readError } = await readQuery.maybeSingle();
+    if (readError) throw new Error(`Failed reading job metadata for ${jobId}: ${readError.message}`);
+    if (claimToken && !jobRow) throw new Error(`Lost claim on job ${jobId} while reading metadata.`);
+
+    const merged = deepMergeMetadata((jobRow?.metadata ?? {}) as Record<string, unknown>, patch);
+    let writeQuery = supabase
+        .from('jobs')
+        .update({ metadata: merged })
+        .eq('id', jobId)
+        .eq('organization_id', organizationId);
+    if (claimToken) writeQuery = writeQuery.eq('claim_token', claimToken);
+    const { data: updatedRows, error: writeError } = await writeQuery.select('id');
+    if (writeError) throw new Error(`Failed writing job metadata for ${jobId}: ${writeError.message}`);
+    if (claimToken && (!Array.isArray(updatedRows) || updatedRows.length === 0)) {
+        throw new Error(`Lost claim on job ${jobId} while writing metadata.`);
+    }
+}
+
+function deepMergeMetadata(base: Record<string, unknown>, patch: Record<string, unknown>): Record<string, unknown> {
+    const out: Record<string, unknown> = { ...base };
+    for (const [key, patchValue] of Object.entries(patch)) {
+        const baseValue = out[key];
+        if (isPlainObject(baseValue) && isPlainObject(patchValue)) {
+            out[key] = deepMergeMetadata(baseValue as Record<string, unknown>, patchValue as Record<string, unknown>);
+        } else {
+            out[key] = patchValue;
+        }
+    }
+    return out;
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+    return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function resolveRenderSourcePath(
+    preferredRenderSource: string,
+    originalSource: string,
+    workDir: string,
+    existingHqSource?: string
+): string {
+    if (RENDER_SOURCE_POLICY === 'force_hq') {
+        return existingHqSource && fs.existsSync(existingHqSource)
+            ? existingHqSource
+            : path.join(workDir, 'source.hq.fallback.mp4');
+    }
+    if (RENDER_SOURCE_POLICY === 'hq_first') {
+        if (existingHqSource && fs.existsSync(existingHqSource)) return existingHqSource;
+        return fs.existsSync(preferredRenderSource) ? preferredRenderSource : originalSource;
+    }
+    return fs.existsSync(preferredRenderSource) ? preferredRenderSource : originalSource;
+}
+
+function shouldRetryRenderWithHq(error: unknown): boolean {
+    const message = String(error instanceof Error ? error.message : error).toLowerCase();
+    return (
+        message.includes('moov atom not found') ||
+        message.includes('invalid data found when processing input') ||
+        message.includes('could not find codec parameters') ||
+        message.includes('error while opening decoder') ||
+        message.includes('error initializing output stream') ||
+        message.includes('cannot determine format') ||
+        message.includes('unsupported codec')
+    );
+}
+
+function createDeterministicClipAssetId(
+    jobId: string,
+    clip: { start: number; end: number; title?: string; excerpt?: string }
+): string {
+    const seed = [
+        jobId,
+        Number(clip.start).toFixed(2),
+        Number(clip.end).toFixed(2),
+        String(clip.title ?? '').trim(),
+        String(clip.excerpt ?? '').trim()
+    ].join('|');
+    const digest = crypto.createHash('sha1').update(seed).digest('hex').slice(0, 12);
+    return `clip_${digest}`;
+}
+
+function createDeterministicClipSourceKey(
+    jobId: string,
+    clip: { start: number; end: number; title?: string; excerpt?: string }
+): string {
+    const seed = [
+        jobId,
+        Number(clip.start).toFixed(3),
+        Number(clip.end).toFixed(3),
+        String(clip.title ?? '').trim(),
+        String(clip.excerpt ?? '').trim()
+    ].join('|');
+    return crypto.createHash('sha1').update(seed).digest('hex').slice(0, 24);
+}
+
+function isClipSourceKeySchemaError(error: unknown): boolean {
+    const code = String((error as { code?: unknown } | null)?.code ?? '').trim();
+    const message = String((error as { message?: unknown } | null)?.message ?? '').toLowerCase();
+    if (code === '42703' || code === '42p10') return true;
+    return message.includes('source_clip_key') || message.includes('on conflict');
+}
+
+async function updateJobStatus(id: string, organizationId: string, status: string, claimToken?: string | null) {
+    let query = supabase
         .from('jobs')
         .update({ status })
         .eq('id', id)
         .eq('organization_id', organizationId);
+
+    if (claimToken) query = query.eq('claim_token', claimToken);
+
+    const { data, error } = await query.select('id').limit(1);
+    if (error) {
+        throw new Error(`Failed to update job status for ${id}: ${error.message}`);
+    }
+
+    if (claimToken && (!Array.isArray(data) || data.length === 0)) {
+        throw new Error(`Lost claim on job ${id} while updating status to "${status}"`);
+    }
 }
 
 function getMediaDurationSeconds(filePath: string): Promise<number | null> {
@@ -240,23 +610,27 @@ async function savePipelineResults(
     renderedFiles: string[],
     srtUrl: string,
     horizontalUrl: string,
-    horizontalLocalPath: string
+    horizontalLocalPath: string,
+    claimToken?: string | null
 ) {
-    const { data: existingJob } = await supabase
+    let existingJobQuery = supabase
         .from('jobs')
         .select('metadata')
         .eq('id', jobId)
-        .eq('organization_id', organizationId)
-        .single();
-    let fullResVideoUrl = '';
-    if (horizontalLocalPath && fs.existsSync(horizontalLocalPath)) {
-        fullResVideoUrl = await uploadFullResToConfiguredStorage(horizontalLocalPath, jobId);
+        .eq('organization_id', organizationId);
+    if (claimToken) existingJobQuery = existingJobQuery.eq('claim_token', claimToken);
+    const { data: existingJob, error: existingJobError } = await existingJobQuery.maybeSingle();
+    if (existingJobError) {
+        throw new Error(`Failed to load existing job metadata for ${jobId}: ${existingJobError.message}`);
+    }
+    if (claimToken && !existingJob) {
+        throw new Error(`Lost claim on job ${jobId} before storing pipeline results.`);
     }
 
     const metadata = {
         ...(existingJob?.metadata || {}),
         full_res_video_path: horizontalLocalPath || null,
-        full_res_video_url: fullResVideoUrl || null,
+        full_res_video_url: null,
         pipeline_mode: PIPELINE_MODE,
         artifact_routing: {
             railway_vertical: ENABLE_RAILWAY_VERTICAL,
@@ -267,21 +641,33 @@ async function savePipelineResults(
     };
 
     // Update Job
-    await supabase.from('jobs').update({
+    let jobUpdateQuery = supabase.from('jobs').update({
         sermon_start_seconds: boundaries.start,
         sermon_end_seconds: boundaries.end,
         video_url: horizontalUrl,
         srt_url: srtUrl,
         metadata
     }).eq('id', jobId).eq('organization_id', organizationId);
+    if (claimToken) jobUpdateQuery = jobUpdateQuery.eq('claim_token', claimToken);
 
-    // Upload each clip and insert into clips table
+    const { data: updatedRows, error: updateJobError } = await jobUpdateQuery.select('id');
+    if (updateJobError) {
+        throw new Error(`Failed to update job outputs for ${jobId}: ${updateJobError.message}`);
+    }
+    if (claimToken && (!Array.isArray(updatedRows) || updatedRows.length === 0)) {
+        throw new Error(`Lost claim on job ${jobId} while persisting job outputs.`);
+    }
+
+    // Upload each clip and upsert into clips table using deterministic source keys.
+    const generatedDraftKeys = new Set<string>();
     if (!ENABLE_RAILWAY_VERTICAL) {
         console.log(`Skipping vertical clip uploads for job ${jobId} (ENABLE_RAILWAY_VERTICAL=false).`);
     }
     for (let i = 0; i < clips.length; i++) {
-        await updateJobStatus(jobId, organizationId, `processing:store:${i + 1}/${clips.length}`);
+        await updateJobStatus(jobId, organizationId, `processing:store:${i + 1}/${clips.length}`, claimToken);
         const clip = clips[i];
+        const sourceClipKey = createDeterministicClipSourceKey(jobId, clip);
+        generatedDraftKeys.add(sourceClipKey);
         const localPath = renderedFiles.find(f => f.includes(clip.id));
 
         let videoUrl = '';
@@ -289,9 +675,10 @@ async function savePipelineResults(
             videoUrl = await uploadAssetWithFallback(localPath, 'assets', `jobs/${jobId}/clips/${clip.id}.mp4`);
         }
 
-        await supabase.from('clips').insert({
+        const clipPayload = {
             organization_id: organizationId,
             job_id: jobId,
+            source_clip_key: sourceClipKey,
             start_seconds: clip.start,
             end_seconds: clip.end,
             title: clip.title,
@@ -299,7 +686,80 @@ async function savePipelineResults(
             confidence_score: clip.confidence,
             video_url: videoUrl,
             status: 'draft'
-        });
+        };
+
+        const { error: upsertClipError } = await supabase
+            .from('clips')
+            .upsert(clipPayload, {
+                onConflict: 'organization_id,job_id,source_clip_key'
+            });
+
+        if (upsertClipError && isClipSourceKeySchemaError(upsertClipError)) {
+            if (!warnedClipSourceKeySchema) {
+                console.warn(
+                    "[clips] source_clip_key upsert schema is unavailable; falling back to non-idempotent inserts. Apply migrations 20260306001000 and 20260306001100."
+                );
+                warnedClipSourceKeySchema = true;
+            }
+            const { error: insertClipError } = await supabase.from('clips').insert({
+                organization_id: organizationId,
+                job_id: jobId,
+                start_seconds: clip.start,
+                end_seconds: clip.end,
+                title: clip.title,
+                transcript_excerpt: clip.excerpt,
+                confidence_score: clip.confidence,
+                video_url: videoUrl,
+                status: 'draft'
+            });
+            if (insertClipError) {
+                throw new Error(`Failed to insert clip ${i + 1} for ${jobId}: ${insertClipError.message}`);
+            }
+            continue;
+        }
+
+        if (upsertClipError) {
+            throw new Error(`Failed to upsert clip ${i + 1} for ${jobId}: ${upsertClipError.message}`);
+        }
+    }
+
+    // Remove stale generated draft clips that are no longer present in this run.
+    const { data: existingDraftClips, error: existingDraftClipsError } = await supabase
+        .from('clips')
+        .select('id,source_clip_key')
+        .eq('organization_id', organizationId)
+        .eq('job_id', jobId)
+        .eq('status', 'draft')
+        .not('source_clip_key', 'is', null);
+    if (existingDraftClipsError && isClipSourceKeySchemaError(existingDraftClipsError)) {
+        if (!warnedClipSourceKeySchema) {
+            console.warn(
+                "[clips] source_clip_key cleanup skipped because schema is unavailable. Apply migrations 20260306001000 and 20260306001100."
+            );
+            warnedClipSourceKeySchema = true;
+        }
+    } else if (existingDraftClipsError) {
+        throw new Error(`Failed to list existing draft clips for ${jobId}: ${existingDraftClipsError.message}`);
+    }
+
+    if (Array.isArray(existingDraftClips) && existingDraftClips.length > 0) {
+        const staleIds = existingDraftClips
+            .filter((row) => !generatedDraftKeys.has(String((row as any).source_clip_key ?? '')))
+            .map((row) => String((row as any).id ?? ''))
+            .filter(Boolean);
+
+        for (let i = 0; i < staleIds.length; i += 100) {
+            const batch = staleIds.slice(i, i + 100);
+            const { error: deleteStaleError } = await supabase
+                .from('clips')
+                .delete()
+                .eq('organization_id', organizationId)
+                .eq('job_id', jobId)
+                .in('id', batch);
+            if (deleteStaleError) {
+                throw new Error(`Failed to delete stale draft clips for ${jobId}: ${deleteStaleError.message}`);
+            }
+        }
     }
 }
 
@@ -406,6 +866,24 @@ function parsePipelineMode(value: string | undefined): PipelineMode {
     return 'prod';
 }
 
+function parseIngestMode(value: string | undefined): IngestMode {
+    const normalized = String(value ?? 'audio_first').trim().toLowerCase();
+    if (normalized === 'audio_first' || normalized === 'eager' || normalized === 'hybrid') {
+        return normalized;
+    }
+    console.warn(`Invalid INGEST_MODE="${value}". Falling back to "audio_first".`);
+    return 'audio_first';
+}
+
+function parseRenderSourcePolicy(value: string | undefined): RenderSourcePolicy {
+    const normalized = String(value ?? 'original_first').trim().toLowerCase();
+    if (normalized === 'original_first' || normalized === 'hq_first' || normalized === 'force_hq') {
+        return normalized;
+    }
+    console.warn(`Invalid RENDER_SOURCE_POLICY="${value}". Falling back to "original_first".`);
+    return 'original_first';
+}
+
 function parseFullResStorageProvider(value: string | undefined, fallback: FullResStorageProvider): FullResStorageProvider {
     const normalized = String(value ?? fallback).trim().toLowerCase();
     if (normalized === 'none' || normalized === 'proxmox' || normalized === 'supabase' || normalized === 's3') {
@@ -464,7 +942,22 @@ async function claimNextJobLegacy(): Promise<PipelineJob | null> {
     }
 
     if (!jobs || jobs.length === 0) return null;
-    return normalizeClaimRow(jobs[0]);
+
+    const first = jobs[0];
+    const { data: claimedRows, error: claimError } = await supabase
+        .from('jobs')
+        .update({ status: 'processing' })
+        .eq('id', first.id)
+        .eq('organization_id', first.organization_id)
+        .eq('status', 'pending')
+        .select('id,youtube_url,organization_id');
+
+    if (claimError) {
+        console.error('Error claiming legacy job:', claimError);
+        return null;
+    }
+    if (!claimedRows || claimedRows.length === 0) return null;
+    return normalizeClaimRow(claimedRows[0]);
 }
 
 function startClaimHeartbeat(job: PipelineJob): NodeJS.Timeout | null {
@@ -527,11 +1020,19 @@ async function completeJob(job: PipelineJob, finalStatus: 'completed' | 'failed'
         payload.lease_expires_at = null;
     }
 
-    await supabase
+    let query = supabase
         .from('jobs')
         .update(payload)
         .eq('id', job.id)
         .eq('organization_id', job.organization_id);
+    if (job.claim_token) query = query.eq('claim_token', job.claim_token);
+
+    const { data, error: updateError } = await query.select('id');
+    if (updateError) {
+        console.error(`Fallback completion update failed for job ${job.id}:`, updateError);
+    } else if (job.claim_token && (!Array.isArray(data) || data.length === 0)) {
+        console.warn(`Fallback completion update skipped for job ${job.id}; claim token mismatch.`);
+    }
 }
 
 async function processClaimedJob(job: PipelineJob): Promise<void> {
@@ -560,9 +1061,10 @@ async function startWorker() {
     console.log(
         `Worker started. claim_mode=${RPC_CLAIM_ENABLED ? 'rpc' : 'legacy'} ` +
         `worker_id=${WORKER_ID} pipeline_mode=${PIPELINE_MODE} ` +
+        `ingest_mode=${INGEST_MODE} render_source_policy=${RENDER_SOURCE_POLICY} ` +
         `vertical_upload=${ENABLE_RAILWAY_VERTICAL} horizontal_upload=${ENABLE_RAILWAY_HORIZONTAL_LOWRES} ` +
         `fullres_upload=${ENABLE_PROXMOX_FULLRES} fullres_provider=${FULLRES_STORAGE_PROVIDER} ` +
-        `blog_stage=${ENABLE_BLOG_ARTIFACT_STAGE}`
+        `blog_stage=${ENABLE_BLOG_ARTIFACT_STAGE} delivery_stage=${DELIVERY_STAGE_ENABLED}`
     );
 
     while (true) {

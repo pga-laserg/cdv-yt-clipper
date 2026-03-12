@@ -7,8 +7,10 @@ export interface IngestResult {
     videoPath: string;
     audioPath: string;
     videoPathOriginal: string;
-    videoPathHQ: string;
+    videoPathHQ?: string;
     videoPathLight: string;
+    videoPathPreferredRender: string;
+    ingestProfile: IngestProfile;
 }
 
 interface DownloadAttempt {
@@ -31,6 +33,30 @@ interface DurationIntegrityStatus {
     issues: string[];
 }
 
+export type IngestMode = 'audio_first' | 'eager' | 'hybrid';
+
+export interface IngestProfile {
+    mode: IngestMode;
+    source_type: 'remote' | 'local';
+    plan: {
+        requires_hq: boolean;
+        light_from_hq: boolean;
+        audio_from_hq: boolean;
+    };
+    download_duration_ms: number;
+    hq_transcode_duration_ms: number;
+    light_transcode_duration_ms: number;
+    audio_extract_duration_ms: number;
+    hq_transcode_performed: boolean;
+}
+
+interface IngestPlan {
+    mode: IngestMode;
+    requiresHQ: boolean;
+    lightFromHQ: boolean;
+    audioFromHQ: boolean;
+}
+
 export async function ingest(source: string, outputDir: string): Promise<IngestResult> {
     console.log(`Ingesting source: ${source}`);
 
@@ -38,11 +64,21 @@ export async function ingest(source: string, outputDir: string): Promise<IngestR
         fs.mkdirSync(outputDir, { recursive: true });
     }
 
+    const ingestStartedAt = Date.now();
+    const sourceType: 'remote' | 'local' = source.startsWith('http') ? 'remote' : 'local';
+    const ingestMode = parseIngestMode(process.env.INGEST_MODE, process.env.PIPELINE_MODE);
+    const plan = planIngestArtifacts(ingestMode, sourceType, {
+        analyzeRequiresLightVideo: true
+    });
+
     const originalVideoTemplate = path.join(outputDir, 'source.original.%(ext)s');
-    const videoPath = path.join(outputDir, 'source.mp4'); // HQ normalized mp4
+    const videoPath = path.join(outputDir, 'source.mp4'); // eager-mode HQ normalized mp4
     const videoPathLight = path.join(outputDir, 'source.light.mp4');
     const audioPath = path.join(outputDir, 'audio.wav');
     let videoPathOriginal = path.join(outputDir, 'source.original.mp4');
+    let videoPathHQ: string | undefined;
+
+    const downloadStartedAt = Date.now();
 
     if (source.startsWith('http')) {
         removeExistingOriginalVideos(outputDir);
@@ -58,35 +94,127 @@ export async function ingest(source: string, outputDir: string): Promise<IngestR
         }
         videoPathOriginal = localOriginal;
     }
+    const downloadDurationMs = Date.now() - downloadStartedAt;
 
-    if (!fs.existsSync(videoPath)) {
-        await normalizeHighQualityMp4(videoPathOriginal, videoPath);
-    } else {
-        console.log(`Reusing existing HQ video at ${videoPath}`);
+    const hqStartedAt = Date.now();
+    let hqTranscodePerformed = false;
+    if (plan.requiresHQ) {
+        videoPathHQ = videoPath;
+        if (!fs.existsSync(videoPathHQ)) {
+            await normalizeHighQualityMp4(videoPathOriginal, videoPathHQ);
+            hqTranscodePerformed = true;
+        } else {
+            console.log(`Reusing existing HQ video at ${videoPathHQ}`);
+        }
     }
+    const hqTranscodeDurationMs = Date.now() - hqStartedAt;
 
+    const lightInputPath = plan.lightFromHQ && videoPathHQ ? videoPathHQ : videoPathOriginal;
+    const lightStartedAt = Date.now();
     if (!fs.existsSync(videoPathLight)) {
-        await createLightweightVideo(videoPath, videoPathLight);
+        await createLightweightVideo(lightInputPath, videoPathLight);
     } else {
         console.log(`Reusing existing lightweight video at ${videoPathLight}`);
     }
+    const lightTranscodeDurationMs = Date.now() - lightStartedAt;
 
-    await ensureDerivedVideoIntegrity(videoPathOriginal, videoPath, videoPathLight);
+    await ensureDerivedVideoIntegrity(videoPathOriginal, videoPathHQ ?? null, videoPathLight);
 
+    const audioInputPath = plan.audioFromHQ && videoPathHQ ? videoPathHQ : videoPathOriginal;
+    const audioStartedAt = Date.now();
     if (!fs.existsSync(audioPath)) {
-        // Extract from HQ normalized source.
-        await extractAudio(videoPath, audioPath);
+        await extractAudio(audioInputPath, audioPath);
     } else {
         console.log(`Reusing existing audio at ${audioPath}`);
     }
+    const audioExtractDurationMs = Date.now() - audioStartedAt;
+
+    const videoPathPreferredRender = videoPathOriginal;
+    const ingestProfile: IngestProfile = {
+        mode: plan.mode,
+        source_type: sourceType,
+        plan: {
+            requires_hq: plan.requiresHQ,
+            light_from_hq: plan.lightFromHQ,
+            audio_from_hq: plan.audioFromHQ
+        },
+        download_duration_ms: downloadDurationMs,
+        hq_transcode_duration_ms: hqTranscodeDurationMs,
+        light_transcode_duration_ms: lightTranscodeDurationMs,
+        audio_extract_duration_ms: audioExtractDurationMs,
+        hq_transcode_performed: hqTranscodePerformed
+    };
+    console.log(
+        `[ingest-profile] mode=${ingestProfile.mode} source=${ingestProfile.source_type} ` +
+            `download=${ingestProfile.download_duration_ms}ms hq=${ingestProfile.hq_transcode_duration_ms}ms ` +
+            `light=${ingestProfile.light_transcode_duration_ms}ms audio=${ingestProfile.audio_extract_duration_ms}ms ` +
+            `hq_performed=${ingestProfile.hq_transcode_performed} total=${Date.now() - ingestStartedAt}ms`
+    );
 
     return {
-        videoPath,
+        videoPath: videoPathPreferredRender,
         audioPath,
         videoPathOriginal,
-        videoPathHQ: videoPath,
-        videoPathLight
+        videoPathHQ,
+        videoPathLight,
+        videoPathPreferredRender,
+        ingestProfile
     };
+}
+
+export async function ensureHighQualityRenderSource(videoPathOriginal: string, outputDir: string): Promise<string> {
+    const fallbackPath = path.join(outputDir, 'source.hq.fallback.mp4');
+    if (fs.existsSync(fallbackPath)) {
+        console.log(`[render-fallback] Reusing existing HQ fallback at ${fallbackPath}`);
+        return fallbackPath;
+    }
+    await normalizeHighQualityMp4(videoPathOriginal, fallbackPath);
+    return fallbackPath;
+}
+
+function planIngestArtifacts(
+    mode: IngestMode,
+    _sourceType: 'remote' | 'local',
+    features: { analyzeRequiresLightVideo: boolean }
+): IngestPlan {
+    const needsLight = features.analyzeRequiresLightVideo;
+    if (mode === 'eager') {
+        return {
+            mode,
+            requiresHQ: true,
+            lightFromHQ: needsLight,
+            audioFromHQ: true
+        };
+    }
+
+    if (mode === 'hybrid') {
+        return {
+            mode,
+            requiresHQ: false,
+            lightFromHQ: false,
+            audioFromHQ: false
+        };
+    }
+
+    return {
+        mode: 'audio_first',
+        requiresHQ: false,
+        lightFromHQ: false,
+        audioFromHQ: false
+    };
+}
+
+function parseIngestMode(rawMode: string | undefined, pipelineModeRaw: string | undefined): IngestMode {
+    const mode = String(rawMode ?? 'audio_first').trim().toLowerCase();
+    if (mode === 'audio_first' || mode === 'eager' || mode === 'hybrid') {
+        return mode;
+    }
+    if (mode && mode !== 'audio_first') {
+        console.warn(`Invalid INGEST_MODE="${rawMode}". Falling back to default.`);
+    }
+
+    const pipelineMode = String(pipelineModeRaw ?? 'prod').trim().toLowerCase();
+    return pipelineMode === 'local' ? 'hybrid' : 'audio_first';
 }
 
 function findExistingOriginalVideo(outputDir: string): string | null {
@@ -121,10 +249,11 @@ function downloadYouTubeHighest(url: string, outputTemplate: string, outputDir: 
 
     const ffmpegBin = resolveBinary(['/opt/homebrew/bin/ffmpeg', '/usr/local/bin/ffmpeg', 'ffmpeg']);
     const ffprobeBin = resolveBinary(['/opt/homebrew/bin/ffprobe', '/usr/local/bin/ffprobe', 'ffprobe']);
-    const nodeBin = resolveBinary(['/opt/homebrew/bin/node', '/usr/local/bin/node', 'node']);
+    const jsRuntimeArg = resolveYtDlpJsRuntimeArg();
 
     const minPreferredHeight = readIntEnv('YTDLP_MIN_PREFERRED_HEIGHT', 720);
     const allowLowQualityFallback = readBoolEnv('YTDLP_ALLOW_LOW_QUALITY_FALLBACK', true);
+    const requireFfprobeForQuality = readBoolEnv('YTDLP_REQUIRE_FFPROBE_FOR_QUALITY', true);
     const cookiesFromBrowser = (process.env.YTDLP_COOKIES_FROM_BROWSER ?? '').trim();
     const enableAndroidFallback = readBoolEnv('YTDLP_ENABLE_ANDROID_FALLBACK', true);
 
@@ -165,8 +294,8 @@ function downloadYouTubeHighest(url: string, outputTemplate: string, outputDir: 
     if (ffmpegBin) {
         commonArgs.push('--ffmpeg-location', ffmpegBin);
     }
-    if (nodeBin) {
-        commonArgs.push('--js-runtimes', `node:${nodeBin}`);
+    if (jsRuntimeArg) {
+        commonArgs.push('--js-runtimes', jsRuntimeArg);
     }
     if (cookiesFromBrowser) {
         commonArgs.push('--cookies-from-browser', cookiesFromBrowser);
@@ -194,10 +323,16 @@ function downloadYouTubeHighest(url: string, outputTemplate: string, outputDir: 
         console.log(`yt-dlp binary: ${ytDlpBin}`);
         console.log(`yt-dlp min preferred height: ${minPreferredHeight}`);
         console.log(`yt-dlp low-quality fallback enabled: ${allowLowQualityFallback}`);
+        console.log(`yt-dlp js runtime: ${jsRuntimeArg ?? 'none'}`);
         if (cookiesFromBrowser) {
             console.log(`yt-dlp cookies-from-browser enabled (${cookiesFromBrowser})`);
         }
-        if (!ffprobeBin) {
+        if (!ffprobeBin && minPreferredHeight > 0 && requireFfprobeForQuality) {
+            throw new Error(
+                'ffprobe not found; cannot enforce YTDLP_MIN_PREFERRED_HEIGHT. Install ffprobe or set YTDLP_REQUIRE_FFPROBE_FOR_QUALITY=false.'
+            );
+        }
+        if (!ffprobeBin && minPreferredHeight > 0) {
             console.warn('ffprobe not found; quality gate disabled (accepting first successful download).');
         }
 
@@ -292,7 +427,7 @@ function createLightweightVideo(inputPath: string, outputPath: string): Promise<
 
 async function ensureDerivedVideoIntegrity(
     videoPathOriginal: string,
-    videoPathHQ: string,
+    videoPathHQ: string | null,
     videoPathLight: string
 ): Promise<void> {
     const requireDurationCheck = readBoolEnv('INGEST_REQUIRE_DURATION_CHECK', true);
@@ -314,16 +449,17 @@ async function ensureDerivedVideoIntegrity(
     console.warn('[ingest] detected derived-video duration integrity issues:');
     for (const issue of initial.issues) console.warn(`  - ${issue}`);
 
-    if (!initial.hqValid) {
+    if (!initial.hqValid && videoPathHQ) {
         console.warn('[ingest] regenerating HQ + light videos from original source...');
         safeUnlink(videoPathHQ);
         await normalizeHighQualityMp4(videoPathOriginal, videoPathHQ);
         safeUnlink(videoPathLight);
         await createLightweightVideo(videoPathHQ, videoPathLight);
     } else if (!initial.lightValid) {
-        console.warn('[ingest] regenerating lightweight video from HQ source...');
+        const regenSource = videoPathHQ && fs.existsSync(videoPathHQ) ? videoPathHQ : videoPathOriginal;
+        console.warn(`[ingest] regenerating lightweight video from ${path.basename(regenSource)}...`);
         safeUnlink(videoPathLight);
-        await createLightweightVideo(videoPathHQ, videoPathLight);
+        await createLightweightVideo(regenSource, videoPathLight);
     }
 
     const repaired = inspectDerivedVideoIntegrity(videoPathOriginal, videoPathHQ, videoPathLight);
@@ -375,6 +511,39 @@ function resolveBinary(candidates: string[]): string | null {
         }
     }
     return null;
+}
+
+function resolveYtDlpJsRuntimeArg(): string | null {
+    const raw = (process.env.YTDLP_JS_RUNTIME ?? 'auto').trim();
+    const selected = raw.toLowerCase();
+
+    const denoBin = () => resolveBinary(['/opt/homebrew/bin/deno', '/usr/local/bin/deno', 'deno']);
+    const nodeBin = () => resolveBinary(['/opt/homebrew/bin/node', '/usr/local/bin/node', 'node']);
+
+    const auto = () => {
+        const deno = denoBin();
+        if (deno) return `deno:${deno}`;
+        const node = nodeBin();
+        if (node) return `node:${node}`;
+        return null;
+    };
+
+    if (!selected || selected === 'auto') return auto();
+    if (selected === 'none' || selected === 'off' || selected === 'false') return null;
+    if (selected.includes(':')) return raw;
+
+    if (selected === 'deno') {
+        const deno = denoBin();
+        return deno ? `deno:${deno}` : null;
+    }
+    if (selected === 'node') {
+        const node = nodeBin();
+        return node ? `node:${node}` : null;
+    }
+
+    const fallback = auto();
+    console.warn(`Unknown YTDLP_JS_RUNTIME="${raw}". Falling back to auto runtime resolution.`);
+    return fallback;
 }
 
 function readBoolEnv(name: string, defaultValue: boolean): boolean {
@@ -479,7 +648,7 @@ function probeVideoDuration(videoPath: string, ffprobeBin: string | null): numbe
 
 function inspectDerivedVideoIntegrity(
     videoPathOriginal: string,
-    videoPathHQ: string,
+    videoPathHQ: string | null,
     videoPathLight: string
 ): DurationIntegrityStatus {
     const ffprobeBin = resolveBinary(['/opt/homebrew/bin/ffprobe', '/usr/local/bin/ffprobe', 'ffprobe']);
@@ -499,7 +668,7 @@ function inspectDerivedVideoIntegrity(
     const minLightRatio = Math.min(1.0, Math.max(0.5, readFloatEnv('INGEST_LIGHT_DURATION_MIN_RATIO', 0.98)));
 
     const originalDurationSec = probeVideoDuration(videoPathOriginal, ffprobeBin);
-    const hqDurationSec = probeVideoDuration(videoPathHQ, ffprobeBin);
+    const hqDurationSec = videoPathHQ ? probeVideoDuration(videoPathHQ, ffprobeBin) : null;
     const lightDurationSec = probeVideoDuration(videoPathLight, ffprobeBin);
 
     const issues: string[] = [];
@@ -509,7 +678,7 @@ function inspectDerivedVideoIntegrity(
     if (originalDurationSec == null) {
         issues.push(`cannot probe original duration: ${videoPathOriginal}`);
     }
-    if (hqDurationSec == null) {
+    if (videoPathHQ && hqDurationSec == null) {
         issues.push(`cannot probe HQ duration: ${videoPathHQ}`);
         hqValid = false;
     }
@@ -518,7 +687,7 @@ function inspectDerivedVideoIntegrity(
         lightValid = false;
     }
 
-    if (originalDurationSec != null && hqDurationSec != null) {
+    if (videoPathHQ && originalDurationSec != null && hqDurationSec != null) {
         const hqRatio = hqDurationSec / originalDurationSec;
         if (hqRatio < minHqRatio) {
             issues.push(
@@ -529,11 +698,12 @@ function inspectDerivedVideoIntegrity(
         }
     }
 
-    if (hqDurationSec != null && lightDurationSec != null) {
-        const lightRatio = lightDurationSec / hqDurationSec;
+    if (lightDurationSec != null && (hqDurationSec != null || originalDurationSec != null)) {
+        const reference = hqDurationSec ?? originalDurationSec!;
+        const lightRatio = lightDurationSec / reference;
         if (lightRatio < minLightRatio) {
             issues.push(
-                `light duration too short (${lightDurationSec.toFixed(2)}s < ${(hqDurationSec * minLightRatio).toFixed(2)}s ` +
+                `light duration too short (${lightDurationSec.toFixed(2)}s < ${(reference * minLightRatio).toFixed(2)}s ` +
                     `ratio=${lightRatio.toFixed(4)} threshold=${minLightRatio.toFixed(4)})`
             );
             lightValid = false;

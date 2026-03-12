@@ -54,6 +54,15 @@ function parseContentType(value: unknown): 'sermon' | 'podcast' | 'interview' | 
   return 'sermon';
 }
 
+function cleanMetadataInput(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  return { ...(value as Record<string, unknown>) };
+}
+
+function cleanMetadataString(value: unknown): string {
+  return String(value ?? '').trim();
+}
+
 async function resolveClientId(organizationId: string, requestedClientId?: string): Promise<string | null> {
   const supabaseServer = getSupabaseServer();
   const requested = cleanId(requestedClientId);
@@ -184,11 +193,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const metadataInput = body.metadata && typeof body.metadata === 'object' && !Array.isArray(body.metadata)
-      ? { ...(body.metadata as Record<string, unknown>) }
-      : {};
-
-    const metadataSize = Buffer.byteLength(JSON.stringify(metadataInput), 'utf8');
+    const rawMetadataInput = cleanMetadataInput(body.metadata);
+    const metadataSize = Buffer.byteLength(JSON.stringify(rawMetadataInput), 'utf8');
     if (metadataSize > 10_000) {
       return NextResponse.json(
         { error: 'metadata exceeds max size (10KB)' },
@@ -196,7 +202,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const requestedClientId = cleanId(body.client_id || metadataInput.client_id);
+    const metadataInput: Record<string, unknown> = {};
+    const requestedClientId = cleanId(body.client_id || cleanMetadataString(rawMetadataInput.client_id));
     if (requestedClientId && !isSafeIdentifier(requestedClientId)) {
       return NextResponse.json(
         { error: 'client_id has invalid format' },
@@ -213,9 +220,9 @@ export async function POST(request: NextRequest) {
     }
 
     metadataInput.client_id = resolvedClientId;
-    metadataInput.content_type = parseContentType(body.content_type ?? metadataInput.content_type);
+    metadataInput.content_type = parseContentType(body.content_type ?? rawMetadataInput.content_type);
 
-    const batchId = cleanId(body.batch_id || metadataInput.batch_id);
+    const batchId = cleanId(body.batch_id || cleanMetadataString(rawMetadataInput.batch_id));
     if (batchId) {
       if (!isSafeIdentifier(batchId)) {
         return NextResponse.json(
@@ -227,7 +234,7 @@ export async function POST(request: NextRequest) {
       metadataInput.job_source = 'batch';
     }
 
-    const monitorId = cleanId(body.monitor_id || metadataInput.monitor_id);
+    const monitorId = cleanId(body.monitor_id || cleanMetadataString(rawMetadataInput.monitor_id));
     if (monitorId) {
       if (!isSafeIdentifier(monitorId)) {
         return NextResponse.json(
@@ -239,7 +246,7 @@ export async function POST(request: NextRequest) {
       metadataInput.job_source = 'monitor';
     }
 
-    const monitorRuleId = cleanId(body.monitor_rule_id || metadataInput.monitor_rule_id);
+    const monitorRuleId = cleanId(body.monitor_rule_id || cleanMetadataString(rawMetadataInput.monitor_rule_id));
     if (monitorRuleId) {
       if (!isSafeIdentifier(monitorRuleId)) {
         return NextResponse.json(
@@ -249,6 +256,14 @@ export async function POST(request: NextRequest) {
       }
       metadataInput.monitor_rule_id = monitorRuleId;
       metadataInput.job_source = 'monitor';
+    }
+
+    const requestedJobSource = cleanMetadataString(rawMetadataInput.job_source).toLowerCase();
+    if (
+      !metadataInput.job_source &&
+      (requestedJobSource === 'manual' || requestedJobSource === 'batch' || requestedJobSource === 'monitor')
+    ) {
+      metadataInput.job_source = requestedJobSource;
     }
 
     if (!metadataInput.job_source) {
