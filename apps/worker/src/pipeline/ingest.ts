@@ -65,7 +65,8 @@ export async function ingest(source: string, outputDir: string): Promise<IngestR
     }
 
     const ingestStartedAt = Date.now();
-    const sourceType: 'remote' | 'local' = source.startsWith('http') ? 'remote' : 'local';
+    const isHttp = source.startsWith('http://') || source.startsWith('https://');
+    const sourceType: 'remote' | 'local' = isHttp ? 'remote' : 'local';
     const ingestMode = parseIngestMode(process.env.INGEST_MODE, process.env.PIPELINE_MODE);
     const plan = planIngestArtifacts(ingestMode, sourceType, {
         analyzeRequiresLightVideo: true
@@ -82,7 +83,15 @@ export async function ingest(source: string, outputDir: string): Promise<IngestR
 
     if (source.startsWith('http')) {
         removeExistingOriginalVideos(outputDir);
-        videoPathOriginal = await downloadYouTubeHighest(source, originalVideoTemplate, outputDir);
+        if (source.includes('youtube.com') || source.includes('youtu.be')) {
+            videoPathOriginal = await downloadYouTubeHighest(source, originalVideoTemplate, outputDir);
+        } else if (isGoogleDriveUrl(source)) {
+            console.log(`Google Drive source detected: ${source}`);
+            videoPathOriginal = await downloadGoogleDriveVideo(source, path.join(outputDir, 'source.original.mp4'));
+        } else {
+            console.log(`Direct download for generic source: ${source}`);
+            videoPathOriginal = await downloadGenericVideo(source, path.join(outputDir, 'source.original.mp4'));
+        }
     } else {
         if (!fs.existsSync(source)) {
             throw new Error(`Local file not found: ${source}`);
@@ -732,4 +741,115 @@ function preserveLowQualityCandidate(sourcePath: string, outputDir: string): str
         console.warn(`Failed to preserve low-quality fallback at ${preserved}:`, error);
         return sourcePath;
     }
+}
+
+/**
+ * Returns true if the URL looks like a Google Drive share/view/uc link.
+ * Handles:
+ *   https://drive.google.com/file/d/{id}/view?usp=sharing
+ *   https://drive.google.com/open?id={id}
+ *   https://drive.google.com/uc?id={id}&export=download
+ */
+function isGoogleDriveUrl(url: string): boolean {
+    return url.includes('drive.google.com');
+}
+
+/**
+ * Extracts the Google Drive file ID from common share URL formats.
+ */
+function extractGoogleDriveFileId(url: string): string | null {
+    // Format: /file/d/{id}/...
+    const fileDMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (fileDMatch) return fileDMatch[1];
+
+    // Format: ?id={id} or &id={id}
+    const idParamMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (idParamMatch) return idParamMatch[1];
+
+    return null;
+}
+
+/**
+ * Downloads a Google Drive file to the output path.
+ * Uses gdown (Python) for large-file-safe downloads with virus-scan bypass.
+ * Falls back to curl with the direct download URL if gdown is not found.
+ */
+function downloadGoogleDriveVideo(url: string, outputPath: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const fileId = extractGoogleDriveFileId(url);
+        if (!fileId) {
+            return reject(new Error(`Could not extract Google Drive file ID from: ${url}`));
+        }
+
+        console.log(`Google Drive file ID: ${fileId}`);
+
+        // Try gdown first — handles large file quota bypass automatically
+        const gdownBin = resolveBinary(['gdown', '/opt/homebrew/bin/gdown', '/usr/local/bin/gdown']);
+        if (gdownBin) {
+            console.log(`Using gdown (${gdownBin}) to download Drive file...`);
+            const proc = spawn(gdownBin, [
+                `https://drive.google.com/uc?id=${fileId}`,
+                '-O', outputPath,
+                '--fuzzy'
+            ]);
+            proc.stdout?.on('data', (d) => console.log(`gdown: ${d}`));
+            proc.stderr?.on('data', (d) => console.error(`gdown: ${d}`));
+            proc.on('close', (code) => {
+                if (code === 0 && fs.existsSync(outputPath)) {
+                    console.log(`Google Drive download complete via gdown: ${outputPath}`);
+                    return resolve(outputPath);
+                }
+                // gdown failed — try python -m gdown as fallback
+                console.warn(`gdown exited with code ${code}. Falling back to python -m gdown...`);
+                const python = spawn('python3', ['-m', 'gdown',
+                    `https://drive.google.com/uc?id=${fileId}`,
+                    '-O', outputPath, '--fuzzy']);
+                python.on('close', (pyCode) => {
+                    if (pyCode === 0 && fs.existsSync(outputPath)) {
+                        return resolve(outputPath);
+                    }
+                    // Final fallback: curl direct download URL
+                    downloadWithCurlDrive(fileId, outputPath, resolve, reject);
+                });
+            });
+        } else {
+            // No gdown available — use curl with the direct download URL
+            downloadWithCurlDrive(fileId, outputPath, resolve, reject);
+        }
+    });
+}
+
+function downloadWithCurlDrive(
+    fileId: string,
+    outputPath: string,
+    resolve: (v: string) => void,
+    reject: (e: Error) => void
+): void {
+    const directUrl = `https://drive.google.com/uc?export=download&id=${fileId}&confirm=t`;
+    console.log(`Falling back to curl for Drive download (may fail for large files): ${directUrl}`);
+    const curl = spawn('curl', ['-L', '-o', outputPath, directUrl]);
+    curl.on('close', (code) => {
+        if (code === 0 && fs.existsSync(outputPath)) {
+            resolve(outputPath);
+        } else {
+            reject(new Error(
+                `All Google Drive download methods failed for file ID: ${fileId}. ` +
+                `Install gdown for large file support: pip install gdown`
+            ));
+        }
+    });
+}
+
+function downloadGenericVideo(url: string, outputPath: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        console.log(`Downloading generic video from ${url} to ${outputPath}...`);
+        const curl = spawn('curl', ['-L', '-o', outputPath, url]);
+        curl.on('close', (code) => {
+            if (code === 0 && fs.existsSync(outputPath)) {
+                resolve(outputPath);
+            } else {
+                reject(new Error(`Failed to download generic video from ${url} (code ${code})`));
+            }
+        });
+    });
 }

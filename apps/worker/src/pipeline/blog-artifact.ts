@@ -63,7 +63,7 @@ export interface BlogPostDraftRow {
     focus_keyword: string;
     tags: string[];
     scripture_refs: string[];
-    youtube_url: string;
+    source_url: string;
     youtube_video_id: string;
     youtube_thumbnail: string;
     sermon_date: string | null;
@@ -172,7 +172,7 @@ export async function runBlogArtifactPostProcess(context: BlogArtifactContext): 
         generated_at: generatedAtIso,
         job_id: context.jobId,
         client_id: clientId,
-        youtube_url: context.youtubeUrl,
+        source_url: context.youtubeUrl,
         boundaries: context.boundaries,
         transcript_count: context.transcriptSegments.length,
         clips_count: context.clips?.length ?? 0
@@ -575,7 +575,7 @@ export function normalizeBlogDraft(args: {
         focus_keyword: focusKeyword,
         tags,
         scripture_refs: scriptureRefs,
-        youtube_url: cleanText(context.youtubeUrl),
+        source_url: cleanText(context.youtubeUrl),
         youtube_video_id: youtubeVideoId,
         youtube_thumbnail: youtubeVideoId ? `https://img.youtube.com/vi/${youtubeVideoId}/maxresdefault.jpg` : '',
         sermon_date: null,

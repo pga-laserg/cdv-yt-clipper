@@ -769,16 +769,32 @@ function cutVideo(input: string, start: number, end: number, output: string, fad
             af.push(`afade=t=out:st=${Math.max(0, duration - fadeOut)}:d=${fadeOut}`);
         }
 
+        // Auto-resolve video codec for hardware acceleration
+        let vcodec = 'libx264';
+        const pipelineMode = String(process.env.PIPELINE_MODE ?? 'prod').toLowerCase();
+        
+        // On Mac, use videotoolbox for all modes if available
+        if (process.platform === 'darwin') {
+            vcodec = 'h264_videotoolbox';
+        } 
+        // In Colab (Cloud Limited) or other Linux environments with NVIDIA
+        else if (pipelineMode === 'cloud_limited' || process.env.COLAB_GPU === 'true') {
+            vcodec = 'h264_nvenc';
+        }
+
+        console.log(`Using video codec: ${vcodec}`);
+
         const cmd = ffmpeg(input)
             .setStartTime(start)
             .setDuration(duration)
-            .videoCodec('libx264')
+            .videoCodec(vcodec)
             .audioCodec('aac')
             .outputOptions([
-                '-preset veryfast',
-                '-crf 20',
-                '-movflags +faststart',
-                '-b:a 192k'
+                ...(vcodec.includes('videotoolbox') ? ['-b:v', '6000k'] : []),
+                ...(vcodec.includes('nvenc') ? ['-preset', 'p1', '-tune', 'hq'] : ['-preset', 'veryfast']),
+                '-crf', '20',
+                '-movflags', '+faststart',
+                '-b:a', '192k'
             ])
             .output(output)
             .on('end', () => resolve())
@@ -858,16 +874,27 @@ function cutVideoVertical(
             'setsar=1'
         ];
 
+        // Auto-resolve video codec for hardware acceleration
+        let vcodec = 'libx264';
+        const pipelineMode = String(process.env.PIPELINE_MODE ?? 'prod').toLowerCase();
+        
+        if (process.platform === 'darwin') {
+            vcodec = 'h264_videotoolbox';
+        } else if (pipelineMode === 'cloud_limited' || process.env.COLAB_GPU === 'true') {
+            vcodec = 'h264_nvenc';
+        }
+
         ffmpeg(input)
             .setStartTime(start)
             .setDuration(duration)
-            .videoCodec('libx264')
+            .videoCodec(vcodec)
             .audioCodec('aac')
             .outputOptions([
-                '-preset veryfast',
-                '-crf 20',
-                '-movflags +faststart',
-                '-b:a 160k'
+                ...(vcodec.includes('videotoolbox') ? ['-b:v', '4000k'] : []),
+                ...(vcodec.includes('nvenc') ? ['-preset', 'p1', '-tune', 'hq'] : ['-preset', 'veryfast']),
+                '-crf', '20',
+                '-movflags', '+faststart',
+                '-b:a', '160k'
             ])
             .videoFilters(filters)
             .output(output)

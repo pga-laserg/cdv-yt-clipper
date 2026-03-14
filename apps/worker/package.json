@@ -6,6 +6,7 @@
         "build": "tsc",
         "start": "node dist/index.js",
         "dev": "ts-node-dev --respawn src/index.ts",
+        "monitor": "ts-node-dev src/monitor.ts",
         "test:ingest": "ts-node-dev src/test-ingest.ts",
         "test:transcribe": "ts-node-dev src/test-transcribe.ts",
         "test:analyze": "ts-node-dev src/test-analyze.ts",

@@ -7,6 +7,17 @@ export async function POST(request: Request) {
     const supabase = getSupabaseServer();
     const body = await request.json();
     
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const { data: userData, error: userError } = await supabase.auth.getUser(token);
+    
+    if (userError || !userData.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { clipId, startSec, endSec, organizationId } = body;
 
     if (!clipId || startSec === undefined || endSec === undefined || !organizationId) {

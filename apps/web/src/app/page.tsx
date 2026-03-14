@@ -165,14 +165,14 @@ export default function Home() {
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <input
-              id="youtube-url"
+              id="source-url"
               type="text"
-              placeholder="YouTube URL..."
+              placeholder="URL or local path..."
               className="px-4 py-2 border rounded-full text-sm w-full sm:w-72"
             />
             <button
               onClick={async () => {
-                const input = document.getElementById('youtube-url') as HTMLInputElement;
+                const input = document.getElementById('source-url') as HTMLInputElement;
                 const url = input?.value;
                 if (!url) return;
 
@@ -183,7 +183,7 @@ export default function Home() {
                   const response = await fetch('/api/v1/jobs', {
                     method: 'POST',
                     headers,
-                    body: JSON.stringify({ youtube_url: url, title: 'New Sermon Job' })
+                    body: JSON.stringify({ source_url: url, title: 'New Sermon Job' })
                   });
 
                   if (!response.ok) {
@@ -242,7 +242,7 @@ export default function Home() {
                       <h3 className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
                         {job.title || 'Untitled Sermon'}
                       </h3>
-                      <p className="text-xs sm:text-sm text-gray-500 font-mono break-all">{job.youtube_url}</p>
+                      <p className="text-xs sm:text-sm text-gray-500 font-mono break-all">{job.source_url}</p>
                     </div>
                   </div>
 

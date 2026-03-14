@@ -11,3 +11,6 @@ apps/worker/work_dir/
 apps/worker/work_tmp/
 apps/worker/dist
 packages/shared/dist/
+apps/worker/src/pipeline/python/test_data/
+*.wav
+tmp/

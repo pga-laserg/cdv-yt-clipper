@@ -33,7 +33,7 @@ export async function GET(
 
     const { data: job, error: jobError } = await supabaseServer
       .from('jobs')
-      .select('id, organization_id, created_at, status, youtube_url, title, video_url, srt_url, sermon_start_seconds, sermon_end_seconds, metadata')
+      .select('id, organization_id, created_at, status, source_url, title, video_url, srt_url, sermon_start_seconds, sermon_end_seconds, metadata')
       .eq('id', id)
       .eq('organization_id', org.organization_id)
       .maybeSingle();

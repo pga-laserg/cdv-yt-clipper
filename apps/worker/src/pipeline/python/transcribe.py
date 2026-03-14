@@ -77,11 +77,21 @@ def transcribe_audio(file_path, model_size, beam_size, word_timestamps=True, wor
     # Reduce parallel tokenizer worker churn that can lead to leaked semaphore warnings.
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     
-    # Check if CUDA is available, otherwise allow CPU
+    # Auto-detect hardware acceleration
     device = "cpu"
     compute_type = "int8"
     
-    print(f"Loading Whisper model '{model_size}' on {device}...", file=sys.stderr)
+    if sys.platform == "darwin":
+        # Apple Silicon / Intel Mac with Metal support
+        # Note: faster-whisper uses CTranslate2 which supports 'auto' or 'cpu' on Mac.
+        # However, we can hint for 'auto' to let it pick the best available.
+        device = "auto" 
+        compute_type = "int8"
+    elif os.getenv("COLAB_GPU") == "true" or "CUDA_VISIBLE_DEVICES" in os.environ:
+        device = "cuda"
+        compute_type = "float16" # Cuda typically prefers float16 for speed
+    
+    print(f"Loading Whisper model '{model_size}' on {device} (platform: {sys.platform})...", file=sys.stderr)
     model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
     print(f"Transcribing {file_path} (Forcing Spanish)...", file=sys.stderr)

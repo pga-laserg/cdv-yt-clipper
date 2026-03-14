@@ -22,7 +22,7 @@ create table jobs (
   organization_id uuid not null references organizations(id) on delete restrict,
   created_at timestamp with time zone default now(),
   status text not null default 'pending', -- pending, processing:*, completed, failed
-  youtube_url text,
+  source_url text,
   original_filename text,
   title text,
   video_url text,

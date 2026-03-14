@@ -36,7 +36,7 @@ async function run() {
         focus_keyword: 'integration',
         tags: ['integration'],
         scripture_refs: ['Santiago 1:2-4'],
-        youtube_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        source_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         youtube_video_id: 'dQw4w9WgXcQ',
         youtube_thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
         sermon_date: null,

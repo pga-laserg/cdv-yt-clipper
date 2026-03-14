@@ -293,7 +293,7 @@ export default function JobDetails({ params: paramsPromise }: { params: Promise<
 
                             <div className="flex flex-col sm:flex-row gap-2">
                                 <Link
-                                    href={`/clips/${clip.id}`}
+                                    href={`/admin/clips/${clip.id}`}
                                     className="flex-1 flex items-center justify-center gap-2 py-2 bg-blue-50 text-blue-600 rounded-xl font-medium hover:bg-blue-100 transition-colors"
                                 >
                                     <Scissors size={18} />

@@ -54,7 +54,7 @@ Tab columns expected by the app:
 9. `focus_keyword`
 10. `tags`
 11. `scripture_refs`
-12. `youtube_url`
+12. `source_url`
 13. `youtube_video_id`
 14. `youtube_thumbnail`
 15. `sermon_date`
@@ -97,7 +97,7 @@ Hard requirements for a published row (from `rowToPost` in `lib/blog/sheets.ts`)
 3. non-empty `content_markdown`
 4. valid ISO `published_at`
 5. valid YouTube payload:
-   - `youtube_url` non-empty
+   - `source_url` non-empty
    - `youtube_video_id` resolved and 11 chars
 
 If a published row fails validation, it is skipped (logged as warning).

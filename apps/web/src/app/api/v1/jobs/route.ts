@@ -10,11 +10,12 @@ function isApiEnabled(): boolean {
   return String(process.env.API_V1_JOBS_ENABLED ?? 'true').toLowerCase() === 'true';
 }
 
-function isValidYoutubeUrl(raw: string): boolean {
+function isValidSourceUrl(raw: string): boolean {
+  // Accept http(s) URLs or absolute local file paths
+  if (raw.startsWith('/') || raw.startsWith('\\')) return true;
   try {
     const url = new URL(raw);
-    const host = url.hostname.toLowerCase();
-    return host.includes('youtube.com') || host.includes('youtu.be');
+    return url.protocol === 'http:' || url.protocol === 'https:';
   } catch {
     return false;
   }
@@ -112,7 +113,7 @@ export async function GET(request: NextRequest) {
     let query = supabaseServer
       .from('jobs')
       .select(
-        'id, organization_id, created_at, status, youtube_url, title, video_url, srt_url, sermon_start_seconds, sermon_end_seconds, metadata',
+        'id, organization_id, created_at, status, source_url, title, video_url, srt_url, sermon_start_seconds, sermon_end_seconds, metadata',
         { count: 'exact' }
       )
       .eq('organization_id', org.organization_id)
@@ -185,10 +186,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const youtubeUrl = String(body.youtube_url || '').trim();
-    if (!youtubeUrl || !isValidYoutubeUrl(youtubeUrl)) {
+    const sourceUrl = String(body.source_url || '').trim();
+    if (!sourceUrl || !isValidSourceUrl(sourceUrl)) {
       return NextResponse.json(
-        { error: 'youtube_url must be a valid YouTube URL' },
+        { error: 'source_url must be a valid URL or an absolute file path' },
         { status: 400 }
       );
     }
@@ -276,7 +277,7 @@ export async function POST(request: NextRequest) {
 
     const insertPayload = {
       organization_id: org.organization_id,
-      youtube_url: youtubeUrl,
+      source_url: sourceUrl,
       status: 'pending',
       title,
       metadata: metadataInput
@@ -285,7 +286,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabaseServer
       .from('jobs')
       .insert(insertPayload)
-      .select('id, organization_id, created_at, status, youtube_url, title, metadata')
+      .select('id, organization_id, created_at, status, source_url, title, metadata')
       .single();
 
     if (error) {

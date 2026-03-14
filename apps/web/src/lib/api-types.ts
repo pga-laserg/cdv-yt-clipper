@@ -1,5 +1,5 @@
 export interface CreateJobRequest {
-  youtube_url: string;
+  source_url: string;
   title?: string;
   client_id?: string;
   content_type?: 'sermon' | 'podcast' | 'interview' | 'talk' | 'generic';
@@ -14,7 +14,7 @@ export interface JobRecord {
   organization_id: string;
   status: string;
   created_at: string;
-  youtube_url: string;
+  source_url: string;
   title?: string | null;
   video_url?: string | null;
   srt_url?: string | null;

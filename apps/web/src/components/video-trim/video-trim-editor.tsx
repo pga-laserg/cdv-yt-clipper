@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { TranscriptSegment } from "@/lib/video/parse-srt";
 import { clampTrimRange, MAX_FINAL_LENGTH_SEC } from "@/lib/video/clamp-range";
 import VideoPlayer from "./video-player";
@@ -86,9 +87,17 @@ export default function VideoTrimEditor({
   const submitTrimJob = async () => {
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/clips/trim", {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const response = await fetch("/api/admin/trim", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           clipId,
           organizationId,

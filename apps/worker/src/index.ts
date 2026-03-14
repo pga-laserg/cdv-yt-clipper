@@ -15,7 +15,7 @@ import { promisify } from 'util';
 
 interface PipelineJob {
     id: string;
-    youtube_url: string;
+    source_url?: string | null;
     organization_id: string;
     claim_token?: string | null;
 }
@@ -60,7 +60,7 @@ let warnedClipSourceKeySchema = false;
 
 async function runPipeline(job: PipelineJob) {
     const jobId = job.id;
-    const source = job.youtube_url;
+    const source = job.source_url || '';
     const organizationId = job.organization_id;
     const workDir = path.resolve(__dirname, `../work_dir/${jobId}`);
     if (!fs.existsSync(workDir)) fs.mkdirSync(workDir, { recursive: true });
@@ -900,14 +900,27 @@ function readBoolEnv(name: string, fallback: boolean): boolean {
 }
 
 function normalizeClaimRow(row: any): PipelineJob | null {
-    if (!row || typeof row !== 'object') return null;
+    if (!row || typeof row !== 'object') {
+        console.debug('normalizeClaimRow: row is not an object', row);
+        return null;
+    }
     const id = typeof row.id === 'string' ? row.id.trim() : '';
-    const youtubeUrl = typeof row.youtube_url === 'string' ? row.youtube_url.trim() : '';
+    const sourceUrl = (typeof row.source_url === 'string' ? row.source_url : (typeof row.youtube_url === 'string' ? row.youtube_url : '')).trim();
     const organizationId = typeof row.organization_id === 'string' ? row.organization_id.trim() : '';
-    if (!id || !youtubeUrl || !organizationId) return null;
+    
+    if (!id || !sourceUrl || !organizationId) {
+        console.debug(`normalizeClaimRow validation failed for job ${id || 'unknown'}:`, {
+            hasId: !!id,
+            hasSourceUrl: !!sourceUrl,
+            hasOrgId: !!organizationId,
+            rawKeys: Object.keys(row)
+        });
+        return null;
+    }
+    
     return {
         id,
-        youtube_url: youtubeUrl,
+        source_url: sourceUrl,
         organization_id: organizationId,
         claim_token: typeof row.claim_token === 'string' ? row.claim_token : null
     };
@@ -931,7 +944,7 @@ async function claimNextJobRpc(workerId: string): Promise<PipelineJob | null> {
 async function claimNextJobLegacy(): Promise<PipelineJob | null> {
     const { data: jobs, error } = await supabase
         .from('jobs')
-        .select('id,youtube_url,organization_id')
+        .select('id,source_url,organization_id')
         .eq('status', 'pending')
         .order('created_at', { ascending: true })
         .limit(1);
@@ -950,7 +963,7 @@ async function claimNextJobLegacy(): Promise<PipelineJob | null> {
         .eq('id', first.id)
         .eq('organization_id', first.organization_id)
         .eq('status', 'pending')
-        .select('id,youtube_url,organization_id');
+        .select('id,source_url,organization_id');
 
     if (claimError) {
         console.error('Error claiming legacy job:', claimError);

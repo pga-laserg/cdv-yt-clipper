@@ -16,7 +16,7 @@ async function seed() {
 
     const { data: job, error: jobError } = await supabase.from('jobs').insert({
         organization_id: organizationId,
-        youtube_url: 'https://www.youtube.com/watch?v=Jg51MCpDf0w',
+        source_url: 'https://www.youtube.com/watch?v=Jg51MCpDf0w',
         status: 'completed',
         sermon_start_seconds: 300,
         sermon_end_seconds: 4800,
