@@ -385,12 +385,22 @@ function downloadYouTubeHighest(url: string, outputTemplate: string, outputDir: 
 
 function normalizeHighQualityMp4(inputPath: string, outputPath: string, onProgress?: (p: number) => void): Promise<void> {
     return new Promise((resolve, reject) => {
-        console.log(`Normalizing HQ MP4 from ${inputPath} -> ${outputPath}`);
+        let vcodec = 'libx264';
+        const pipelineMode = String(process.env.PIPELINE_MODE ?? 'prod').toLowerCase();
+        
+        if (process.platform === 'darwin') {
+            vcodec = 'h264_videotoolbox';
+        } else if (pipelineMode === 'cloud_limited' || process.env.COLAB_GPU === 'true') {
+            vcodec = 'h264_nvenc';
+        }
+
+        console.log(`Normalizing HQ MP4 from ${inputPath} -> ${outputPath} using codec: ${vcodec}`);
         ffmpeg(inputPath)
-            .videoCodec('libx264')
+            .videoCodec(vcodec)
             .audioCodec('aac')
             .outputOptions([
-                '-preset', 'medium',
+                ...(vcodec.includes('videotoolbox') ? ['-b:v', '5000k'] : []),
+                ...(vcodec.includes('nvenc') ? ['-preset', 'p2', '-tune', 'hq'] : ['-preset', 'medium']),
                 '-crf', '20',
                 '-pix_fmt', 'yuv420p',
                 '-movflags', '+faststart',
@@ -418,13 +428,23 @@ function normalizeHighQualityMp4(inputPath: string, outputPath: string, onProgre
 
 function createLightweightVideo(inputPath: string, outputPath: string, onProgress?: (p: number) => void): Promise<void> {
     return new Promise((resolve, reject) => {
-        console.log(`Creating lightweight MP4 from ${inputPath} -> ${outputPath}`);
+        let vcodec = 'libx264';
+        const pipelineMode = String(process.env.PIPELINE_MODE ?? 'prod').toLowerCase();
+        
+        if (process.platform === 'darwin') {
+            vcodec = 'h264_videotoolbox';
+        } else if (pipelineMode === 'cloud_limited' || process.env.COLAB_GPU === 'true') {
+            vcodec = 'h264_nvenc';
+        }
+
+        console.log(`Creating lightweight MP4 from ${inputPath} -> ${outputPath} using codec: ${vcodec}`);
         ffmpeg(inputPath)
-            .videoCodec('libx264')
+            .videoCodec(vcodec)
             .audioCodec('aac')
             .size('640x?')
             .outputOptions([
-                '-preset', 'veryfast',
+                ...(vcodec.includes('videotoolbox') ? ['-b:v', '1500k'] : []),
+                ...(vcodec.includes('nvenc') ? ['-preset', 'p1', '-tune', 'hq'] : ['-preset', 'veryfast']),
                 '-crf', '31',
                 '-pix_fmt', 'yuv420p',
                 '-movflags', '+faststart',
