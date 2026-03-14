@@ -57,7 +57,7 @@ interface IngestPlan {
     audioFromHQ: boolean;
 }
 
-export async function ingest(source: string, outputDir: string): Promise<IngestResult> {
+export async function ingest(source: string, outputDir: string, onProgress?: (stage: string, percent: number) => void): Promise<IngestResult> {
     console.log(`Ingesting source: ${source}`);
 
     if (!fs.existsSync(outputDir)) {
@@ -110,7 +110,7 @@ export async function ingest(source: string, outputDir: string): Promise<IngestR
     if (plan.requiresHQ) {
         videoPathHQ = videoPath;
         if (!fs.existsSync(videoPathHQ)) {
-            await normalizeHighQualityMp4(videoPathOriginal, videoPathHQ);
+            await normalizeHighQualityMp4(videoPathOriginal, videoPathHQ, (p) => onProgress?.('hq_transcode', p));
             hqTranscodePerformed = true;
         } else {
             console.log(`Reusing existing HQ video at ${videoPathHQ}`);
@@ -121,18 +121,18 @@ export async function ingest(source: string, outputDir: string): Promise<IngestR
     const lightInputPath = plan.lightFromHQ && videoPathHQ ? videoPathHQ : videoPathOriginal;
     const lightStartedAt = Date.now();
     if (!fs.existsSync(videoPathLight)) {
-        await createLightweightVideo(lightInputPath, videoPathLight);
+        await createLightweightVideo(lightInputPath, videoPathLight, (p) => onProgress?.('light_transcode', p));
     } else {
         console.log(`Reusing existing lightweight video at ${videoPathLight}`);
     }
     const lightTranscodeDurationMs = Date.now() - lightStartedAt;
 
-    await ensureDerivedVideoIntegrity(videoPathOriginal, videoPathHQ ?? null, videoPathLight);
+    await ensureDerivedVideoIntegrity(videoPathOriginal, videoPathHQ ?? null, videoPathLight, onProgress);
 
     const audioInputPath = plan.audioFromHQ && videoPathHQ ? videoPathHQ : videoPathOriginal;
     const audioStartedAt = Date.now();
     if (!fs.existsSync(audioPath)) {
-        await extractAudio(audioInputPath, audioPath);
+        await extractAudio(audioInputPath, audioPath, (p) => onProgress?.('audio_extract', p));
     } else {
         console.log(`Reusing existing audio at ${audioPath}`);
     }
@@ -171,13 +171,13 @@ export async function ingest(source: string, outputDir: string): Promise<IngestR
     };
 }
 
-export async function ensureHighQualityRenderSource(videoPathOriginal: string, outputDir: string): Promise<string> {
+export async function ensureHighQualityRenderSource(videoPathOriginal: string, outputDir: string, onProgress?: (p: number) => void): Promise<string> {
     const fallbackPath = path.join(outputDir, 'source.hq.fallback.mp4');
     if (fs.existsSync(fallbackPath)) {
         console.log(`[render-fallback] Reusing existing HQ fallback at ${fallbackPath}`);
         return fallbackPath;
     }
-    await normalizeHighQualityMp4(videoPathOriginal, fallbackPath);
+    await normalizeHighQualityMp4(videoPathOriginal, fallbackPath, onProgress);
     return fallbackPath;
 }
 
@@ -383,7 +383,7 @@ function downloadYouTubeHighest(url: string, outputTemplate: string, outputDir: 
     })();
 }
 
-function normalizeHighQualityMp4(inputPath: string, outputPath: string): Promise<void> {
+function normalizeHighQualityMp4(inputPath: string, outputPath: string, onProgress?: (p: number) => void): Promise<void> {
     return new Promise((resolve, reject) => {
         console.log(`Normalizing HQ MP4 from ${inputPath} -> ${outputPath}`);
         ffmpeg(inputPath)
@@ -396,11 +396,19 @@ function normalizeHighQualityMp4(inputPath: string, outputPath: string): Promise
                 '-movflags', '+faststart',
                 '-b:a', '192k'
             ])
+            .on('progress', (progress) => {
+                if (progress.percent && onProgress) {
+                    onProgress(Math.floor(progress.percent));
+                    process.stdout.write(`\r[ingest] HQ transcode: ${Math.floor(progress.percent)}%           `);
+                }
+            })
             .on('end', () => {
+                process.stdout.write('\n');
                 console.log('HQ normalization complete.');
                 resolve();
             })
             .on('error', (err) => {
+                process.stdout.write('\n');
                 console.error('HQ normalization error:', err);
                 reject(err);
             })
@@ -408,7 +416,7 @@ function normalizeHighQualityMp4(inputPath: string, outputPath: string): Promise
     });
 }
 
-function createLightweightVideo(inputPath: string, outputPath: string): Promise<void> {
+function createLightweightVideo(inputPath: string, outputPath: string, onProgress?: (p: number) => void): Promise<void> {
     return new Promise((resolve, reject) => {
         console.log(`Creating lightweight MP4 from ${inputPath} -> ${outputPath}`);
         ffmpeg(inputPath)
@@ -422,11 +430,19 @@ function createLightweightVideo(inputPath: string, outputPath: string): Promise<
                 '-movflags', '+faststart',
                 '-b:a', '96k'
             ])
+            .on('progress', (progress) => {
+                if (progress.percent && onProgress) {
+                    onProgress(Math.floor(progress.percent));
+                    process.stdout.write(`\r[ingest] Light transcode: ${Math.floor(progress.percent)}%           `);
+                }
+            })
             .on('end', () => {
+                process.stdout.write('\n');
                 console.log('Lightweight video complete.');
                 resolve();
             })
             .on('error', (err) => {
+                process.stdout.write('\n');
                 console.error('Lightweight video error:', err);
                 reject(err);
             })
@@ -437,7 +453,8 @@ function createLightweightVideo(inputPath: string, outputPath: string): Promise<
 async function ensureDerivedVideoIntegrity(
     videoPathOriginal: string,
     videoPathHQ: string | null,
-    videoPathLight: string
+    videoPathLight: string,
+    onProgress?: (stage: string, percent: number) => void
 ): Promise<void> {
     const requireDurationCheck = readBoolEnv('INGEST_REQUIRE_DURATION_CHECK', true);
     const initial = inspectDerivedVideoIntegrity(videoPathOriginal, videoPathHQ, videoPathLight);
@@ -461,14 +478,14 @@ async function ensureDerivedVideoIntegrity(
     if (!initial.hqValid && videoPathHQ) {
         console.warn('[ingest] regenerating HQ + light videos from original source...');
         safeUnlink(videoPathHQ);
-        await normalizeHighQualityMp4(videoPathOriginal, videoPathHQ);
+        await normalizeHighQualityMp4(videoPathOriginal, videoPathHQ, (p) => onProgress?.('hq_transcode_repair', p));
         safeUnlink(videoPathLight);
-        await createLightweightVideo(videoPathHQ, videoPathLight);
+        await createLightweightVideo(videoPathHQ, videoPathLight, (p) => onProgress?.('light_transcode_repair', p));
     } else if (!initial.lightValid) {
         const regenSource = videoPathHQ && fs.existsSync(videoPathHQ) ? videoPathHQ : videoPathOriginal;
         console.warn(`[ingest] regenerating lightweight video from ${path.basename(regenSource)}...`);
         safeUnlink(videoPathLight);
-        await createLightweightVideo(regenSource, videoPathLight);
+        await createLightweightVideo(regenSource, videoPathLight, (p) => onProgress?.('light_transcode_repair', p));
     }
 
     const repaired = inspectDerivedVideoIntegrity(videoPathOriginal, videoPathHQ, videoPathLight);
@@ -488,18 +505,26 @@ async function ensureDerivedVideoIntegrity(
     );
 }
 
-function extractAudio(videoPath: string, audioPath: string): Promise<void> {
+function extractAudio(videoPath: string, audioPath: string, onProgress?: (p: number) => void): Promise<void> {
     return new Promise((resolve, reject) => {
         console.log(`Extracting audio to ${audioPath}...`);
         ffmpeg(videoPath)
             .toFormat('wav')
             .audioFrequency(16000) // Whisper prefers 16kHz
             .audioChannels(1)      // Mono
+            .on('progress', (progress) => {
+                if (progress.percent && onProgress) {
+                    onProgress(Math.floor(progress.percent));
+                    process.stdout.write(`\r[ingest] Audio extract: ${Math.floor(progress.percent)}%           `);
+                }
+            })
             .on('end', () => {
+                process.stdout.write('\n');
                 console.log('Audio extraction complete.');
                 resolve();
             })
             .on('error', (err) => {
+                process.stdout.write('\n');
                 console.error('ffmpeg error:', err);
                 reject(err);
             })

@@ -72,6 +72,7 @@ async function runPipeline(job: PipelineJob) {
         console.log('--- Stage 1: Ingest ---');
         currentStage = 'ingest';
         await updateJobStatus(jobId, organizationId, 'processing:ingest', job.claim_token);
+        let lastIngestProgressAt = 0;
         const {
             videoPathOriginal,
             videoPathHQ,
@@ -79,7 +80,14 @@ async function runPipeline(job: PipelineJob) {
             videoPathPreferredRender,
             audioPath,
             ingestProfile
-        } = await ingest(source, workDir);
+        } = await ingest(source, workDir, (stage, percent) => {
+            const now = Date.now();
+            if (now - lastIngestProgressAt < 3000) return; // Wait 3s between DB updates
+            lastIngestProgressAt = now;
+            void updateJobStatus(jobId, organizationId, `processing:ingest:${stage}:${percent}%`, job.claim_token).catch((err) => {
+                console.warn(`Failed to write ingest progress for job ${jobId}:`, err);
+            });
+        });
         await mergeJobMetadata(jobId, organizationId, {
             pipeline: {
                 ingest: {
@@ -155,7 +163,12 @@ async function runPipeline(job: PipelineJob) {
             videoPathPreferredRender,
             videoPathLight,
             videoPathHQ,
-            claimToken: job.claim_token
+            claimToken: job.claim_token,
+            onProgress: (stage, percent) => {
+                void updateJobStatus(jobId, organizationId, `processing:render:${stage}:${percent}%`, job.claim_token).catch((err) => {
+                    console.warn(`Failed to write render progress for job ${jobId}:`, err);
+                });
+            }
         });
         const renderedFiles = renderResult.renderedFiles;
         console.log(`Stage render completed in ${Math.round((Date.now() - startedAt) / 1000)}s`);
@@ -269,6 +282,7 @@ async function renderWithFallback(args: {
     videoPathLight: string;
     videoPathHQ?: string;
     claimToken?: string | null;
+    onProgress?: (stage: string, percent: number) => void;
 }): Promise<{ renderedFiles: string[]; renderSource: string; hqFallbackUsed: boolean }> {
     let renderSource = resolveRenderSourcePath(args.videoPathPreferredRender, args.videoPathOriginal, args.workDir, args.videoPathHQ);
     let hqFallbackUsed = false;
@@ -280,7 +294,8 @@ async function renderWithFallback(args: {
     try {
         const renderedFiles = await render(renderSource, args.boundaries, args.clipData, {
             trackingVideoPath: args.videoPathLight,
-            horizontalVideoPath: args.videoPathOriginal
+            horizontalVideoPath: args.videoPathOriginal,
+            onProgress: args.onProgress
         });
         await mergeJobMetadata(args.jobId, args.organizationId, {
             artifacts: {
@@ -304,7 +319,8 @@ async function renderWithFallback(args: {
         hqFallbackUsed = true;
         const renderedFiles = await render(renderSource, args.boundaries, args.clipData, {
             trackingVideoPath: args.videoPathLight,
-            horizontalVideoPath: args.videoPathOriginal
+            horizontalVideoPath: args.videoPathOriginal,
+            onProgress: args.onProgress
         });
         await mergeJobMetadata(args.jobId, args.organizationId, {
             artifacts: {

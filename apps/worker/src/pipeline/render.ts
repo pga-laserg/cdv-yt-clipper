@@ -410,7 +410,7 @@ export async function render(
     videoPath: string,
     boundaries: { start: number; end: number },
     clips: { start: number; end: number; id: string; score?: number; confidence?: number }[],
-    options: { trackingVideoPath?: string; horizontalVideoPath?: string } = {}
+    options: { trackingVideoPath?: string; horizontalVideoPath?: string; onProgress?: (msg: string, p: number) => void } = {}
 ): Promise<string[]> {
     console.log('Rendering clips...');
     const trackingVideoPath = options.trackingVideoPath && fs.existsSync(options.trackingVideoPath)
@@ -469,7 +469,7 @@ export async function render(
     await cutVideo(horizontalVideoPath, boundaries.start, boundaries.end, sermonPath, {
         fadeInSec: horizontalFadeInSec,
         fadeOutSec: horizontalFadeOutSec,
-    });
+    }, (p) => options.onProgress?.(`horizontal`, p));
     results.push(sermonPath);
 
     let centerX = 0.5;
@@ -510,13 +510,14 @@ export async function render(
         }
 
         const debug = await cutVideoVertical(
-            videoPath,
+            trackingVideoPath,
             clip.start,
             clip.end,
             clipPath,
-            centerX,
+            summary.center_x,
             trackData?.track ?? null,
-            trackData?.scene_cuts_sec ?? []
+            trackData?.scene_cuts_sec ?? [],
+            (p) => options.onProgress?.(`clip_${clip.id.slice(0, 8)}`, p)
         );
         results.push(clipPath);
 
@@ -750,7 +751,7 @@ async function detectSpeakerTrack(videoPath: string, start: number, end: number)
 
 type FadeOpts = { fadeInSec?: number; fadeOutSec?: number };
 
-function cutVideo(input: string, start: number, end: number, output: string, fades: FadeOpts = {}): Promise<void> {
+function cutVideo(input: string, start: number, end: number, output: string, fades: FadeOpts = {}, onProgress?: (p: number) => void): Promise<void> {
     return new Promise((resolve, reject) => {
         console.log(`Cutting sermon: ${start}s to ${end}s`);
         const duration = end - start;
@@ -797,8 +798,20 @@ function cutVideo(input: string, start: number, end: number, output: string, fad
                 '-b:a', '192k'
             ])
             .output(output)
-            .on('end', () => resolve())
-            .on('error', (err) => reject(err));
+            .on('progress', (progress) => {
+                if (progress.percent && onProgress) {
+                    onProgress(Math.floor(progress.percent));
+                    process.stdout.write(`\r[render] Horizontal render: ${Math.floor(progress.percent)}%           `);
+                }
+            })
+            .on('end', () => {
+                process.stdout.write('\n');
+                resolve();
+            })
+            .on('error', (err) => {
+                process.stdout.write('\n');
+                reject(err);
+            });
 
         if (vf.length) cmd.videoFilters(vf.join(','));
         if (af.length) cmd.audioFilters(af.join(','));
@@ -814,7 +827,8 @@ function cutVideoVertical(
     output: string,
     centerX: number,
     centerTrack: CropTrackPoint[] | null = null,
-    sceneCutsSec: number[] = []
+    sceneCutsSec: number[] = [],
+    onProgress?: (p: number) => void
 ): Promise<VerticalClipDebug> {
     return new Promise((resolve, reject) => {
         console.log(`Cutting vertical clip v3: ${start}s to ${end}s with center ${centerX}`);
@@ -898,8 +912,15 @@ function cutVideoVertical(
             ])
             .videoFilters(filters)
             .output(output)
-            .on('stderr', (line) => console.log(`ffmpeg: ${line}`))
+            .on('progress', (progress) => {
+                if (progress.percent && onProgress) {
+                    onProgress(Math.floor(progress.percent));
+                    process.stdout.write(`\r[render] Vertical render: ${Math.floor(progress.percent)}%           `);
+                }
+            })
+            .on('stderr', (line) => {}) // Mute raw stderr to keep console clean
             .on('end', () => {
+                process.stdout.write('\n');
                 const debug: VerticalClipDebug = {
                     raw_track_points: centerTrack?.length ?? 0,
                     processed_track_points: processedTrack?.length ?? 0,
@@ -922,7 +943,10 @@ function cutVideoVertical(
                 };
                 resolve(debug);
             })
-            .on('error', (err) => reject(err))
+            .on('error', (err) => {
+                process.stdout.write('\n');
+                reject(err);
+            })
             .run();
     });
 }
