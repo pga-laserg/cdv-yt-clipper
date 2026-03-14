@@ -368,7 +368,9 @@ async function runDeliveryStage(args: {
         const lowresPath = args.horizontalLocal.replace(/\.mp4$/i, '.delivery.lowres.mp4');
         const encodeStartedAt = Date.now();
         try {
-            await transcodeForUpload(args.horizontalLocal, lowresPath);
+            await transcodeForUpload(args.horizontalLocal, lowresPath, (p) => {
+                void updateJobStatus(args.jobId, args.organizationId, `processing:delivery:encode:${p}%`, args.claimToken).catch(() => {});
+            });
             await updateJobStatus(args.jobId, args.organizationId, 'processing:delivery:upload', args.claimToken);
             horizontalUrl = await uploadAssetWithFallback(lowresPath, 'assets', `jobs/${args.jobId}/sermon_horizontal.mp4`);
             encodes.push({
@@ -393,7 +395,9 @@ async function runDeliveryStage(args: {
         await updateJobStatus(args.jobId, args.organizationId, 'processing:delivery:encode', args.claimToken);
         const encodeStartedAt = Date.now();
         try {
-            const hqPath = await ensureHighQualityRenderSource(args.videoPathOriginal, args.workDir);
+            const hqPath = await ensureHighQualityRenderSource(args.videoPathOriginal, args.workDir, (p) => {
+                void updateJobStatus(args.jobId, args.organizationId, `processing:delivery:encode:${p}%`, args.claimToken).catch(() => {});
+            });
             await updateJobStatus(args.jobId, args.organizationId, 'processing:delivery:upload', args.claimToken);
             fullResPath = hqPath;
             fullResUrl = await uploadFullResToConfiguredStorage(hqPath, args.jobId);
@@ -849,20 +853,43 @@ async function uploadAssetWithFallback(filePath: string, bucket: string, destina
     }
 }
 
-function transcodeForUpload(inputPath: string, outputPath: string): Promise<void> {
+function transcodeForUpload(inputPath: string, outputPath: string, onProgress?: (p: number) => void): Promise<void> {
     return new Promise((resolve, reject) => {
+        let vcodec = 'libx264';
+        const pipelineMode = String(process.env.PIPELINE_MODE ?? 'prod').toLowerCase();
+        
+        if (process.platform === 'darwin') {
+            vcodec = 'h264_videotoolbox';
+        } else if (pipelineMode === 'cloud_limited' || process.env.COLAB_GPU === 'true') {
+            vcodec = 'h264_nvenc';
+        }
+
+        console.log(`[delivery] Transcoding for upload using codec: ${vcodec}`);
         ffmpeg(inputPath)
-            .videoCodec('libx264')
+            .videoCodec(vcodec)
             .audioCodec('aac')
             .outputOptions([
-                '-preset veryfast',
-                '-crf 33',
-                '-movflags +faststart',
-                '-b:a 96k'
+                ...(vcodec.includes('videotoolbox') ? ['-b:v', '1500k'] : []),
+                ...(vcodec.includes('nvenc') ? ['-preset', 'p2', '-tune', 'hq'] : ['-preset', 'veryfast']),
+                '-crf', '33',
+                '-movflags', '+faststart',
+                '-b:a', '96k'
             ])
             .output(outputPath)
-            .on('end', () => resolve())
-            .on('error', (err) => reject(err))
+            .on('progress', (progress) => {
+                if (progress.percent && onProgress) {
+                    onProgress(Math.floor(progress.percent));
+                    process.stdout.write(`\r[delivery] Transcode: ${Math.floor(progress.percent)}%           `);
+                }
+            })
+            .on('end', () => {
+                process.stdout.write('\n');
+                resolve();
+            })
+            .on('error', (err) => {
+                process.stdout.write('\n');
+                reject(err);
+            })
             .run();
     });
 }
