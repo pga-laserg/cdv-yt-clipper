@@ -184,11 +184,27 @@ async function run() {
 
     for (const item of detailed) {
         const c = item.clip;
+        const sb = c.score_breakdown;
         md.push(`## Clip ${item.index}: ${c.title}`);
         md.push(`- Range: ${c.start.toFixed(2)} - ${c.end.toFixed(2)} (${fmt(c.start)} - ${fmt(c.end)})`);
         md.push(`- Duration: ${item.duration_sec}s`);
-        md.push(`- Confidence: ${c.confidence}`);
-        md.push(`- Hook: ${c.hook || '[empty]'}`);
+        md.push(`- Score: ${c.score}`);
+        md.push(`- Hook type: ${c.hook_type ?? '[none]'}`);
+        md.push(`- Hook text: ${c.hook || '[empty]'}`);
+        if (sb) {
+            md.push(`- Score breakdown:`);
+            md.push(`  - hook_strength:       ${sb.hook_strength}  (weight 20%)`);
+            md.push(`  - spiritual_impact:    ${sb.spiritual_impact}  (weight 30%)`);
+            md.push(`  - shareability:        ${sb.shareability}  (weight 15%)`);
+            md.push(`  - ending_completeness: ${sb.ending_completeness}  (weight 35%)`);
+            md.push(`  - model_confidence:    ${sb.model_confidence}  (metadata only)`);
+        }
+        if (c.broll_cues && c.broll_cues.length) {
+            md.push(`- B-roll cues (${c.broll_cues.length}):`);
+            for (const cue of c.broll_cues) {
+                md.push(`  - @${cue.offset_sec.toFixed(1)}s: ${cue.description} [${cue.keywords.join(', ')}]`);
+            }
+        }
         md.push(`- Excerpt: ${c.excerpt || '[empty]'}`);
         md.push(`- Paragraph overlaps: ${item.paragraph_count}`);
         if (item.nearest_start_paragraph) {

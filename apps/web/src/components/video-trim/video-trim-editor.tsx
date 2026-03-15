@@ -9,6 +9,7 @@ import VideoPlayer from "./video-player";
 import WaveformTimeline from "./waveform-timeline";
 import TranscriptPanel from "./transcript-panel";
 import TrimToolbar from "./trim-toolbar";
+import Scorecard from "./scorecard";
 
 export default function VideoTrimEditor({
   clipId,
@@ -17,6 +18,8 @@ export default function VideoTrimEditor({
   initialStartSec,
   initialEndSec,
   transcript,
+  scoreBreakdown,
+  hookType,
 }: {
   clipId: string;
   videoUrl: string;
@@ -24,6 +27,8 @@ export default function VideoTrimEditor({
   initialStartSec: number;
   initialEndSec: number;
   transcript: TranscriptSegment[];
+  scoreBreakdown?: any;
+  hookType?: string;
 }) {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -148,6 +153,7 @@ export default function VideoTrimEditor({
       </div>
 
       <aside className="border rounded-2xl bg-white shadow-sm flex flex-col h-[800px] overflow-hidden">
+        <Scorecard scoreBreakdown={scoreBreakdown} hookType={hookType} />
         <div className="p-4 border-b bg-gray-50 flex items-center justify-between font-medium shrink-0">
           <span>Transcript</span>
         </div>

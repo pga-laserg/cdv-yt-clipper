@@ -68,6 +68,8 @@ export default async function ClipTrimmerPage({
           initialStartSec={clip.start_seconds}
           initialEndSec={clip.end_seconds}
           transcript={relevantTranscript}
+          scoreBreakdown={clip.score_breakdown}
+          hookType={clip.hook_type}
         />
       </main>
     </div>

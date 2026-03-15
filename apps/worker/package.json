@@ -41,8 +41,10 @@
         "seed": "ts-node-dev src/seed.ts"
     },
     "dependencies": {
+        "@anthropic-ai/sdk": "^0.78.0",
         "@google-cloud/speech": "^7.2.1",
         "@google-cloud/storage": "^7.19.0",
+        "@google/generative-ai": "^0.24.1",
         "@supabase/supabase-js": "^2.39.0",
         "dotenv": "^16.3.1",
         "fluent-ffmpeg": "^2.1.2",

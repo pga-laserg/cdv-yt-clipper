@@ -1,13 +1,19 @@
-import { OpenAI } from 'openai';
 import { loadWorkerEnv } from '../lib/load-env';
+import { generateStructuredOutput, LLMProvider } from '../lib/llm';
 
 loadWorkerEnv();
 
-const getOpenAIClient = () => {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) return null;
-    return new OpenAI({ apiKey });
-};
+export type HookType = 'question' | 'promise' | 'scripture' | 'story' | 'contrast' | 'none';
+
+/** A single B-roll cue point identified by the LLM within a clip. */
+export interface BrollCue {
+    /** Seconds from clip start (0 = clip.start) where the B-roll cutaway would fit */
+    offset_sec: number;
+    /** 2–3 searchable stock-footage keywords, e.g. ["open bible", "church congregation"] */
+    keywords: string[];
+    /** Short human-readable description of the suggested visual */
+    description: string;
+}
 
 export interface HighlightClip {
     start: number;
@@ -17,12 +23,21 @@ export interface HighlightClip {
     hook: string;
     confidence: number;
     score: number;
+    hook_type?: HookType;
     score_breakdown?: {
-        model_virality: number;
-        model_confidence: number;
-        duration_preference: number;
+        /** 0–1: How strongly the opening line grabs attention (LLM-rated) */
+        hook_strength: number;
+        /** 0–1: Theological depth, conviction, or emotional resonance (LLM-rated) */
+        spiritual_impact: number;
+        /** 0–1: "I'm sending this to someone" potential (LLM-rated) */
+        shareability: number;
+        /** 0–1: How cleanly the clip ends on a complete thought (local heuristic) */
         ending_completeness: number;
+        /** 0–1: Model's self-assessed coherence and correct bounding (metadata only, not in composite) */
+        model_confidence: number;
     };
+    /** B-roll cue points (only present when HIGHLIGHTS_BROLL_CUES_ENABLED=true) */
+    broll_cues?: BrollCue[];
 }
 
 export type HighlightSelectionProfile = 'standard' | 'dense' | 'arc';
@@ -56,13 +71,8 @@ interface HighlightContext {
     paragraphs?: ParagraphLite[] | null;
     chapters?: ChapterLite[] | null;
     profile?: HighlightSelectionProfileInput | null;
-}
-
-interface HighlightRequest {
-    count: number;
-    minDurationSec: number;
-    maxDurationSec: number;
-    usedRanges: Array<{ start: number; end: number }>;
+    /** When true, ask the LLM to identify B-roll cue moments per clip. Defaults to HIGHLIGHTS_BROLL_CUES_ENABLED env var. */
+    includeBrollCues?: boolean;
 }
 
 interface HighlightSelectionConfig {
@@ -72,9 +82,9 @@ interface HighlightSelectionConfig {
     preferredDurationSec: number;
     targetCount: number;
     scoreWeights: {
-        modelVirality: number;
-        modelConfidence: number;
-        durationPreference: number;
+        hookStrength: number;
+        spiritualImpact: number;
+        shareability: number;
         endingCompleteness: number;
     };
     promptGuidance: string[];
@@ -109,6 +119,12 @@ function overlaps(a: { start: number; end: number }, b: { start: number; end: nu
     return a.start < b.end + pad && b.start < a.end + pad;
 }
 
+function parseHookType(raw: unknown): HookType {
+    const value = String(raw ?? '').trim().toLowerCase();
+    const valid: HookType[] = ['question', 'promise', 'scripture', 'story', 'contrast', 'none'];
+    return (valid.includes(value as HookType) ? value : 'none') as HookType;
+}
+
 function normalizeClip(
     raw: any,
     sermonStart: number,
@@ -126,15 +142,67 @@ function normalizeClip(
     if (end - start < minDurationSec) return null;
     start = Number(start.toFixed(2));
     end = Number(end.toFixed(2));
+
+    // Parse new 4-subscore fields. If the LLM returns the legacy flat `score`
+    // float without subscores, use it as spiritual_impact and default the rest.
+    const hasNewSubscores =
+        Number.isFinite(Number(raw?.hook_strength)) ||
+        Number.isFinite(Number(raw?.spiritual_impact)) ||
+        Number.isFinite(Number(raw?.shareability));
+
+    const hook_strength = hasNewSubscores
+        ? clamp(Number(raw?.hook_strength ?? 0.5), 0, 1)
+        : 0.5;
+    const spiritual_impact = hasNewSubscores
+        ? clamp(Number(raw?.spiritual_impact ?? 0.5), 0, 1)
+        : clamp(Number(raw?.score ?? raw?.confidence ?? 0.5), 0, 1);
+    const shareability = hasNewSubscores
+        ? clamp(Number(raw?.shareability ?? 0.5), 0, 1)
+        : 0.5;
+    const confidence = clamp(Number(raw?.confidence ?? 0.55), 0, 1);
+    const hook_type = parseHookType(raw?.hook_type);
+
+    // Parse optional B-roll cues array
+    const broll_cues = parseBrollCues(raw?.broll_cues, start);
+
     return {
         start,
         end,
         title: cleanText(raw?.title || 'Sermon Highlight'),
         excerpt: cleanText(raw?.excerpt || ''),
         hook: cleanText(raw?.hook || ''),
-        confidence: clamp(Number(raw?.confidence ?? raw?.score ?? 0.55), 0, 1),
-        score: clamp(Number(raw?.score ?? raw?.confidence ?? 0.55), 0, 1)
+        confidence,
+        score: 0, // will be computed by scoreClip
+        hook_type,
+        score_breakdown: {
+            hook_strength,
+            spiritual_impact,
+            shareability,
+            ending_completeness: 0, // filled by scoreClip
+            model_confidence: confidence
+        },
+        ...(broll_cues.length ? { broll_cues } : {})
     };
+}
+
+/** Parse and sanitize the LLM's raw broll_cues array. Returns [] if missing or malformed. */
+function parseBrollCues(raw: unknown, clipStart: number): BrollCue[] {
+    if (!Array.isArray(raw) || !raw.length) return [];
+    const out: BrollCue[] = [];
+    for (const item of raw) {
+        if (!item || typeof item !== 'object') continue;
+        const offset = Number((item as any).offset_sec ?? (item as any).at_seconds ?? 0);
+        if (!Number.isFinite(offset) || offset < 0) continue;
+        const rawKw = (item as any).keywords;
+        const keywords: string[] = Array.isArray(rawKw)
+            ? rawKw.map((k: unknown) => cleanText(String(k ?? ''))).filter(Boolean).slice(0, 4)
+            : [];
+        if (!keywords.length) continue;
+        const description = cleanText(String((item as any).description ?? '')).slice(0, 120);
+        out.push({ offset_sec: Number(offset.toFixed(2)), keywords, description });
+        if (out.length >= 4) break; // cap at 4 cues per clip
+    }
+    return out;
 }
 
 function buildTranscriptLines(transcript: { start: number; end: number; text: string }[], maxLines = 180): string {
@@ -194,9 +262,9 @@ function getHighlightSelectionConfig(context?: Partial<HighlightContext>): Highl
         preferredDurationSec,
         targetCount,
         scoreWeights: {
-            modelVirality: 0.5,
-            modelConfidence: 0.1,
-            durationPreference: 0.05,
+            hookStrength: 0.20,
+            spiritualImpact: 0.30,
+            shareability: 0.15,
             endingCompleteness: 0.35
         },
         promptGuidance: []
@@ -229,7 +297,7 @@ function getHighlightSelectionConfig(context?: Partial<HighlightContext>): Highl
 }
 
 async function askHighlights(
-    openai: OpenAI,
+    provider: LLMProvider,
     model: string,
     payload: {
         profile: HighlightSelectionProfile;
@@ -244,16 +312,61 @@ async function askHighlights(
         chapterLines: string;
         usedRanges: Array<{ start: number; end: number }>;
         promptGuidance: string[];
+        includeBrollCues: boolean;
     }
 ): Promise<any[]> {
     const used = payload.usedRanges
         .map((r, idx) => `${idx + 1}. ${r.start.toFixed(2)}-${r.end.toFixed(2)}`)
         .join('\n');
+
+    const brollSchemaLine = payload.includeBrollCues
+        ? '  "broll_cues":[{"offset_sec":number,"keywords":[string],"description":string}],'
+        : '';
+
     const prompt = [
         'Select social-ready sermon highlights from this sermon-only payload.',
         'Output JSON only in this schema:',
-        '{"highlights":[{"start":number,"end":number,"title":string,"excerpt":string,"hook":string,"confidence":number,"score":number,"why_end_complete":"short"}]}',
-        `Constraints:`,
+        '{"highlights":[{',
+        '  "start":number, "end":number,',
+        '  "title":string, "excerpt":string, "hook":string,',
+        '  "confidence":number,',
+        '  "hook_type":"question"|"promise"|"scripture"|"story"|"contrast"|"none",',
+        '  "hook_strength":number,',
+        '  "spiritual_impact":number,',
+        '  "shareability":number,',
+        brollSchemaLine,
+        '  "why_end_complete":"short"',
+        '}]}',
+        '',
+        'SERMON VIRALITY SCORING — fill these three subscores per clip (0..1 each):',
+        '- "hook_strength": How strongly the opening line grabs attention.',
+        '  0.9-1.0 = bold claim, unexpected question, or striking scripture. 0.5 = decent opener. 0.0 = flat or mid-sentence start.',
+        '- "spiritual_impact": Theological depth, spiritual conviction, or emotional resonance with a faith audience.',
+        '  0.9-1.0 = transformative moment, clear application, or deeply moving. 0.5 = solid content. 0.0 = factual/logistical filler.',
+        '- "shareability": Would someone immediately send this to a friend or family member?',
+        '  0.9-1.0 = universal insight or memorable line anyone can relate to. 0.5 = meaningful but niche. 0.0 = internal church logistics.',
+        '',
+        'HOOK TYPE — classify the opening move of each clip:',
+        '  "question": Opens with a question that creates curiosity.',
+        '  "promise": Makes a bold claim or gives a promise ("If you do X, Y will happen").',
+        '  "scripture": Opens directly with a Bible verse or reference.',
+        '  "story": Starts with a personal anecdote or narrative.',
+        '  "contrast": Uses before/after, problem/solution, or paradox framing.',
+        '  "none": No discernible hook pattern.',
+        '',
+        ...(payload.includeBrollCues ? [
+            'B-ROLL CUES — for each clip, identify 2-3 moments where stock footage would enhance the visual:',
+            '- "offset_sec": seconds from clip.start (0 = very beginning of the clip)',
+            '- "keywords": 2-3 short, searchable stock-footage search terms (e.g. ["open bible", "person praying"])',
+            '  Use concrete, visual nouns. Prefer universal imagery over brand-specific references.',
+            '  Good examples: "church congregation", "sunrise over city", "family at dinner table", "hands clasped in prayer"',
+            '  Avoid abstract or non-visual terms like "faith" or "hope" alone.',
+            '- "description": one short phrase describing the suggested visual cutaway',
+            '- Identify moments when the speaker references a concrete object, place, person, or concept that benefits from illustration.',
+            '- Prefer emotional peaks, metaphor explanations, or scripture context moments.',
+            '',
+        ] : []),
+        'CLIP SELECTION CONSTRAINTS:',
         `- return exactly ${payload.count} highlight(s)`,
         '- select the best overall ideas, not the best ideas that merely happen to be near the preferred duration',
         '- prioritize clips whose central idea is strong, memorable, emotionally resonant, and likely to hold attention',
@@ -261,13 +374,12 @@ async function askHighlights(
         `- each duration must be between ${payload.minDurationSec}s and ${payload.maxDurationSec}s`,
         `- duration near ${payload.preferredDurationSec}s is only a weak preference, not a hard target`,
         '- do not sacrifice a complete idea just to land near the preferred duration',
-        '- each clip must be catchy and complete thought (prioritize complete endings over intros)',
+        '- each clip must be a catchy, complete thought (prioritize complete endings over intros)',
         '- avoid clipping before the core idea lands; ending completeness is critical',
         '- avoid overlap with already selected ranges',
         '- spread clips across different sermon moments',
         '- clips must stay within sermon bounds',
         `- selection profile: ${payload.profile}`,
-        '- "score" must mean viral potential of the idea itself on a 0..1 scale',
         '- "confidence" must mean your confidence that the selected clip is coherent, complete, and correctly bounded',
         `Sermon bounds: ${payload.sermonStart.toFixed(2)}-${payload.sermonEnd.toFixed(2)}`,
         used ? `Already selected ranges (avoid overlap):\n${used}` : 'Already selected ranges: none',
@@ -283,13 +395,10 @@ async function askHighlights(
         payload.transcriptLines
     ].join('\n');
 
-    const response = await openai.chat.completions.create({
-        model,
-        messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+    const result = await generateStructuredOutput<{ highlights: any[] }>(provider, model, {
+        prompt
     });
-    const content = response.choices[0]?.message?.content ?? '{}';
-    return parseHighlights(content);
+    return result?.highlights || [];
 }
 
 function endingCompletenessScore(
@@ -303,26 +412,10 @@ function endingCompletenessScore(
         .join(' ')
         .trim();
     if (!tail) return 0.4;
-    if (/[.!?]["')\]]?\s*$/.test(tail)) return 1;
-    if (/\b(am[ée]n|amen|gracias|oramos|oremos)\b/i.test(tail)) return 0.9;
+    if (/[.!?]["')]?\s*$/.test(tail)) return 1;
+    if (/\b(amé?n|gracias|oramos|oremos)\b/i.test(tail)) return 0.9;
     if (/[,;:]\s*$/.test(tail)) return 0.45;
     return 0.65;
-}
-
-function durationPreferenceScore(duration: number, preferred: number, min: number, max: number): number {
-    if (duration < min || duration > max) return 0;
-    const edgeFloor = 0.65;
-    if (duration === preferred) return 1;
-    if (duration < preferred) {
-        const leftSpan = Math.max(1, preferred - min);
-        const distance = preferred - duration;
-        const normalized = clamp(distance / leftSpan, 0, 1);
-        return clamp(1 - normalized * (1 - edgeFloor), edgeFloor, 1);
-    }
-    const rightSpan = Math.max(1, max - preferred);
-    const distance = duration - preferred;
-    const normalized = clamp(distance / rightSpan, 0, 1);
-    return clamp(1 - normalized * (1 - edgeFloor), edgeFloor, 1);
 }
 
 function scoreClip(
@@ -330,32 +423,28 @@ function scoreClip(
     transcript: { start: number; end: number; text: string }[],
     config: HighlightSelectionConfig
 ): HighlightClip {
-    const duration = clip.end - clip.start;
-    const virality = clamp(clip.score, 0, 1);
-    const conf = clamp(clip.confidence, 0, 1);
-    const durScore = durationPreferenceScore(
-        duration,
-        config.preferredDurationSec,
-        config.minDurationSec,
-        config.maxDurationSec
-    );
+    const { hookStrength, spiritualImpact, shareability, endingCompleteness } = config.scoreWeights;
+    const sb = clip.score_breakdown!;
+
     const endScore = endingCompletenessScore(clip, transcript);
     const score = clamp(
-        virality * config.scoreWeights.modelVirality +
-            conf * config.scoreWeights.modelConfidence +
-            durScore * config.scoreWeights.durationPreference +
-            endScore * config.scoreWeights.endingCompleteness,
+        sb.hook_strength * hookStrength +
+        sb.spiritual_impact * spiritualImpact +
+        sb.shareability * shareability +
+        endScore * endingCompleteness,
         0,
         1
     );
+
     return {
         ...clip,
         score: Number(score.toFixed(3)),
         score_breakdown: {
-            model_virality: Number(virality.toFixed(3)),
-            model_confidence: Number(conf.toFixed(3)),
-            duration_preference: Number(durScore.toFixed(3)),
-            ending_completeness: Number(endScore.toFixed(3))
+            hook_strength: Number(sb.hook_strength.toFixed(3)),
+            spiritual_impact: Number(sb.spiritual_impact.toFixed(3)),
+            shareability: Number(sb.shareability.toFixed(3)),
+            ending_completeness: Number(endScore.toFixed(3)),
+            model_confidence: Number(sb.model_confidence.toFixed(3))
         }
     };
 }
@@ -364,20 +453,31 @@ async function findHighlightsOpenAI(
     transcript: { start: number; end: number; text: string }[],
     context?: Partial<HighlightContext>
 ): Promise<HighlightClip[]> {
-    const openai = getOpenAIClient();
-    if (!openai) {
-        console.warn('OpenAI API key missing, skipping AI highlights.');
-        return [];
+    const provider = (process.env.HIGHLIGHTS_LLM_PROVIDER || 'openai').toLowerCase() as LLMProvider;
+    
+    // Resolve model based on provider
+    let model = '';
+    if (provider === 'google') {
+        model = process.env.HIGHLIGHTS_GOOGLE_MODEL || 'gemini-2.0-flash';
+    } else if (provider === 'anthropic') {
+        model = process.env.HIGHLIGHTS_ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
+    } else {
+        model = process.env.HIGHLIGHTS_OPENAI_MODEL || process.env.ANALYZE_OPENAI_MODEL || 'gpt-4o-mini';
     }
+    
     if (!transcript.length) return [];
 
     const selection = getHighlightSelectionConfig(context);
     const sermonStart = Number(context?.sermonStart ?? transcript[0].start);
     const sermonEnd = Number(context?.sermonEnd ?? transcript[transcript.length - 1].end);
     const { minDurationSec, maxDurationSec, preferredDurationSec, targetCount } = selection;
-    const model = process.env.HIGHLIGHTS_OPENAI_MODEL || process.env.ANALYZE_OPENAI_MODEL || 'gpt-5-mini';
+    
+    const includeBrollCues =
+        context?.includeBrollCues ??
+        String(process.env.HIGHLIGHTS_BROLL_CUES_ENABLED ?? 'false').toLowerCase() === 'true';
+    
     console.log(
-        `Finding highlights using strategy: openai profile=${selection.profile} range=${minDurationSec}-${maxDurationSec}s preferred=${preferredDurationSec}s`
+        `Finding highlights using strategy: ${provider} model=${model} profile=${selection.profile} range=${minDurationSec}-${maxDurationSec}s preferred=${preferredDurationSec}s broll=${includeBrollCues}`
     );
 
     const paragraphsAll = Array.isArray(context?.paragraphs) ? context!.paragraphs! : [];
@@ -406,19 +506,24 @@ async function findHighlightsOpenAI(
     const accepted: HighlightClip[] = [];
     let usedRanges: Array<{ start: number; end: number }> = [];
 
-    const pass1 = await askHighlights(openai, model, {
+    const sharedPayload = {
         profile: selection.profile,
         sermonStart,
         sermonEnd,
         minDurationSec,
         maxDurationSec,
         preferredDurationSec,
-        count: targetCount,
         paragraphLines,
         transcriptLines,
         chapterLines,
-        usedRanges,
-        promptGuidance: selection.promptGuidance
+        promptGuidance: selection.promptGuidance,
+        includeBrollCues
+    };
+
+    const pass1 = await askHighlights(provider, model, {
+        ...sharedPayload,
+        count: targetCount,
+        usedRanges
     });
     for (const raw of pass1) {
         const clip = normalizeClip(raw, sermonStart, sermonEnd, minDurationSec, maxDurationSec);
@@ -431,19 +536,10 @@ async function findHighlightsOpenAI(
 
     const remaining = Math.max(0, targetCount - accepted.length);
     if (remaining > 0) {
-        const pass2 = await askHighlights(openai, model, {
-            profile: selection.profile,
-            sermonStart,
-            sermonEnd,
-            minDurationSec,
-            maxDurationSec,
-            preferredDurationSec,
+        const pass2 = await askHighlights(provider, model, {
+            ...sharedPayload,
             count: remaining,
-            paragraphLines,
-            transcriptLines,
-            chapterLines,
-            usedRanges,
-            promptGuidance: selection.promptGuidance
+            usedRanges
         });
         for (const raw of pass2) {
             const clip = normalizeClip(raw, sermonStart, sermonEnd, minDurationSec, maxDurationSec);

@@ -5,6 +5,7 @@ import { render } from './pipeline/render';
 import { uploadFile, UploadFailedError } from './pipeline/store';
 import { runBlogArtifactPostProcess } from './pipeline/blog-artifact';
 import { supabase } from './lib/supabase';
+import { getProcessingCache, upsertProcessingCache, generateTranscriptHash } from './lib/cache';
 import path from 'path';
 import fs from 'fs';
 import ffmpeg from 'fluent-ffmpeg';
@@ -68,6 +69,15 @@ async function runPipeline(job: PipelineJob) {
     let currentStage = 'initializing';
 
     try {
+        // 0. Cache Lookup
+        console.log(`[cache] Checking for ${source}...`);
+        const cacheHit = await getProcessingCache(source);
+        let cachedSegments = cacheHit?.segments || null;
+        let cachedAnalysis = cacheHit?.analysis_json || null;
+
+        if (cacheHit) {
+            console.log(`[cache] HIT for ${source}. Has segments: ${Boolean(cachedSegments)}, Has analysis: ${Boolean(cachedAnalysis)}`);
+        }
         // 1. Ingest
         console.log('--- Stage 1: Ingest ---');
         currentStage = 'ingest';
@@ -114,38 +124,71 @@ async function runPipeline(job: PipelineJob) {
         console.log('--- Stage 2: Transcribe ---');
         currentStage = 'transcribe';
         await updateJobStatus(jobId, organizationId, 'processing:transcribe', job.claim_token);
-        const totalDurationSeconds = await getMediaDurationSeconds(audioPath);
-        let lastProgressSecond = -1;
-        let lastProgressAt = 0;
-        const segments = await transcribe(audioPath, {
-            onProgress: (currentSeconds) => {
-                if (!totalDurationSeconds || !Number.isFinite(totalDurationSeconds)) return;
-                const current = Math.min(Math.max(0, Math.floor(currentSeconds)), Math.floor(totalDurationSeconds));
-                const now = Date.now();
-
-                // Throttle DB writes while still giving useful movement in UI.
-                if (current <= lastProgressSecond || now - lastProgressAt < 5000) return;
-                lastProgressSecond = current;
-                lastProgressAt = now;
-                void updateJobStatus(jobId, organizationId, `processing:transcribe:${current}/${Math.floor(totalDurationSeconds)}`, job.claim_token).catch((error) => {
-                    console.warn(`Failed to write transcribe progress for job ${jobId}:`, error);
-                });
-            },
-            onFallback: (reason) => {
-                console.warn(reason);
-                void updateJobStatus(jobId, organizationId, 'processing:transcribe:fallback', job.claim_token).catch((error) => {
-                    console.warn(`Failed to write transcribe fallback status for job ${jobId}:`, error);
-                });
-            }
-        });
+        
+        let segments: any[] = [];
         const srtPath = path.join(path.dirname(audioPath), 'source.srt');
+
+        if (cachedSegments && cachedSegments.length > 0) {
+            console.log(`[cache] Skipping Transcribe: using ${cachedSegments.length} cached segments.`);
+            segments = cachedSegments;
+            // Ensure SRT exists for following stages
+            if (!fs.existsSync(srtPath)) {
+                const { jsonToSrt } = await import('./utils/srt');
+                fs.writeFileSync(srtPath, jsonToSrt(segments));
+            }
+        } else {
+            const totalDurationSeconds = await getMediaDurationSeconds(audioPath);
+            let lastProgressSecond = -1;
+            let lastProgressAt = 0;
+            segments = await transcribe(audioPath, {
+                onProgress: (currentSeconds) => {
+                    if (!totalDurationSeconds || !Number.isFinite(totalDurationSeconds)) return;
+                    const current = Math.min(Math.max(0, Math.floor(currentSeconds)), Math.floor(totalDurationSeconds));
+                    const now = Date.now();
+
+                    // Throttle DB writes while still giving useful movement in UI.
+                    if (current <= lastProgressSecond || now - lastProgressAt < 5000) return;
+                    lastProgressSecond = current;
+                    lastProgressAt = now;
+                    void updateJobStatus(jobId, organizationId, `processing:transcribe:${current}/${Math.floor(totalDurationSeconds)}`, job.claim_token).catch((error) => {
+                        console.warn(`Failed to write transcribe progress for job ${jobId}:`, error);
+                    });
+                },
+                onFallback: (reason) => {
+                    console.warn(reason);
+                    void updateJobStatus(jobId, organizationId, 'processing:transcribe:fallback', job.claim_token).catch((error) => {
+                        console.warn(`Failed to write transcribe fallback status for job ${jobId}:`, error);
+                    });
+                }
+            });
+            // Update cache with segments if they were newly generated
+            await upsertProcessingCache(source, { segments });
+        }
         console.log(`Stage transcribe completed in ${Math.round((Date.now() - startedAt) / 1000)}s`);
 
         // 3. Analyze
         console.log('--- Stage 3: Analyze ---');
         currentStage = 'analyze';
         await updateJobStatus(jobId, organizationId, 'processing:analyze', job.claim_token);
-        const { boundaries, clips } = await analyze(segments, { workDir, audioPath, videoPath: videoPathLight });
+
+        let boundaries: { start: number; end: number };
+        let clips: any[];
+
+        if (cachedAnalysis && cacheHit?.transcript_hash === generateTranscriptHash(segments)) {
+            console.log('[cache] Skipping Analyze: using cached boundaries and clips.');
+            boundaries = cachedAnalysis.boundaries;
+            clips = cachedAnalysis.clips;
+        } else {
+            const analysisResult = await analyze(segments, { workDir, audioPath, videoPath: videoPathLight });
+            boundaries = analysisResult.boundaries;
+            clips = analysisResult.clips;
+            
+            // Persist full result to cache
+            await upsertProcessingCache(source, { 
+                segments, 
+                analysis: { boundaries, clips } 
+            });
+        }
         console.log(`Stage analyze completed in ${Math.round((Date.now() - startedAt) / 1000)}s`);
 
         // 4. Render
@@ -704,6 +747,9 @@ async function savePipelineResults(
             title: clip.title,
             transcript_excerpt: clip.excerpt,
             confidence_score: clip.confidence,
+            hook_type: clip.hook_type ?? null,
+            score_breakdown: clip.score_breakdown ?? null,
+            broll_cues: clip.broll_cues ?? null,
             video_url: videoUrl,
             status: 'draft'
         };
@@ -729,6 +775,9 @@ async function savePipelineResults(
                 title: clip.title,
                 transcript_excerpt: clip.excerpt,
                 confidence_score: clip.confidence,
+                hook_type: clip.hook_type ?? null,
+                score_breakdown: clip.score_breakdown ?? null,
+                broll_cues: clip.broll_cues ?? null,
                 video_url: videoUrl,
                 status: 'draft'
             });

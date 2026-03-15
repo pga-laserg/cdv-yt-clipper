@@ -64,6 +64,12 @@ export async function ingest(source: string, outputDir: string, onProgress?: (st
         fs.mkdirSync(outputDir, { recursive: true });
     }
 
+    try {
+        fs.writeFileSync(path.join(outputDir, 'metadata.json'), JSON.stringify({ source, ingestedAt: new Date().toISOString() }, null, 2));
+    } catch (error) {
+        console.warn(`Failed to write ingest metadata.json: ${error}`);
+    }
+
     const ingestStartedAt = Date.now();
     const isHttp = source.startsWith('http://') || source.startsWith('https://');
     const sourceType: 'remote' | 'local' = isHttp ? 'remote' : 'local';

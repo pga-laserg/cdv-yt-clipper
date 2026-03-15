@@ -2,6 +2,7 @@ import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import { jsonToSrt } from '../utils/srt';
+import { fetchYouTubeTranscript } from '../lib/defuddle';
 
 export interface TransientSegment {
     start: number;
@@ -75,6 +76,52 @@ export async function transcribe(audioPath: string, options?: TranscribeOptions)
     }
 
     const provider = resolveTranscribeProvider(process.env.TRANSCRIBE_PROVIDER);
+    const workDir = path.dirname(audioPath);
+    const metadataPath = path.join(workDir, 'metadata.json');
+    let sourceUrl: string | undefined;
+    if (fs.existsSync(metadataPath)) {
+        try {
+            const meta = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+            sourceUrl = meta.source;
+        } catch (e) {
+            console.warn(`Failed to read metadata.json for source URL: ${e}`);
+        }
+    }
+
+    const isYouTube = sourceUrl && (sourceUrl.includes('youtube.com') || sourceUrl.includes('youtu.be'));
+    const tryDefuddle = isYouTube && (provider === 'auto' || provider === 'local' || provider === 'elevenlabs_scribe_v2');
+
+    if (tryDefuddle && sourceUrl) {
+        try {
+            console.log(`YouTube source detected. Attempting Defuddle fast-path for ${sourceUrl}...`);
+            const { segments, audioEvents } = await fetchYouTubeTranscript(sourceUrl);
+            if (segments.length > 0) {
+                console.log(`Defuddle fast-path succeeded with ${segments.length} segments.`);
+                
+                // Write standard artifacts
+                writeTranscriptArtifacts(audioPath, segments);
+                
+                // Write Defuddle-specific audio events artifact if music detected
+                if (audioEvents.length > 0) {
+                    const audioEventsPayload = {
+                        source: 'defuddle-youtube-manual-captions',
+                        duration_sec: segments[segments.length - 1].end,
+                        step_sec: null,
+                        segments: audioEvents
+                    };
+                    fs.writeFileSync(path.join(workDir, 'audio.events.defuddle.json'), JSON.stringify(audioEventsPayload, null, 2));
+                    // Also write to the primary audio.events.json to satisfy downstream signals
+                    fs.writeFileSync(path.join(workDir, 'audio.events.json'), JSON.stringify(audioEventsPayload, null, 2));
+                    console.log(`Music cues detected via Defuddle: ${audioEvents.length} events (written to audio.events.json).`);
+                }
+                
+                return segments;
+            }
+        } catch (error) {
+            console.warn(`Defuddle fast-path failed: ${error}. Falling back to normal flow.`);
+        }
+    }
+
     const tryElevenLabs = provider === 'auto' || provider === 'elevenlabs_scribe_v2';
     if (tryElevenLabs) {
         try {
