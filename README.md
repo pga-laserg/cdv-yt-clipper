@@ -9,8 +9,13 @@ Many churches lack consistent media volunteers. This project serves as a "force 
 ## 🔄 How it Works
 
 1.  **Ingest**: YouTube livestreams or local uploads are pulled into the system.
-2.  **Transcription**: Local STT (Whisper/faster-whisper) creates a timestamped transcript.
-3.  **Analysis**: AI-powered detection identifies sermon boundaries and selects high-impact highlight moments (under 60s).
+2.  **Transcription**:
+    - **Defuddle Fast-Path**: (YouTube only) Fetches existing captions and music cues immediately.
+    - **ElevenLabs Scribe v2**: Cloud STT fallback for high-quality word-level timestamps.
+    - **Local STT**: `faster-whisper` serves as a reliable local fallback.
+3.  **Analysis**: AI-powered detection identifies sermon boundaries and selects high-impact highlight moments.
+    - **Virality Scoring**: 4-factor taxonomy (Hook, Impact, Shareability, Completeness).
+    - **B-roll Cues**: AI identifies moments for stock footage insertion.
 4.  **Rendering**: `ffmpeg` automatically cuts the horizontal sermon-only video and vertical 9:16 shorts.
 5.  **Review**: A volunteer uses the Next.js dashboard to preview, edit titles, and approve clips for publishing.
 
@@ -19,14 +24,15 @@ Many churches lack consistent media volunteers. This project serves as a "force 
 -   **Monorepo**: Managed with [Turborepo](https://turbo.build/repo).
 -   **Web App**: [Next.js](https://nextjs.org/) (Frontend & Dashboard).
 -   **Worker**: Node.js engine for heavy lifting (processing & rendering).
--   **Database**: [Supabase](https://supabase.com/) (Auth, Metadata, and optional Storage).
--   **Processing**: `ffmpeg` for video manipulation and local Whisper models for transcription.
+-   **Transcription**: [Defuddle](src/lib/defuddle.ts), [ElevenLabs Scribe v2](src/pipeline/transcribe.ts), and local Whisper models.
+-   **Database**: [Supabase](https://supabase.com/) (Auth, Metadata, and Processing Cache).
+-   **Processing**: `ffmpeg` for video manipulation and local/cloud STT providers.
 
 ## 📁 Repository Structure
 
 -   `apps/web`: The Next.js dashboard for reviewing and managing jobs.
 -   `apps/worker`: The core logic for ingestion, transcription, and video rendering.
--   `packages/*`: Shared utilities and configurations.
+-   `docs/worker-pipeline.md`: Technical deep-dive into the processing pipeline.
 
 ## ⚡️ Getting Started
 
@@ -53,6 +59,9 @@ Many churches lack consistent media volunteers. This project serves as a "force 
 
 ## 📈 Roadmap
 
--   [ ] Speaker diarization to better isolate the preacher.
+-   [x] Speaker diarization to isolate the preacher.
+-   [x] Processing Cache to skip redundant work.
 -   [ ] Integrated captioning for vertical shorts.
 -   [ ] Direct social media publishing (Postiz integration).
+
+
