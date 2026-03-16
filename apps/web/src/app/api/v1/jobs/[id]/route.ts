@@ -33,7 +33,7 @@ export async function GET(
 
     const { data: job, error: jobError } = await supabaseServer
       .from('jobs')
-      .select('id, organization_id, created_at, status, source_url, title, video_url, srt_url, sermon_start_seconds, sermon_end_seconds, metadata')
+      .select('id, organization_id, created_at, status, source_url, title, video_url, srt_url, sermon_start_seconds, sermon_end_seconds, metadata, claimed_at, lease_expires_at')
       .eq('id', id)
       .eq('organization_id', org.organization_id)
       .maybeSingle();
@@ -69,6 +69,112 @@ export async function GET(
     };
 
     return NextResponse.json(response);
+  } catch (error) {
+    return orgContextErrorResponse(error);
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  if (!isApiEnabled()) {
+    return NextResponse.json(
+      { error: 'API temporarily disabled', code: 'api_disabled' },
+      { status: 503 }
+    );
+  }
+
+  try {
+    const supabaseServer = getSupabaseServer();
+    const org = await requireOrgContext(request);
+    const { id } = await context.params;
+    const body = await request.json();
+
+    if (!UUID_RE.test(id)) {
+      return NextResponse.json({ error: 'Invalid job id' }, { status: 400 });
+    }
+
+    const { mode } = body; // 'abort' or 'retry'
+    let updateData: Record<string, any> = {};
+
+    if (mode === 'abort') {
+      updateData = {
+        status: 'failed',
+        last_error: 'Cancelled by user',
+        claim_token: null,
+        claimed_at: null,
+        claimed_by: null,
+        lease_expires_at: null
+      };
+    } else if (mode === 'retry') {
+      updateData = {
+        status: 'pending',
+        last_error: null,
+        claim_token: null,
+        claimed_at: null,
+        claimed_by: null,
+        lease_expires_at: null,
+        current_stage: null,
+        progress_percentage: 0
+      };
+    } else {
+      return NextResponse.json({ error: 'Invalid update mode' }, { status: 400 });
+    }
+
+    const { data, error } = await supabaseServer
+      .from('jobs')
+      .update(updateData)
+      .eq('id', id)
+      .eq('organization_id', org.organization_id)
+      .select('id, status')
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, job: data });
+  } catch (error) {
+    return orgContextErrorResponse(error);
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  if (!isApiEnabled()) {
+    return NextResponse.json(
+      { error: 'API temporarily disabled', code: 'api_disabled' },
+      { status: 503 }
+    );
+  }
+
+  try {
+    const supabaseServer = getSupabaseServer();
+    const org = await requireOrgContext(request);
+    const { id } = await context.params;
+
+    if (!UUID_RE.test(id)) {
+      return NextResponse.json({ error: 'Invalid job id' }, { status: 400 });
+    }
+
+    // Actually delete the record
+    const { error } = await supabaseServer
+      .from('jobs')
+      .delete()
+      .eq('id', id)
+      .eq('organization_id', org.organization_id);
+
+    if (error) {
+      return NextResponse.json(
+        { error: `Failed to delete job: ${error.message}` },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
   } catch (error) {
     return orgContextErrorResponse(error);
   }

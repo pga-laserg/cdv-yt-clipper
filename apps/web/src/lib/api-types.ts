@@ -21,6 +21,8 @@ export interface JobRecord {
   sermon_start_seconds?: number | null;
   sermon_end_seconds?: number | null;
   metadata?: Record<string, unknown> | null;
+  claimed_at?: string | null;
+  lease_expires_at?: string | null;
 }
 
 export interface ClipRecord {

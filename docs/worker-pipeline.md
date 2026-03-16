@@ -10,6 +10,8 @@ This document describes the internal architecture of the `apps/worker` service: 
 
 The worker runs a linear pipeline of stages. Each stage is orchestrated from `src/index.ts` → `runPipeline()`.
 
+For specific details on running this on a Mac M1 with hardware acceleration and background persistence, see [Mac M1 Worker Architecture](./mac-m1-worker.md).
+
 ```
 Job (source_url from Supabase)
   │

@@ -11,6 +11,7 @@ interface AnalyzeOptions {
     workDir?: string;
     audioPath?: string;
     videoPath?: string;
+    signal?: AbortSignal;
 }
 
 export async function analyze(
@@ -22,7 +23,8 @@ export async function analyze(
     const boundaries = await findSermonBoundaries(transcript, {
         workDir: options.workDir,
         audioPath: options.audioPath,
-        videoPath: options.videoPath
+        videoPath: options.videoPath,
+        signal: options.signal
     });
 
     let finalBoundaries = boundaries;

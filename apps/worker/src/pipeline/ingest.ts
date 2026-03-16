@@ -11,6 +11,7 @@ export interface IngestResult {
     videoPathLight: string;
     videoPathPreferredRender: string;
     ingestProfile: IngestProfile;
+    title?: string;
 }
 
 interface DownloadAttempt {
@@ -57,7 +58,7 @@ interface IngestPlan {
     audioFromHQ: boolean;
 }
 
-export async function ingest(source: string, outputDir: string, onProgress?: (stage: string, percent: number) => void): Promise<IngestResult> {
+export async function ingest(source: string, outputDir: string, onProgress?: (stage: string, percent: number) => void, signal?: AbortSignal): Promise<IngestResult> {
     console.log(`Ingesting source: ${source}`);
 
     if (!fs.existsSync(outputDir)) {
@@ -90,7 +91,7 @@ export async function ingest(source: string, outputDir: string, onProgress?: (st
     if (source.startsWith('http')) {
         removeExistingOriginalVideos(outputDir);
         if (source.includes('youtube.com') || source.includes('youtu.be')) {
-            videoPathOriginal = await downloadYouTubeHighest(source, originalVideoTemplate, outputDir);
+            videoPathOriginal = await downloadYouTubeHighest(source, originalVideoTemplate, outputDir, signal);
         } else if (isGoogleDriveUrl(source)) {
             console.log(`Google Drive source detected: ${source}`);
             videoPathOriginal = await downloadGoogleDriveVideo(source, path.join(outputDir, 'source.original.mp4'));
@@ -166,6 +167,22 @@ export async function ingest(source: string, outputDir: string, onProgress?: (st
             `hq_performed=${ingestProfile.hq_transcode_performed} total=${Date.now() - ingestStartedAt}ms`
     );
 
+    const ffprobeBin = resolveBinary(['/opt/homebrew/bin/ffprobe', '/usr/local/bin/ffprobe', 'ffprobe']);
+    let extractedTitle = probeVideoTitle(videoPathOriginal, ffprobeBin);
+    if (!extractedTitle && isHttp) {
+        const ytDlpBin = resolveBinary(['/opt/homebrew/bin/yt-dlp', '/usr/local/bin/yt-dlp', 'yt-dlp']);
+        if (ytDlpBin) {
+            try {
+                const res = spawnSync(ytDlpBin, ['--get-title', source], { encoding: 'utf8', env: buildSpawnEnv() });
+                if (res.status === 0) extractedTitle = res.stdout.trim();
+            } catch {}
+        }
+    }
+    if (!extractedTitle) {
+        const base = path.basename(source);
+        extractedTitle = base.includes('.') ? base.substring(0, base.lastIndexOf('.')) : base;
+    }
+
     return {
         videoPath: videoPathPreferredRender,
         audioPath,
@@ -173,7 +190,8 @@ export async function ingest(source: string, outputDir: string, onProgress?: (st
         videoPathHQ,
         videoPathLight,
         videoPathPreferredRender,
-        ingestProfile
+        ingestProfile,
+        title: extractedTitle
     };
 }
 
@@ -256,7 +274,7 @@ function removeExistingOriginalVideos(outputDir: string): void {
     }
 }
 
-function downloadYouTubeHighest(url: string, outputTemplate: string, outputDir: string): Promise<string> {
+function downloadYouTubeHighest(url: string, outputTemplate: string, outputDir: string, signal?: AbortSignal): Promise<string> {
     const ytDlpBin = resolveBinary(['/opt/homebrew/bin/yt-dlp', '/usr/local/bin/yt-dlp', 'yt-dlp']);
     if (!ytDlpBin) {
         throw new Error('yt-dlp binary not found. Install yt-dlp and ensure it is on PATH.');
@@ -317,15 +335,29 @@ function downloadYouTubeHighest(url: string, outputTemplate: string, outputDir: 
     }
 
     const runAttempt = (attempt: DownloadAttempt): Promise<string | null> =>
-        new Promise((resolve) => {
+        new Promise((resolve, reject) => {
             console.log(`yt-dlp attempt: ${attempt.name}`);
             removeExistingOriginalVideos(outputDir);
             const ytDlp = spawn(ytDlpBin, [...commonArgs, ...attempt.args, '-o', outputTemplate, url], {
                 env: buildSpawnEnv()
             });
+
+            const onAbort = () => {
+                console.log(`Aborting yt-dlp attempt: ${attempt.name}`);
+                try {
+                    ytDlp.kill('SIGKILL');
+                } catch {}
+                reject(new Error('yt-dlp download aborted via signal'));
+            };
+
+            if (signal) {
+                signal.addEventListener('abort', onAbort, { once: true });
+            }
+
             ytDlp.stdout.on('data', (data) => console.log(`yt-dlp: ${data}`));
             ytDlp.stderr.on('data', (data) => console.error(`yt-dlp stderr: ${data}`));
             ytDlp.on('close', (code) => {
+                if (signal) signal.removeEventListener('abort', onAbort);
                 if (code !== 0) return resolve(null);
                 const output = findExistingOriginalVideo(outputDir);
                 resolve(output ?? null);
@@ -701,6 +733,30 @@ function probeVideoDuration(videoPath: string, ffprobeBin: string | null): numbe
         const duration = Number.parseFloat(raw);
         if (!Number.isFinite(duration) || duration <= 0) return null;
         return duration;
+    } catch {
+        return null;
+    }
+}
+
+function probeVideoTitle(videoPath: string, ffprobeBin: string | null): string | null {
+    if (!ffprobeBin) return null;
+    try {
+        const result = spawnSync(
+            ffprobeBin,
+            [
+                '-v',
+                'error',
+                '-show_entries',
+                'format_tags=title',
+                '-of',
+                'default=noprint_wrappers=1:nokey=1',
+                videoPath
+            ],
+            { encoding: 'utf8' }
+        );
+        if (result.status !== 0) return null;
+        const raw = (result.stdout ?? '').trim();
+        return raw || null;
     } catch {
         return null;
     }

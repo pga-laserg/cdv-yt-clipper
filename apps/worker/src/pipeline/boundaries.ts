@@ -131,6 +131,7 @@ interface FindBoundariesOptions {
     workDir?: string;
     audioPath?: string;
     videoPath?: string;
+    signal?: AbortSignal;
 }
 
 interface CorrectionOptions {
@@ -762,12 +763,35 @@ function sanitizeCandidates(
 function runProcess(
     cmd: string,
     args: string[],
-    options: { streamStdout?: boolean; streamStderr?: boolean; logPrefix?: string } = {}
+    options: { streamStdout?: boolean; streamStderr?: boolean; logPrefix?: string; timeoutMs?: number; signal?: AbortSignal } = {}
 ): Promise<{ stdout: string; stderr: string }> {
     return new Promise((resolve, reject) => {
         const proc = spawn(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] });
         let stdout = '';
         let stderr = '';
+        let settled = false;
+        
+        const timeout = options.timeoutMs ? setTimeout(() => {
+            if (settled) return;
+            settled = true;
+            try {
+                proc.kill('SIGKILL');
+            } catch {}
+            reject(new Error(`${cmd} timed out after ${options.timeoutMs}ms`));
+        }, options.timeoutMs) : null;
+
+        if (options.signal) {
+            options.signal.addEventListener('abort', () => {
+                if (settled) return;
+                settled = true;
+                if (timeout) clearTimeout(timeout);
+                try {
+                    proc.kill('SIGKILL');
+                } catch {}
+                reject(new Error(`${cmd} aborted via signal`));
+            }, { once: true });
+        }
+
         const prefix = options.logPrefix ? `${options.logPrefix} ` : '';
         proc.stdout.on('data', (d) => {
             const chunk = d.toString();
@@ -779,8 +803,16 @@ function runProcess(
             stderr += chunk;
             if (options.streamStderr) process.stderr.write(`${prefix}${chunk}`);
         });
-        proc.on('error', (err) => reject(err));
+        proc.on('error', (err) => {
+            if (settled) return;
+            settled = true;
+            if (timeout) clearTimeout(timeout);
+            reject(err);
+        });
         proc.on('close', (code) => {
+            if (settled) return;
+            settled = true;
+            if (timeout) clearTimeout(timeout);
             if (code !== 0) return reject(new Error(`${cmd} exited with code ${code}. stderr tail: ${stderr.slice(-1200)}`));
             resolve({ stdout, stderr });
         });
@@ -1418,13 +1450,18 @@ async function runDiarizeGoogleChirp(chunkPath: string): Promise<SpeakerTurn[]> 
     }
 
     if (words.length === 0) {
+        console.warn(`[targeted-diarization][google_chirp3] No words found. Response results keys: ${Object.keys((response as any)?.results || {}).join(', ')}`);
+        if (resultEntry) {
+            console.warn(`[targeted-diarization][google_chirp3] resultEntry keys: ${Object.keys(resultEntry).join(', ')}`);
+            if (resultEntry.error) console.error(`[targeted-diarization][google_chirp3] resultEntry error:`, resultEntry.error);
+        }
         throw new Error('Google Chirp 3 returned no diarized words for targeted chunk.');
     }
     console.log(`[targeted-diarization][google_chirp3] parsed diarized words=${words.length}`);
     return wordsToSpeakerTurns(words);
 }
 
-async function runDiarizeLocal(chunkPath: string): Promise<SpeakerTurn[]> {
+async function runDiarizeLocal(chunkPath: string, signal?: AbortSignal): Promise<SpeakerTurn[]> {
     const pythonScriptCandidates = [
         path.resolve(__dirname, 'python/diarize.py'),
         path.resolve(__dirname, '../../src/pipeline/python/diarize.py')
@@ -1444,7 +1481,7 @@ async function runDiarizeLocal(chunkPath: string): Promise<SpeakerTurn[]> {
     if (token) args.push('--token', token);
     console.log(`[targeted-diarization][local] running pyannote on ${path.basename(chunkPath)}`);
     const t0 = Date.now();
-    const { stdout } = await runProcess(pythonBin, args, { streamStderr: true, logPrefix: '[targeted-diarization][local]' });
+    const { stdout } = await runProcess(pythonBin, args, { streamStderr: true, logPrefix: '[targeted-diarization][local]', signal });
     console.log(`[targeted-diarization][local] completed in ${((Date.now() - t0) / 1000).toFixed(1)}s`);
     const parsed = JSON.parse(stdout) as SpeakerTurn[];
     if (!Array.isArray(parsed)) throw new Error('Invalid diarization output (expected array).');
@@ -1452,7 +1489,7 @@ async function runDiarizeLocal(chunkPath: string): Promise<SpeakerTurn[]> {
     return parsed;
 }
 
-async function runDiarize(chunkPath: string): Promise<SpeakerTurn[]> {
+async function runDiarize(chunkPath: string, signal?: AbortSignal): Promise<SpeakerTurn[]> {
     const backend = String(process.env.TARGET_DIAR_BACKEND ?? 'google_chirp3').toLowerCase();
     console.log(`[targeted-diarization] backend=${backend} chunk=${path.basename(chunkPath)}`);
     if (backend === 'google_chirp3') {
@@ -1463,10 +1500,10 @@ async function runDiarize(chunkPath: string): Promise<SpeakerTurn[]> {
             const allowFallback = String(process.env.TARGET_DIAR_GOOGLE_FALLBACK_LOCAL ?? 'true').toLowerCase() === 'true';
             if (!allowFallback) throw error;
             console.warn('google_chirp3 diarization failed, falling back to local pyannote:', error);
-            return runDiarizeLocal(chunkPath);
+            return runDiarizeLocal(chunkPath, signal);
         }
     }
-    return runDiarizeLocal(chunkPath);
+    return runDiarizeLocal(chunkPath, signal);
 }
 
 async function runFacePass(
@@ -2143,7 +2180,8 @@ export async function findSermonBoundaries(
             `[targeted-diarization] profile=${profile} pre_scan=${preScanSec}s post_scan=${postScanSec}s anchor=${anchorSec}s confirm_gap=${maxConfirmGapSec}s`
         );
 
-        const maxCandidateDeltaSec = Number(process.env.TARGET_DIAR_MAX_CANDIDATE_DELTA_SEC ?? 900);
+        const maxCandidateDeltaSec = Number(process.env.TARGET_DIAR_MAX_CANDIDATE_DELTA_SEC ?? 600);
+        const maxChunkScanSec = Number(process.env.TARGET_DIAR_CHUNK_SCAN_LIMIT_SEC ?? 900);
         const transcriptStartCandidates = deriveTranscriptStartCandidates(
             normalized,
             guess.start,
@@ -2181,10 +2219,19 @@ export async function findSermonBoundaries(
         const earliestEndSeed = Math.min(...endCandidates);
         const latestEndSeed = Math.max(...endCandidates);
 
-        const preWindowStart = Math.max(0, earliestStartSeed - preScanSec);
-        const preWindowEnd = Math.min(audioEnd, latestStartSeed + anchorSec);
-        const postWindowStart = Math.max(0, earliestEndSeed - anchorSec);
-        const postWindowEnd = Math.min(audioEnd, latestEndSeed + postScanSec);
+        let preWindowStart = Math.max(0, earliestStartSeed - preScanSec);
+        let preWindowEnd = Math.min(audioEnd, latestStartSeed + anchorSec);
+        if (preWindowEnd - preWindowStart > maxChunkScanSec) {
+            console.warn(`[targeted-diarization] pre-window too large (${(preWindowEnd - preWindowStart).toFixed(1)}s), clamping to ${maxChunkScanSec}s`);
+            preWindowStart = preWindowEnd - maxChunkScanSec;
+        }
+
+        let postWindowStart = Math.max(0, earliestEndSeed - anchorSec);
+        let postWindowEnd = Math.min(audioEnd, latestEndSeed + postScanSec);
+        if (postWindowEnd - postWindowStart > maxChunkScanSec) {
+            console.warn(`[targeted-diarization] post-window too large (${(postWindowEnd - postWindowStart).toFixed(1)}s), clamping to ${maxChunkScanSec}s`);
+            postWindowEnd = postWindowStart + maxChunkScanSec;
+        }
 
         const tmpDir = path.join(workDir, 'processed');
         fs.mkdirSync(tmpDir, { recursive: true });
@@ -2261,9 +2308,9 @@ export async function findSermonBoundaries(
         const postChunk = path.join(tmpDir, 'diar.post.wav');
 
         await extractChunk(options.audioPath, preChunk, preWindowStart, preWindowEnd);
-        const preTurnsAbs = absoluteTurns(await runDiarize(preChunk), preWindowStart, 'pre');
+        const preTurnsAbs = absoluteTurns(await runDiarize(preChunk, options.signal), preWindowStart, 'pre');
         await extractChunk(options.audioPath, postChunk, postWindowStart, postWindowEnd);
-        const postTurnsAbs = absoluteTurns(await runDiarize(postChunk), postWindowStart, 'post');
+        const postTurnsAbs = absoluteTurns(await runDiarize(postChunk, options.signal), postWindowStart, 'post');
 
         const preAnchorStart = Math.max(preWindowStart, guess.start + 10);
         const preAnchorEnd = Math.min(preWindowEnd, guess.start + 70);

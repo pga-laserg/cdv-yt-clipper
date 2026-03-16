@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
     let query = supabaseServer
       .from('jobs')
       .select(
-        'id, organization_id, created_at, status, source_url, title, video_url, srt_url, sermon_start_seconds, sermon_end_seconds, metadata',
+        'id, organization_id, created_at, status, source_url, title, video_url, srt_url, sermon_start_seconds, sermon_end_seconds, metadata, claimed_at, lease_expires_at',
         { count: 'exact' }
       )
       .eq('organization_id', org.organization_id)

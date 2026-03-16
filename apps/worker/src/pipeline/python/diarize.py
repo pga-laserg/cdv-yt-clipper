@@ -21,7 +21,20 @@ def diarize(audio_file: str, token: str) -> list[dict]:
     # some pyannote checkpoints. We trust pyannote HF checkpoints here.
     os.environ.setdefault("TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD", "1")
     warnings.filterwarnings("ignore", category=UserWarning)
+    
+    import torch
     from pyannote.audio import Pipeline
+
+    # Select device
+    device = torch.device("cpu")
+    if torch.backends.mps.is_available():
+        device = torch.device("mps")
+        print("Using device: MPS (Apple Silicon GPU)", file=sys.stderr)
+    elif torch.cuda.is_available():
+        device = torch.device("cuda")
+        print(f"Using device: CUDA ({torch.cuda.get_device_name(0)})", file=sys.stderr)
+    else:
+        print("Using device: CPU", file=sys.stderr)
 
     # Official model id for the requested pipeline.
     try:
@@ -35,6 +48,9 @@ def diarize(audio_file: str, token: str) -> list[dict]:
             "pyannote/speaker-diarization-3.1",
             use_auth_token=token,
         )
+
+    # Move pipeline to device
+    pipeline.to(device)
 
     diarization = pipeline(audio_file)
     segments: list[dict] = []

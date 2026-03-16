@@ -19,6 +19,7 @@ interface PipelineJob {
     source_url?: string | null;
     organization_id: string;
     claim_token?: string | null;
+    signal?: AbortSignal;
 }
 
 type PipelineMode = 'local' | 'cloud_limited' | 'prod';
@@ -59,7 +60,14 @@ const DELIVERY_ENCODE_HQ_PACKAGE = readBoolEnv('DELIVERY_ENCODE_HQ_PACKAGE', fal
 const execFileAsync = promisify(execFile);
 let warnedClipSourceKeySchema = false;
 
+function checkAborted(job: PipelineJob) {
+    if (job.signal?.aborted) {
+        throw new Error(`Job aborted: ${job.signal.reason || 'Lease lost'}`);
+    }
+}
+
 async function runPipeline(job: PipelineJob) {
+    checkAborted(job);
     const jobId = job.id;
     const source = job.source_url || '';
     const organizationId = job.organization_id;
@@ -81,7 +89,7 @@ async function runPipeline(job: PipelineJob) {
         // 1. Ingest
         console.log('--- Stage 1: Ingest ---');
         currentStage = 'ingest';
-        await updateJobStatus(jobId, organizationId, 'processing:ingest', job.claim_token);
+        await updateJobStatus(jobId, organizationId, 'processing:ingest', job.claim_token, job.signal);
         let lastIngestProgressAt = 0;
         const {
             videoPathOriginal,
@@ -89,15 +97,22 @@ async function runPipeline(job: PipelineJob) {
             videoPathLight,
             videoPathPreferredRender,
             audioPath,
-            ingestProfile
+            ingestProfile,
+            title: extractedTitle
         } = await ingest(source, workDir, (stage, percent) => {
             const now = Date.now();
             if (now - lastIngestProgressAt < 3000) return; // Wait 3s between DB updates
             lastIngestProgressAt = now;
-            void updateJobStatus(jobId, organizationId, `processing:ingest:${stage}:${percent}%`, job.claim_token).catch((err) => {
+            void updateJobStatus(jobId, organizationId, `processing:ingest:${stage}:${percent}%`, job.claim_token, job.signal).catch((err) => {
                 console.warn(`Failed to write ingest progress for job ${jobId}:`, err);
             });
-        });
+        }, job.signal);
+
+        if (extractedTitle) {
+            console.log(`[ingest] Extracted title: "${extractedTitle}"`);
+            await mergeJobMetadata(jobId, organizationId, { title: extractedTitle }, job.claim_token, job.signal);
+        }
+
         await mergeJobMetadata(jobId, organizationId, {
             pipeline: {
                 ingest: {
@@ -117,13 +132,14 @@ async function runPipeline(job: PipelineJob) {
                     preferred_render_source: videoPathPreferredRender
                 }
             }
-        }, job.claim_token);
+        }, job.claim_token, job.signal);
         console.log(`Stage ingest completed in ${Math.round((Date.now() - startedAt) / 1000)}s`);
+        checkAborted(job);
 
         // 2. Transcribe
         console.log('--- Stage 2: Transcribe ---');
         currentStage = 'transcribe';
-        await updateJobStatus(jobId, organizationId, 'processing:transcribe', job.claim_token);
+        await updateJobStatus(jobId, organizationId, 'processing:transcribe', job.claim_token, job.signal);
         
         let segments: any[] = [];
         const srtPath = path.join(path.dirname(audioPath), 'source.srt');
@@ -150,26 +166,28 @@ async function runPipeline(job: PipelineJob) {
                     if (current <= lastProgressSecond || now - lastProgressAt < 5000) return;
                     lastProgressSecond = current;
                     lastProgressAt = now;
-                    void updateJobStatus(jobId, organizationId, `processing:transcribe:${current}/${Math.floor(totalDurationSeconds)}`, job.claim_token).catch((error) => {
+                    void updateJobStatus(jobId, organizationId, `processing:transcribe:${current}/${Math.floor(totalDurationSeconds)}`, job.claim_token, job.signal).catch((error) => {
                         console.warn(`Failed to write transcribe progress for job ${jobId}:`, error);
                     });
                 },
                 onFallback: (reason) => {
                     console.warn(reason);
-                    void updateJobStatus(jobId, organizationId, 'processing:transcribe:fallback', job.claim_token).catch((error) => {
+                    void updateJobStatus(jobId, organizationId, 'processing:transcribe:fallback', job.claim_token, job.signal).catch((error) => {
                         console.warn(`Failed to write transcribe fallback status for job ${jobId}:`, error);
                     });
-                }
+                },
+                signal: job.signal
             });
             // Update cache with segments if they were newly generated
             await upsertProcessingCache(source, { segments });
         }
         console.log(`Stage transcribe completed in ${Math.round((Date.now() - startedAt) / 1000)}s`);
+        checkAborted(job);
 
         // 3. Analyze
         console.log('--- Stage 3: Analyze ---');
         currentStage = 'analyze';
-        await updateJobStatus(jobId, organizationId, 'processing:analyze', job.claim_token);
+        await updateJobStatus(jobId, organizationId, 'processing:analyze', job.claim_token, job.signal);
 
         let boundaries: { start: number; end: number };
         let clips: any[];
@@ -190,11 +208,12 @@ async function runPipeline(job: PipelineJob) {
             });
         }
         console.log(`Stage analyze completed in ${Math.round((Date.now() - startedAt) / 1000)}s`);
+        checkAborted(job);
 
         // 4. Render
         console.log('--- Stage 4: Render ---');
         currentStage = 'render';
-        await updateJobStatus(jobId, organizationId, 'processing:render', job.claim_token);
+        await updateJobStatus(jobId, organizationId, 'processing:render', job.claim_token, job.signal);
         const clipData = clips.map((c) => ({ ...c, id: createDeterministicClipAssetId(jobId, c) }));
         const renderResult = await renderWithFallback({
             jobId,
@@ -208,7 +227,7 @@ async function runPipeline(job: PipelineJob) {
             videoPathHQ,
             claimToken: job.claim_token,
             onProgress: (stage, percent) => {
-                void updateJobStatus(jobId, organizationId, `processing:render:${stage}:${percent}%`, job.claim_token).catch((err) => {
+                void updateJobStatus(jobId, organizationId, `processing:render:${stage}:${percent}%`, job.claim_token, job.signal).catch((err) => {
                     console.warn(`Failed to write render progress for job ${jobId}:`, err);
                 });
             }
@@ -219,7 +238,7 @@ async function runPipeline(job: PipelineJob) {
         // 5. Store & Metadata
         console.log('--- Stage 5: Store ---');
         currentStage = 'store';
-        await updateJobStatus(jobId, organizationId, 'processing:store', job.claim_token);
+        await updateJobStatus(jobId, organizationId, 'processing:store', job.claim_token, job.signal);
 
         const shouldUploadSharedAssets = ENABLE_RAILWAY_VERTICAL || ENABLE_RAILWAY_HORIZONTAL_LOWRES;
 
@@ -255,7 +274,8 @@ async function runPipeline(job: PipelineJob) {
             srtUrl,
             '',
             horizontalLocal ?? '',
-            job.claim_token
+            job.claim_token,
+            job.signal
         );
 
         // 6. Blog Artifact (non-blocking for final success state)
@@ -493,8 +513,25 @@ async function mergeJobMetadata(
     jobId: string,
     organizationId: string,
     patch: Record<string, unknown>,
-    claimToken?: string | null
+    claimToken?: string | null,
+    signal?: AbortSignal
 ): Promise<void> {
+    if (signal?.aborted) {
+        console.log(`[abort] Skipping metadata merge for job ${jobId} (aborted)`);
+        return;
+    }
+    const topLevelFields = ['title', 'status', 'last_error'];
+    const topLevelUpdate: Record<string, any> = {};
+    const metadataPatch: Record<string, any> = {};
+
+    for (const [key, value] of Object.entries(patch)) {
+        if (topLevelFields.includes(key)) {
+            topLevelUpdate[key] = value;
+        } else {
+            metadataPatch[key] = value;
+        }
+    }
+
     let readQuery = supabase
         .from('jobs')
         .select('metadata')
@@ -505,10 +542,13 @@ async function mergeJobMetadata(
     if (readError) throw new Error(`Failed reading job metadata for ${jobId}: ${readError.message}`);
     if (claimToken && !jobRow) throw new Error(`Lost claim on job ${jobId} while reading metadata.`);
 
-    const merged = deepMergeMetadata((jobRow?.metadata ?? {}) as Record<string, unknown>, patch);
+    const merged = deepMergeMetadata((jobRow?.metadata ?? {}) as Record<string, unknown>, metadataPatch);
+    
+    const finalUpdate: Record<string, any> = { ...topLevelUpdate, metadata: merged };
+    
     let writeQuery = supabase
         .from('jobs')
-        .update({ metadata: merged })
+        .update(finalUpdate)
         .eq('id', jobId)
         .eq('organization_id', organizationId);
     if (claimToken) writeQuery = writeQuery.eq('claim_token', claimToken);
@@ -603,7 +643,12 @@ function isClipSourceKeySchemaError(error: unknown): boolean {
     return message.includes('source_clip_key') || message.includes('on conflict');
 }
 
-async function updateJobStatus(id: string, organizationId: string, status: string, claimToken?: string | null) {
+async function updateJobStatus(id: string, organizationId: string, status: string, claimToken?: string | null, signal?: AbortSignal) {
+    if (signal?.aborted) {
+        console.log(`[abort] Skipping status update to "${status}" for job ${id} (aborted)`);
+        return;
+    }
+
     let query = supabase
         .from('jobs')
         .update({ status })
@@ -674,7 +719,8 @@ async function savePipelineResults(
     srtUrl: string,
     horizontalUrl: string,
     horizontalLocalPath: string,
-    claimToken?: string | null
+    claimToken?: string | null,
+    signal?: AbortSignal
 ) {
     let existingJobQuery = supabase
         .from('jobs')
@@ -727,7 +773,7 @@ async function savePipelineResults(
         console.log(`Skipping vertical clip uploads for job ${jobId} (ENABLE_RAILWAY_VERTICAL=false).`);
     }
     for (let i = 0; i < clips.length; i++) {
-        await updateJobStatus(jobId, organizationId, `processing:store:${i + 1}/${clips.length}`, claimToken);
+        await updateJobStatus(jobId, organizationId, `processing:store:${i + 1}/${clips.length}`, claimToken, signal);
         const clip = clips[i];
         const sourceClipKey = createDeterministicClipSourceKey(jobId, clip);
         generatedDraftKeys.add(sourceClipKey);
@@ -993,7 +1039,6 @@ function readBoolEnv(name: string, fallback: boolean): boolean {
 
 function normalizeClaimRow(row: any): PipelineJob | null {
     if (!row || typeof row !== 'object') {
-        console.debug('normalizeClaimRow: row is not an object', row);
         return null;
     }
     const id = typeof row.id === 'string' ? row.id.trim() : '';
@@ -1065,11 +1110,22 @@ async function claimNextJobLegacy(): Promise<PipelineJob | null> {
     return normalizeClaimRow(claimedRows[0]);
 }
 
-function startClaimHeartbeat(job: PipelineJob): NodeJS.Timeout | null {
+function startClaimHeartbeat(job: PipelineJob, abortController?: AbortController): NodeJS.Timeout | null {
     if (!RPC_CLAIM_ENABLED || !job.claim_token) return null;
 
-    const heartbeatEveryMs = Math.max(15_000, Math.floor((JOB_LEASE_SECONDS * 1000) / 2));
+    // Heartbeat every 1/3 of the lease to allow for network retries/slowness.
+    const heartbeatEveryMs = Math.max(10_000, Math.floor((JOB_LEASE_SECONDS * 1000) / 3));
+    console.log(`[heartbeat] Starting heartbeat for job ${job.id} every ${heartbeatEveryMs/1000}s. Lease: ${JOB_LEASE_SECONDS}s`);
+
+    let heartbeatFailures = 0;
+    const maxHeartbeatFailures = 2;
+
     const timer = setInterval(async () => {
+        if (abortController?.signal.aborted) {
+            clearInterval(timer);
+            return;
+        }
+
         try {
             const { data, error } = await supabase.rpc('heartbeat_job_claim', {
                 p_job_id: job.id,
@@ -1078,15 +1134,24 @@ function startClaimHeartbeat(job: PipelineJob): NodeJS.Timeout | null {
             });
 
             if (error) {
-                console.error(`heartbeat_job_claim failed for job ${job.id}:`, error);
+                heartbeatFailures++;
+                console.error(`[heartbeat] heartbeat_job_claim failed for job ${job.id} (failure ${heartbeatFailures}/${maxHeartbeatFailures}):`, error);
+                if (heartbeatFailures >= maxHeartbeatFailures) {
+                    console.error(`[heartbeat] Too many heartbeat failures for job ${job.id}. Aborting pipeline.`);
+                    abortController?.abort(new Error('Heartbeat lost (network/db error)'));
+                }
                 return;
             }
 
-            if (data !== true) {
-                console.warn(`heartbeat_job_claim returned false for job ${job.id}; lease may be lost.`);
+            heartbeatFailures = 0;
+            if (data === true) {
+                console.debug(`[heartbeat] Lease extended for job ${job.id}`);
+            } else {
+                console.warn(`[heartbeat] heartbeat_job_claim returned false for job ${job.id}; lease may be lost. Aborting.`);
+                abortController?.abort(new Error('Lease lost (re-claimed by another worker/stale)'));
             }
         } catch (error) {
-            console.error(`heartbeat_job_claim crashed for job ${job.id}:`, error);
+            console.error(`[heartbeat] heartbeat_job_claim crashed for job ${job.id}:`, error);
         }
     }, heartbeatEveryMs);
 
@@ -1141,11 +1206,13 @@ async function completeJob(job: PipelineJob, finalStatus: 'completed' | 'failed'
 }
 
 async function processClaimedJob(job: PipelineJob): Promise<void> {
-    const heartbeat = startClaimHeartbeat(job);
+    const abortController = new AbortController();
+    const heartbeat = startClaimHeartbeat(job, abortController);
     let failure: string | null = null;
 
     try {
         console.log(`Found job: ${job.id}. Starting pipeline...`);
+        job.signal = abortController.signal;
         await runPipeline(job);
         await completeJob(job, 'completed', null);
     } catch (error) {

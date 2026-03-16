@@ -47,14 +47,14 @@ Many churches lack consistent media volunteers. This project serves as a "force 
 1.  Clone the repository.
 2.  Install dependencies:
     ```bash
-    npm install
+    pnpm install
     ```
 3.  Configure environment variables:
     -   See `apps/web/.env.example`
     -   See `apps/worker/.env.example`
 4.  Run the development server:
     ```bash
-    npm run dev
+    pnpm dev
     ```
 
 ## 📈 Roadmap

@@ -13,6 +13,7 @@ export interface TransientSegment {
 interface TranscribeOptions {
     onProgress?: (currentSeconds: number) => void;
     onFallback?: (reason: string) => void;
+    signal?: AbortSignal;
 }
 
 type TranscribeProvider = 'auto' | 'local' | 'elevenlabs_scribe_v2';
@@ -264,6 +265,11 @@ async function runElevenLabsScribeV2(audioPath: string, options?: TranscribeOpti
     form.set('file', blob, path.basename(audioPath));
 
     const controller = new AbortController();
+    if (options?.signal?.aborted) throw new Error('Transcription aborted via signal');
+    if (options?.signal) {
+        options.signal.addEventListener('abort', () => controller.abort(), { once: true });
+    }
+    
     const timeout = setTimeout(() => controller.abort(), cfg.timeoutMs);
     const endpoint = 'https://api.elevenlabs.io/v1/speech-to-text';
     options?.onProgress?.(0);
@@ -732,6 +738,21 @@ function runTranscriptionAttempt(
         let stdout = '';
         let stderr = '';
         let settled = false;
+
+        const onAbort = () => {
+            if (settled) return;
+            settled = true;
+            if (timeout) clearTimeout(timeout);
+            try {
+                pythonProcess.kill('SIGKILL');
+            } catch {}
+            reject(new Error('Transcription aborted via signal'));
+        };
+
+        if (options?.signal) {
+            options.signal.addEventListener('abort', onAbort, { once: true });
+        }
+
         const timeoutMs = Number(process.env.TRANSCRIBE_NO_PROGRESS_TIMEOUT_MS || 180000);
         let timeout: NodeJS.Timeout | null = null;
         const resetNoProgressTimeout = () => {
@@ -783,6 +804,7 @@ function runTranscriptionAttempt(
             if (settled) return;
             settled = true;
             if (timeout) clearTimeout(timeout);
+            if (options?.signal) options.signal.removeEventListener('abort', onAbort);
 
             try {
                 const parsed = JSON.parse(stdout) as TransientSegment[];

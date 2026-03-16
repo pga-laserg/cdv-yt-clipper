@@ -2,90 +2,12 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Play, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Play, Clock, CheckCircle, AlertCircle, Trash2, X, MoreVertical, RotateCcw, Copy, Trash, Ban, MessageSquare, ExternalLink } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import type { JobListResponse, JobRecord } from '@/lib/api-types';
+import { JobProgress } from '@/components/JobProgress';
 
 type Job = JobRecord;
-
-function formatClock(totalSeconds: number): string {
-  const seconds = Math.max(0, Math.floor(totalSeconds));
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-  return `${m}:${String(s).padStart(2, '0')}`;
-}
-
-function getProgressState(status: string): { determinate: boolean; value: number; text: string } {
-  if (status === 'pending') return { determinate: true, value: 0, text: 'Queued' };
-  if (status === 'completed') return { determinate: true, value: 100, text: '100%' };
-  if (status === 'failed') return { determinate: true, value: 100, text: 'Failed' };
-
-  if (status.startsWith('processing:transcribe:')) {
-    const match = status.match(/processing:transcribe:(\d+)\/(\d+)/);
-    if (!match) return { determinate: false, value: 45, text: 'Transcribing...' };
-    const current = Number(match[1]);
-    const total = Number(match[2]);
-    if (!total) return { determinate: false, value: 45, text: 'Transcribing...' };
-    const ratio = Math.min(1, current / total);
-    return {
-      determinate: true,
-      value: Math.max(1, Math.round(ratio * 100)),
-      text: `${formatClock(current)} / ${formatClock(total)}`
-    };
-  }
-
-  if (status.startsWith('processing:store')) {
-    const match = status.match(/processing:store:(\d+)\/(\d+)/);
-    if (!match) return { determinate: false, value: 45, text: 'Saving outputs...' };
-    const done = Number(match[1]);
-    const total = Number(match[2]);
-    if (!total) return { determinate: false, value: 45, text: 'Saving outputs...' };
-    const ratio = Math.min(1, done / total);
-    return {
-      determinate: true,
-      value: Math.max(1, Math.round(ratio * 100)),
-      text: `${done}/${total} clips saved`
-    };
-  }
-
-  if (status.startsWith('processing:blog:publish')) {
-    return { determinate: false, value: 96, text: 'Publishing blog destinations...' };
-  }
-
-  if (status.startsWith('processing:blog')) {
-    return { determinate: false, value: 92, text: 'Generating blog artifact...' };
-  }
-
-  if (status.startsWith('processing')) {
-    return { determinate: false, value: 45, text: 'In progress...' };
-  }
-
-  return { determinate: false, value: 45, text: 'In progress...' };
-}
-
-function getStageLabel(status: string): string {
-  if (status === 'pending') return 'Queued';
-  if (status === 'completed') return 'Completed';
-  if (status === 'failed') return 'Failed';
-  if (status.startsWith('processing:transcribe:')) return 'Transcribing audio';
-  if (status.startsWith('processing:ingest')) return 'Ingesting source';
-  if (status.startsWith('processing:transcribe')) return 'Transcribing audio';
-  if (status.startsWith('processing:analyze')) return 'Finding highlights';
-  if (status.startsWith('processing:render')) return 'Rendering clips';
-  if (status.startsWith('processing:store')) {
-    const match = status.match(/processing:store:(\d+)\/(\d+)/);
-    if (match) return `Saving clips (${match[1]}/${match[2]})`;
-    return 'Saving outputs';
-  }
-  if (status.startsWith('processing:blog:generate')) return 'Generating blog draft';
-  if (status.startsWith('processing:blog:persist')) return 'Saving blog draft';
-  if (status.startsWith('processing:blog:sync')) return 'Syncing blog draft';
-  if (status.startsWith('processing:blog:publish')) return 'Publishing blog destinations';
-  if (status.startsWith('processing:blog')) return 'Generating blog artifact';
-  return status;
-}
 
 function getThumbnailUrl(job: Job): string | null {
   if (!job.video_url) return null;
@@ -107,6 +29,13 @@ export default function Home() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string>('');
+  const [newJobUrl, setNewJobUrl] = useState('');
+  const [isMounted, setIsMounted] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<string|null>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const fetchJobs = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -119,7 +48,14 @@ export default function Home() {
       });
 
       if (response.status === 401) {
-        setApiError('Authentication required. Sign in to view and create jobs.');
+        setApiError('Authentication required. Sign in/check session.');
+        setJobs([]);
+        setLoading(false);
+        return;
+      }
+
+      if (response.status === 403) {
+        setApiError('Forbidden: You do not have access to this organization.');
         setJobs([]);
         setLoading(false);
         return;
@@ -134,6 +70,7 @@ export default function Home() {
       }
 
       const data = (await response.json()) as JobListResponse;
+      console.log('Fetched jobs:', data.items?.length, data);
       setJobs(data.items || []);
       setApiError('');
       setLoading(false);
@@ -143,6 +80,105 @@ export default function Home() {
       setLoading(false);
     }
   }, []);
+
+  const handleRetryJob = async (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpenMenuId(null);
+    
+    try {
+      const headers = await buildAuthHeaders();
+      const response = await fetch(`/api/v1/jobs/${id}`, {
+        method: 'PATCH',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'retry' })
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({ error: 'Failed' }));
+        alert(body.error);
+      } else {
+        await fetchJobs(true);
+      }
+    } catch (err) {
+      alert('Network error');
+    }
+  };
+
+  const handleDeleteJob = async (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpenMenuId(null);
+    
+    if (!confirm('Delete this job permanently? This cannot be undone.')) return;
+
+    try {
+      const headers = await buildAuthHeaders();
+      const response = await fetch(`/api/v1/jobs/${id}`, {
+        method: 'DELETE',
+        headers
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({ error: 'Failed' }));
+        alert(body.error);
+      } else {
+        await fetchJobs(true);
+      }
+    } catch (err) {
+      alert('Network error');
+    }
+  };
+
+  const handleAbortJob = async (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpenMenuId(null);
+    
+    if (!confirm('Abort this job? This will stop processing.')) return;
+
+    try {
+      const headers = await buildAuthHeaders();
+      const response = await fetch(`/api/v1/jobs/${id}`, {
+        method: 'PATCH',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'abort' })
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({ error: 'Failed' }));
+        alert(body.error);
+      } else {
+        await fetchJobs(true);
+      }
+    } catch (err) {
+      alert('Network error');
+    }
+  };
+
+  const handleAddJob = async () => {
+    if (!newJobUrl) return;
+    setLoading(true);
+
+    try {
+      const headers = await buildAuthHeaders(true);
+      const response = await fetch('/api/v1/jobs', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ source_url: newJobUrl, title: 'New Sermon Job' })
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({ error: 'Failed to create job' }));
+        alert(body.error || 'Failed to create job');
+      } else {
+        setNewJobUrl('');
+        await fetchJobs(true);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const initial = setTimeout(() => {
@@ -155,139 +191,232 @@ export default function Home() {
     };
   }, [fetchJobs]);
 
+  useEffect(() => {
+    const handleClickOutside = () => setOpenMenuId(null);
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-white" suppressHydrationWarning>
-      <main className="max-w-6xl mx-auto p-4 sm:p-8 text-black">
-        <header className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8 sm:mb-12">
-          <div>
-            <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 tracking-tight">Sermon Shorts</h1>
-            <p className="text-gray-500 mt-1 sm:mt-2 text-sm sm:text-lg">Automation Pipeline Dashboard</p>
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 selection:bg-indigo-100 selection:text-indigo-700" suppressHydrationWarning>
+      <main className="max-w-5xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        
+        {/* Header & Submission Section */}
+        <div className="relative mb-16 text-center">
+          <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold uppercase tracking-widest animate-fade-in">
+            <Play size={10} fill="currentColor" />
+            Live Pipeline
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <input
-              id="source-url"
-              type="text"
-              placeholder="URL or local path..."
-              className="px-4 py-2 border rounded-full text-sm w-full sm:w-72"
-            />
-            <button
-              onClick={async () => {
-                const input = document.getElementById('source-url') as HTMLInputElement;
-                const url = input?.value;
-                if (!url) return;
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 mb-4">
+            Sermon <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Shorts</span>
+          </h1>
+          <p className="text-slate-500 text-lg max-w-2xl mx-auto mb-10">
+            Automated video intelligence for modern ministry. Drop a URL and let AI do the heavy lifting.
+          </p>
 
-                setLoading(true);
-
-                try {
-                  const headers = await buildAuthHeaders(true);
-                  const response = await fetch('/api/v1/jobs', {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify({ source_url: url, title: 'New Sermon Job' })
-                  });
-
-                  if (!response.ok) {
-                    const body = await response.json().catch(() => ({ error: 'Failed to create job' }));
-                    alert(body.error || 'Failed to create job');
-                  } else {
-                    input.value = '';
-                    await fetchJobs(true);
-                  }
-                } finally {
-                  setLoading(false);
-                }
-              }}
-              className="bg-black text-white px-6 py-2 rounded-full font-medium hover:bg-gray-800 transition-colors shadow-lg w-full sm:w-auto"
-            >
-              Add Job
-            </button>
+          <div className="max-w-xl mx-auto relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+            <div className="relative flex flex-col sm:flex-row gap-3 p-2 bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl">
+              <input
+                type="text"
+                value={newJobUrl}
+                onChange={(e) => setNewJobUrl(e.target.value)}
+                placeholder="Paste YouTube URL or local path..."
+                className="flex-1 px-5 py-3 bg-transparent border-none focus:ring-0 text-slate-700 placeholder:text-slate-400 font-medium"
+                onKeyDown={(e) => e.key === 'Enter' && handleAddJob()}
+              />
+              <button
+                onClick={handleAddJob}
+                disabled={loading || !newJobUrl}
+                className="px-8 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg active:scale-95"
+              >
+                {loading ? 'Starting...' : 'Process Video'}
+              </button>
+            </div>
           </div>
-        </header>
+        </div>
 
         {apiError && (
-          <div className="mb-6 p-4 rounded-xl border border-red-200 bg-red-50 text-red-700 text-sm">
+          <div className="mb-8 p-4 rounded-2xl border border-red-100 bg-red-50/50 backdrop-blur-sm text-red-600 text-sm flex items-center gap-3 animate-shake">
+            <AlertCircle size={18} />
             {apiError}
           </div>
         )}
 
+        {/* Jobs List Section */}
         <section>
-          <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-            <Clock size={20} className="text-blue-600" />
-            Recent Jobs
-          </h2>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl font-bold flex items-center gap-2 text-slate-800">
+              <Clock size={20} className="text-indigo-600" />
+              Active Pipeline
+            </h2>
+            <div className="text-xs font-medium text-slate-400 flex items-center gap-2">
+              Auto-refreshing 5s
+              <button 
+                onClick={() => void fetchJobs()}
+                className="p-1 hover:bg-slate-100 rounded-md transition-colors"
+                title="Refresh now"
+              >
+                <Clock size={12} />
+              </button>
+            </div>
+          </div>
 
-          <div className="space-y-4">
+          <div className="grid gap-4">
             {jobs.map((job) => (
               <Link
                 key={job.id}
                 href={`/jobs/${job.id}`}
-                className="block p-4 sm:p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-100 transition-all group"
+                className="group relative overflow-hidden bg-white/60 backdrop-blur-md border border-slate-200/60 rounded-3xl p-4 sm:p-5 shadow-sm hover:shadow-xl hover:border-indigo-200/50 transition-all duration-300 transform hover:-translate-y-1"
               >
-                <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-12 sm:w-20 sm:h-14 bg-blue-50 rounded-lg overflow-hidden flex items-center justify-center text-blue-600 shrink-0">
-                      {getThumbnailUrl(job) ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={getThumbnailUrl(job)!}
-                          alt="Job thumbnail"
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <Play size={24} />
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                        {job.title || 'Untitled Sermon'}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-gray-500 font-mono break-all">{job.source_url}</p>
+                {/* Background Decor */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/50 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-indigo-100/50 transition-colors" />
+
+                <div className="relative flex flex-col sm:flex-row gap-5 items-start sm:items-center">
+                  {/* Thumbnail / Icon */}
+                  <div className="relative w-full sm:w-40 aspect-video bg-slate-100 rounded-2xl overflow-hidden shadow-inner shrink-0 group-hover:ring-4 ring-indigo-50 transition-all">
+                    {getThumbnailUrl(job) ? (
+                      <img
+                        src={getThumbnailUrl(job)!}
+                        alt="Thumbnail"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-400">
+                        <Play size={32} />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                      <Play size={24} className="text-white opacity-0 group-hover:opacity-100 transform scale-50 group-hover:scale-100 transition-all" />
                     </div>
                   </div>
 
-                  <div className="w-full sm:w-auto">
-                    <div className="text-left sm:text-right">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${job.status === 'completed' ? 'bg-green-100 text-green-700' :
-                        job.status === 'failed' ? 'bg-red-100 text-red-700' :
-                          'bg-blue-100 text-blue-700 animate-pulse'
-                        }`}>
-                        {job.status === 'completed' && <CheckCircle size={12} />}
-                        {job.status === 'failed' && <AlertCircle size={12} />}
-                        {getStageLabel(job.status)}
-                      </span>
-                      {(() => {
-                        const progress = getProgressState(job.status);
-                        return (
-                          <div className="mt-2 w-full sm:w-44 sm:ml-auto">
-                            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full transition-all ${job.status === 'failed' ? 'bg-red-500' : 'bg-blue-500'} ${progress.determinate ? '' : 'animate-pulse'}`}
-                                style={{ width: `${progress.value}%` }}
-                              />
+                  {/* Info & Progress */}
+                  <div className="flex-1 min-w-0 w-full space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <h3 className="text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
+                          {job.title || 'Untitled Sermon'}
+                        </h3>
+                        
+                        <div className="relative">
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setOpenMenuId(openMenuId === job.id ? null : job.id);
+                            }}
+                            className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all"
+                            title="More options"
+                          >
+                            <MoreVertical size={18} />
+                          </button>
+
+                          {openMenuId === job.id && (
+                            <div className="absolute left-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
+                              {job.status !== 'completed' && job.status !== 'failed' && (
+                                <button
+                                  onClick={(e) => handleAbortJob(e, job.id)}
+                                  className="w-full text-left px-4 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                                >
+                                  <Ban size={14} /> ABORT JOB
+                                </button>
+                              )}
+                              
+                              {(job.status === 'failed' || job.status === 'completed') && (
+                                <button
+                                  onClick={(e) => handleRetryJob(e, job.id)}
+                                  className="w-full text-left px-4 py-2 text-xs font-bold text-indigo-600 hover:bg-indigo-50 flex items-center gap-2"
+                                >
+                                  <RotateCcw size={14} /> RETRY JOB
+                                </button>
+                              )}
+
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault(); e.stopPropagation();
+                                  navigator.clipboard.writeText(job.id);
+                                  setOpenMenuId(null);
+                                }}
+                                className="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 flex items-center gap-2"
+                              >
+                                <Copy size={14} /> COPY ID
+                              </button>
+
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault(); e.stopPropagation();
+                                  window.open(job.source_url, '_blank');
+                                  setOpenMenuId(null);
+                                }}
+                                className="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 flex items-center gap-2"
+                              >
+                                <ExternalLink size={14} /> VIEW SOURCE
+                              </button>
+
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault(); e.stopPropagation();
+                                  alert('Comments feature coming soon!');
+                                  setOpenMenuId(null);
+                                }}
+                                className="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 flex items-center gap-2"
+                              >
+                                <MessageSquare size={14} /> SEND COMMENTS
+                              </button>
+
+                              <div className="border-t border-slate-100 my-1"></div>
+
+                              <button
+                                onClick={(e) => handleDeleteJob(e, job.id)}
+                                className="w-full text-left px-4 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                              >
+                                <Trash size={14} /> DELETE PERMANENTLY
+                              </button>
                             </div>
-                            <p className="text-xs text-gray-400 mt-1">{progress.text}</p>
-                          </div>
-                        );
-                      })()}
-                      <p className="text-xs text-gray-400 mt-1">
-                        {new Date(job.created_at).toLocaleDateString()}
-                      </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                         <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter ${
+                          job.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                          job.status === 'failed' ? 'bg-rose-100 text-rose-700' :
+                          'bg-indigo-100 text-indigo-700'
+                        }`}>
+                          {job.status.replace('processing:', '').split(':')[0] || job.status}
+                        </span>
+                        <time className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                          {isMounted 
+                            ? new Date(job.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                            : '...'
+                          }
+                        </time>
+                      </div>
                     </div>
+                    
+                    <JobProgress job={job} />
                   </div>
                 </div>
               </Link>
             ))}
 
-            {loading && <div className="p-12 text-center text-gray-400">Loading jobs...</div>}
+            {loading && jobs.length === 0 && (
+              <div className="py-20 text-center space-y-4">
+                <div className="inline-block w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                <p className="text-slate-400 font-medium">Syncing pipeline status...</p>
+              </div>
+            )}
+            
             {!loading && jobs.length === 0 && !apiError && (
-              <div className="p-8 sm:p-12 text-center text-gray-400 border-2 border-dashed rounded-2xl">
-                No jobs found. Start by creating a new one.
+              <div className="py-20 text-center bg-white/40 backdrop-blur-sm border-2 border-dashed border-slate-200 rounded-3xl">
+                <p className="text-slate-400 font-medium">No jobs in the queue. Processing is idle.</p>
               </div>
             )}
           </div>
         </section>
-      </main>
+        </main>
     </div>
   );
 }
+
